@@ -1,0 +1,50 @@
+{
+  "name": "@nathanjhood/esbuild-scripts",
+  "version": "0.1.0",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com/nathanjhood/nathanjhood.github.io.git",
+    "directory": "packages/@nathanjhood/esbuild-scripts"
+  },
+  "scripts": {
+    "build": "pkgroll",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --check ./**/*.{js,jsx,ts,tsx,css,md,json} --config ./prettier.config.mjs",
+    "format:fix": "prettier --write ./**/*.{js,jsx,ts,tsx,css,md,json} --config ./prettier.config.mjs"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.cts",
+  "bin": {
+    "esbuild-scripts": "./dist/cli.js"
+  },
+  "exports": {
+    "require": {
+      "types": "./dist/index.d.cts",
+      "default": "./dist/index.cjs"
+    },
+    "import": {
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
+    }
+  },
+  "dependencies": {
+    "@types/node": "22.5.4",
+    "esbuild": "0.23.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.10.0",
+    "eslint": "^9.10.0",
+    "eslint-config-prettier": "9.1.0",
+    "globals": "^15.9.0",
+    "pkgroll": "2.5.0",
+    "prettier": "3.3.3",
+    "tsc": "2.0.4",
+    "tslib": "2.7.0",
+    "tsx": "4.19.1",
+    "typescript": "5.6.2",
+    "typescript-eslint": "^8.5.0"
+  }
+}
