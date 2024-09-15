@@ -1,0 +1,70 @@
+name: node
+
+on:
+  # Runs on all pushes
+  push:
+  # A push is made to a GitHub Pages-enabled branch
+  page_build:
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# When pushing new commits, cancel any running builds on that branch
+concurrency:
+  group: node-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  NODE_ENV: 'production'
+  BUILD_DIR: 'dist'
+  TSC_COMPILE_ON_ERROR: false
+  # fast refresh probably does nothing in prod...
+  FAST_REFRESH: true
+
+jobs:
+  run:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        node-version: [18, 20]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: yarn
+          cache-dependency-path: yarn.lock
+
+      - name: Install
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        run: yarn
+
+      - name: Build
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        run: yarn build
+
+      - name: Test
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        run: yarn test
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nathanjhood-github-io-${{ matrix.os }}-node-v${{ matrix.node-version }}
+          path: '${{ github.workspace }}/${{ env.BUILD_DIR }}'
+
+      - name: Download Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: nathanjhood-github-io-${{ matrix.os }}-node-v${{ matrix.node-version }}
+          path: '${{ github.workspace }}/${{ env.BUILD_DIR }}'
+          github-token: ${{ env.GITHUB_TOKEN }}
