@@ -8,7 +8,8 @@
     "directory": "packages/@nathanjhood/esbuild-scripts"
   },
   "scripts": {
-    "build": "pkgroll",
+    "build": "pkgroll --build",
+    "test": "./test/run.ts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --check ./**/*.{js,jsx,ts,tsx,css,md,json} --config ./prettier.config.mjs",
