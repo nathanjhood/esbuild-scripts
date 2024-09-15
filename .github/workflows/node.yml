@@ -53,6 +53,8 @@ jobs:
 
       - name: Test
         shell: bash
+        env:
+          NODE_ENV: test
         working-directory: ${{ github.workspace }}
         run: yarn test
 
