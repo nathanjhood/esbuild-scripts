@@ -14,17 +14,15 @@ import os = require("node:os");
 type NodeTestRunnerParameters = Required<Parameters<typeof test.run>>;
 type NodeTestRunnerOptions = NodeTestRunnerParameters[0];
 
-// const { before, after } = test;
-
 const abortController: AbortController = new AbortController();
 
 const options: Readonly<NodeTestRunnerOptions> = Object.freeze<NodeTestRunnerOptions>({
   files: [
     // path.resolve(path.join(__dirname, '/config/env/index.test.ts')),
     // path.resolve(path.join(__dirname, '/config/paths/index.test.ts')),
+    path.resolve(path.join(__dirname, '/process/parseEnv.test.ts')),
     path.resolve(path.join(__dirname, '/process/parseCommand.test.ts')),
     path.resolve(path.join(__dirname, '/process/parseArgV.test.ts')),
-    path.resolve(path.join(__dirname, '/process/parseEnv.test.ts')),
     path.resolve(path.join(__dirname, '/cli.test.ts')),
   ],
   concurrency: os.availableParallelism() - 1,
