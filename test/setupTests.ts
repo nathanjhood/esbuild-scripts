@@ -38,8 +38,10 @@ const options: Readonly<NodeTestRunnerOptions> = Object.freeze<NodeTestRunnerOpt
       console.error(testFail);
       process.exitCode = 1; // must be != 0, to avoid false positives in CI pipelines
     });
-    // coverage reporter: spec
-    testsStream.compose(reporters.spec).pipe(process.stdout);
+    // coverage reporter
+    const isTTY = process.stdout.isTTY;
+    const reporter = isTTY ? reporters.spec : reporters.tap;
+    testsStream.compose(reporter).pipe(process.stdout);
   },
   // testNamePatterns: [
   //   "**/*.test.?(c|m)js",
