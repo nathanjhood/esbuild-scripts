@@ -21,6 +21,7 @@ const options: Readonly<NodeTestRunnerOptions> =
     files: [
       // path.resolve(path.join(__dirname, '/config/env/index.test.ts')),
       // path.resolve(path.join(__dirname, '/config/paths/index.test.ts')),
+      path.resolve(path.join(__dirname, '/process/parseCwd.test.ts')),
       path.resolve(path.join(__dirname, '/process/parseEnv.test.ts')),
       path.resolve(path.join(__dirname, '/process/parseCommand.test.ts')),
       path.resolve(path.join(__dirname, '/process/parseArgV.test.ts')),
