@@ -9,59 +9,101 @@ import console = require("node:console");
 import process = require("node:process");
 import Module = require("node:module");
 
-// import handleRejection = require("./handlers/handleRejection");
-
 import packageJson = require("../package.json");
 import parseCommand = require("./process/parseCommand");
 import parseArgV = require("./process/parseArgV");
+import parseEnv = require("./process/parseEnv");
 
-
-
+/**
+ *
+ * @param {NodeJS.Process} proc
+ * @returns
+ */
 const cli = (proc: NodeJS.Process) => {
   //
-  proc.on("unhandledRejection", (err) => {
+  proc.on("unhandledRejection", (err, origin) => {
     throw err;
   });
   //
   const abortController = new AbortController();
   //
-  parseCommand(proc).then((runtime) => {
+  return parseCommand(proc).then((runtime) => {
     //
-    parseArgV(proc).then(({ values, positionals, tokens }) => {
-      // console.log("runtime:", runtime);
-      // console.log("tokens:", tokens);
-      // console.log("values:", values);
-      // console.log("positionals:", positionals);
-      const joinedRtArgs: string[] = [];
-      if(runtime.tokens) runtime.tokens.forEach((token, id) => {
-        if (token.kind === 'option') {
-          joinedRtArgs.push(`${token.rawName}`)
-          if(token.value) joinedRtArgs.push(`${token.value}`)
-        }
-        else if (token.kind === 'positional') {
-          joinedRtArgs.push(`${token.value}`);
-        }
+    return parseArgV(proc).then((args) => {
+
+      return parseEnv(proc).then((env) => {
+        //
+        const joinedRtArgs: string[] = [];
+        //
+        if (runtime.tokens) runtime.tokens.forEach((token) => {
+          if (token.kind === 'option') {
+            joinedRtArgs.push(`${token.rawName}`)
+            if(token.value) joinedRtArgs.push(`${token.value}`)
+          }
+          else if (token.kind === 'positional') {
+            joinedRtArgs.push(`${token.value}`);
+          }
+        })
+        //
+
+        const result: childProcess.SpawnSyncReturns<Buffer> = childProcess.spawnSync(
+          joinedRtArgs[0]!,
+          joinedRtArgs.slice(1).concat(require.resolve('./scripts/' + args.positionals[0])),
+          {
+            stdio: 'inherit',
+            cwd: proc.cwd(),
+            argv0: joinedRtArgs[0],
+            env: env, // from 'parseEnv()'
+            signal: abortController.signal,
+            shell: true // depends...
+          }
+        );
+        //
+
+        //
+        const { error, output, pid, signal, status, stderr, stdout } = result;
+
+        //
+        return { error, output, pid, signal, status, stderr, stdout };
+        //
+      }).catch<void>((err) => {
+        abortController.abort(err);
+        proc.exitCode = 1;
+        throw err;
       })
-      return childProcess.spawnSync(
-        joinedRtArgs[0]!,
-        joinedRtArgs.slice(1).concat(require.resolve('./scripts/' + positionals[0])),
-        {
-          stdio: 'inherit',
-          cwd: proc.cwd(),
-          argv0: joinedRtArgs[0],
-          env: proc.env,
-          signal: abortController.signal,
-          shell: true // depends...
-        }
-      );
-    });
-  });
+
+
+    }).catch<void>(
+      (err) => {
+        abortController.abort(err);
+        proc.exitCode = 1;
+        throw err;
+      }
+    );
+  }).catch<void>(
+    (err) => {
+      abortController.abort(err);
+      proc.exitCode = 1;
+      throw err;
+    }
+  );
 };
 
 export = cli;
 
 if (require.main === module) {
-  cli(process);
+  cli(process)
+    .then(
+      (proc) => {
+        if (!proc) throw new Error("no child process returned from spawnSync()", { cause: proc });
+        return proc;
+      }
+  ).catch(
+    (reason) => {
+      console.error(new Error("node process", { cause: reason }));
+      process.exitCode = 1;
+    }
+  );
 }
 
 
