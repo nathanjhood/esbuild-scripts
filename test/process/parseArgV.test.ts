@@ -12,9 +12,14 @@ test.suite('parseArgV', (suiteContext_parseArgV) => {
   //
   const mock = test.mock;
   //
-  test.after(() => {
+  test.afterEach((ctx, done) => {
+    done();
+  }, { signal: suiteContext_parseArgV.signal });
+  //
+  test.after((ctx, done) => {
     mock.reset();
-  });
+    done();
+  }, { signal: suiteContext_parseArgV.signal });
   //
   test.describe('imports', { signal: suiteContext_parseArgV.signal, timeout: timeout }, (suiteContext_imports) => {
     test.it('require', { signal: suiteContext_imports.signal, timeout: timeout },  (ctx) => {

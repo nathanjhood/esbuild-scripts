@@ -7,11 +7,9 @@
 import test = require("node:test");
 import process = require("node:process");
 
-const { describe, it, before, after, beforeEach, afterEach } = test;
-
 const timeout = 10000;
 
-describe('parseEnv', (suiteContext_parseEnv) => {
+test.describe('parseEnv', { timeout: timeout }, (suiteContext_parseEnv) => {
   const mock = test.mock;
   const env = {
     NODE_ENV: "test"
@@ -24,26 +22,28 @@ describe('parseEnv', (suiteContext_parseEnv) => {
     cwd: getCwd
   }
   //
-  afterEach(() => {
+  test.afterEach((ctx, done) => {
     mock.restoreAll();
-  });
-  after(() => {
+    done();
+  }, { signal: suiteContext_parseEnv.signal });
+  test.after((ctx, done) => {
     mock.reset();
-  });
+    done();
+  }, { signal: suiteContext_parseEnv.signal });
   //
-  describe('imports', { signal: suiteContext_parseEnv.signal, timeout: timeout }, (suiteContext_imports) => {
-    it('require', { signal: suiteContext_imports.signal, timeout: timeout}, (ctx) => {
+  test.describe('imports', { signal: suiteContext_parseEnv.signal, timeout: timeout }, (suiteContext_imports) => {
+    test.it('require', { signal: suiteContext_imports.signal, timeout: timeout}, (ctx) => {
       return ctx.assert.doesNotThrow(() => require('../../src/process/parseEnv'));
     });
-    it('import', { signal: suiteContext_imports.signal, timeout: timeout}, (ctx) => {
+    test.it('import', { signal: suiteContext_imports.signal, timeout: timeout}, (ctx) => {
       return ctx.assert.doesNotReject(() => import('../../src/process/parseEnv'));
     });
-    it('import (async)', { signal: suiteContext_imports.signal, timeout: timeout}, (ctx) => {
+    test.it('import (async)', { signal: suiteContext_imports.signal, timeout: timeout}, (ctx) => {
       return ctx.assert.doesNotThrow(async () => await import('../../src/process/parseEnv'));
     });
   });
-  describe('runs', { signal: suiteContext_parseEnv.signal, timeout: timeout }, (suiteContext_runs) => {
-    it('loads .env from cwd()', { timeout: timeout, signal: suiteContext_runs.signal }, (ctx) => {
+  test.describe('runs', { signal: suiteContext_parseEnv.signal, timeout: timeout }, (suiteContext_runs) => {
+    test.it('loads .env from cwd()', { timeout: timeout, signal: suiteContext_runs.signal }, (ctx) => {
       const parseEnv: typeof import("../../src/process/parseEnv") = require("../../src/process/parseEnv");
       parseEnv(process).then((env) => {
         return ctx.assert.ok(env);

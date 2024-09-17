@@ -6,19 +6,29 @@
 
 import test = require("node:test");
 
-const { describe, it, before, after, beforeEach, afterEach } = test;
-
 const timeout = 10000;
 
-describe('parseCommand', () => {
-  describe('imports', () => {
-    it('require', (ctx) => {
+test.describe('parseCommand', { timeout: timeout }, (suiteContext_parseCommand) => {
+  //
+  const mock = test.mock;
+  //
+  test.afterEach((ctx, done) => {
+    done();
+  }, { signal: suiteContext_parseCommand.signal })
+  //
+  test.after((ctx, done) => {
+    mock.reset();
+    done();
+  }, { signal: suiteContext_parseCommand.signal });
+  //
+  test.describe('imports', () => {
+    test.it('require', (ctx) => {
       return ctx.assert.doesNotThrow(() => require('../../src/process/parseCommand'));
     });
-    it('import', (ctx) => {
+    test.it('import', (ctx) => {
       return ctx.assert.doesNotReject(() => import('../../src/process/parseCommand'));
     });
-    it('import (async)', (ctx) => {
+    test.it('import (async)', (ctx) => {
       return ctx.assert.doesNotThrow(async () => await import('../../src/process/parseCommand'));
     });
   })
