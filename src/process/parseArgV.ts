@@ -5,11 +5,11 @@
  */
 
 /** */
-import util = require("node:util");
+import util = require('node:util');
 
 type ParseArgVOptions = {
   sync?: true | false;
-}
+};
 
 type ParsedArgV = ReturnType<typeof util.parseArgs>;
 
@@ -25,7 +25,10 @@ interface parseArgVSync {
   (proc: NodeJS.Process, options?: ParseArgVOptions): ParsedArgV;
 }
 
-const parseArgV: parseArgV = (proc: NodeJS.Process, options?: ParseArgVOptions) => {
+const parseArgV: parseArgV = (
+  proc: NodeJS.Process,
+  options?: ParseArgVOptions
+) => {
   //
   type ArgV = util.ParseArgsConfig['options'];
   type ParsedArgV = ReturnType<typeof util.parseArgs>;
@@ -40,19 +43,14 @@ const parseArgV: parseArgV = (proc: NodeJS.Process, options?: ParseArgVOptions) 
   //
   const parseArgsOptionsConfig: ArgV = {
     //
-    'verbose': { type: 'boolean' },
+    verbose: { type: 'boolean' },
     'no-verbose': { type: 'boolean' },
-    'color': { type: 'boolean' },
+    color: { type: 'boolean' },
     'no-color': { type: 'boolean' },
-    'logfile': { type: 'string' },
-    'no-logfile': { type: 'boolean' }
+    logfile: { type: 'string' },
+    'no-logfile': { type: 'boolean' },
   };
-  const scripts: Scripts = [
-    'build',
-    'test',
-    'start',
-    'init'
-  ];
+  const scripts: Scripts = ['build', 'test', 'start', 'init'];
   //
 
   //
@@ -61,7 +59,7 @@ const parseArgV: parseArgV = (proc: NodeJS.Process, options?: ParseArgVOptions) 
     const {
       values: values,
       positionals: positionals,
-      tokens: tokens
+      tokens: tokens,
     } = util.parseArgs({
       args: args,
       options: parseArgsOptionsConfig,
@@ -91,45 +89,42 @@ const parseArgV: parseArgV = (proc: NodeJS.Process, options?: ParseArgVOptions) 
         if (scripts.includes(token.value)) {
           // prevent any possibility of passing both '<script>' and '--<script>'
           const foundScript = token.value;
-          if(values[foundScript]) delete values[foundScript];
+          if (values[foundScript]) delete values[foundScript];
         } else {
-          return rejectArgV("unknown script: " + token.value);
+          return rejectArgV('unknown script: ' + token.value);
         }
       });
     //
     return resolveArgV({
       values: values,
       positionals: positionals,
-      tokens: tokens
-    })
-  }).catch(
-    (err) => {
-      throw err;
-    }
-  ); // result
+      tokens: tokens,
+    });
+  }).catch((err) => {
+    throw err;
+  }); // result
 
   //
   return result;
-}
+};
 
 export = parseArgV;
 
 if (require.main === module) {
   ((proc: NodeJS.Process, options?: ParseArgVOptions) => {
     parseArgV(proc)
-    .then(
-      (args) => {
+      .then((args) => {
         const { values, positionals, tokens } = args;
-        console.log("values:", values);
-        console.log("positionals:", positionals);
-        console.log("tokens:", tokens);
+        console.log('values:', values);
+        console.log('positionals:', positionals);
+        console.log('tokens:', tokens);
         return args;
-      }
-  ).catch(
-    (reason) => {
-      console.error(new Error("require.main.parseArgV failed", { cause: reason }));
-      throw reason;
-    }
-  );
+      })
+      .catch((reason) => {
+        console.error(
+          new Error('require.main.parseArgV failed', { cause: reason })
+        );
+        throw reason;
+      });
   })(global.process, { sync: true });
 }

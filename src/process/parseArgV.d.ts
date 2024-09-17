@@ -4,11 +4,11 @@
  * @copyright 2024 MIT License
  */
 
-import util = require("node:util");
+import util = require('node:util');
 
 declare type ParseArgVOptions = {
   sync?: true | false;
-}
+};
 
 declare type ParsedArgV = ReturnType<typeof util.parseArgs>;
 
