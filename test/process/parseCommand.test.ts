@@ -19,16 +19,17 @@ test.describe('parseCommand', { timeout: timeout }, (suiteContext_parseCommand) 
   //
   test.afterEach((ctx, done) => {
     //
+    mock.restoreAll();
     return done();
     //
-  }, { signal: suiteContext_parseCommand.signal }) satisfies void;
+  }, { timeout: timeout, signal: suiteContext_parseCommand.signal }) satisfies void;
   //
   test.after((ctx, done) => {
     //
     mock.reset();
     return done();
     //
-  }, { signal: suiteContext_parseCommand.signal }) satisfies void;
+  }, { timeout: timeout, signal: suiteContext_parseCommand.signal }) satisfies void;
   //
 
   //
@@ -36,26 +37,28 @@ test.describe('parseCommand', { timeout: timeout }, (suiteContext_parseCommand) 
     //
 
     //
-    test.it('require', (ctx) => {
-      return ctx.assert.doesNotThrow((): typeof import('../../src/process/parseCommand') => require('../../src/process/parseCommand'));
+    test.it('require', { timeout: timeout, signal: suiteContext_imports.signal }, (ctx, done) => {
+      const t: void = ctx.assert.doesNotThrow((): typeof import('../../src/process/parseCommand') => require('../../src/process/parseCommand'));
+      return done(t);
     }) satisfies Promise<void>;
     //
 
     //
-    test.it('import', (ctx) => {
-      return ctx.assert.doesNotReject(import('../../src/process/parseCommand'));
+    test.it('import', { timeout: timeout, signal: suiteContext_imports.signal }, (ctx, done) => {
+      ctx.assert.doesNotReject(import('../../src/process/parseCommand')).then(done).catch(done);
     }) satisfies Promise<void>;
     //
 
     //
-    test.it('import <Promise>', (ctx) => {
-      return ctx.assert.doesNotReject((): Promise<{ default: (proc: NodeJS.Process) => Promise<ReturnType<typeof util.parseArgs>>}> => import('../../src/process/parseCommand'));
+    test.it('import <Promise>', { timeout: timeout, signal: suiteContext_imports.signal }, (ctx, done) => {
+      ctx.assert.doesNotReject((): Promise<{ default: (proc: NodeJS.Process) => Promise<ReturnType<typeof util.parseArgs>>}> => import('../../src/process/parseCommand')).then(done).catch(done);
     }) satisfies Promise<void>;
     //
 
     //
-    test.it('import (async)', (ctx) => {
-      return ctx.assert.doesNotThrow(async (): Promise<{ default: (proc: NodeJS.Process) => Promise<ReturnType<typeof util.parseArgs>>}> => await import('../../src/process/parseCommand'));
+    test.it('import (async)', { timeout: timeout, signal: suiteContext_imports.signal }, (ctx, done) => {
+      const t: void = ctx.assert.doesNotThrow(async (): Promise<{ default: (proc: NodeJS.Process) => Promise<ReturnType<typeof util.parseArgs>>}> => await import('../../src/process/parseCommand'));
+      return done(t);
     }) satisfies Promise<void>;
     //
 

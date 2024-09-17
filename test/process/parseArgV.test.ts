@@ -9,7 +9,7 @@ import util = require("node:util");
 
 const timeout = 10000;
 
-test.suite('parseArgV', (suiteContext_parseArgV) => {
+test.suite('parseArgV', { timeout: timeout }, (suiteContext_parseArgV) => {
   //
 
   //
@@ -18,39 +18,46 @@ test.suite('parseArgV', (suiteContext_parseArgV) => {
 
   //
   test.afterEach((ctx, done) => {
-    done();
-  }, { signal: suiteContext_parseArgV.signal }) satisfies void;
+    //
+    mock.restoreAll();
+    return done();
+    //
+  }, { timeout: timeout, signal: suiteContext_parseArgV.signal }) satisfies void;
   //
   test.after((ctx, done) => {
+    //
     mock.reset();
-    done();
-  }, { signal: suiteContext_parseArgV.signal }) satisfies void;
+    return done();
+    //
+  }, { timeout: timeout, signal: suiteContext_parseArgV.signal }) satisfies void;
   //
 
   //
-  test.describe('imports', { signal: suiteContext_parseArgV.signal, timeout: timeout }, (suiteContext_imports) => {
+  test.describe('imports', { timeout: timeout, signal: suiteContext_parseArgV.signal }, (suiteContext_imports) => {
     //
 
     //
-    test.it('require', { signal: suiteContext_imports.signal, timeout: timeout }, (ctx) => {
-      return ctx.assert.doesNotThrow((): typeof import('../../src/process/parseArgV') => require('../../src/process/parseArgV'));
+    test.it('require', { timeout: timeout, signal: suiteContext_imports.signal }, (ctx, done) => {
+      const t: void = ctx.assert.doesNotThrow((): typeof import('../../src/process/parseArgV') => require('../../src/process/parseArgV'));
+      return done(t);
     }) satisfies Promise<void>;
     //
 
     //
-    test.it('import', { signal: suiteContext_imports.signal, timeout: timeout }, (ctx) => {
-      return ctx.assert.doesNotReject(import('../../src/process/parseArgV'));
+    test.it('import', { timeout: timeout, signal: suiteContext_imports.signal }, (ctx, done) => {
+      ctx.assert.doesNotReject(import('../../src/process/parseArgV')).then(done).catch(done);
     }) satisfies Promise<void>;
 
     //
-    test.it('import <Promise>', { signal: suiteContext_imports.signal, timeout: timeout }, (ctx) => {
-      return ctx.assert.doesNotReject((): Promise<{ default: (proc: NodeJS.Process) => Promise<ReturnType<typeof util.parseArgs>>}> => import('../../src/process/parseArgV'));
+    test.it('import <Promise>', { timeout: timeout, signal: suiteContext_imports.signal }, (ctx, done) => {
+      ctx.assert.doesNotReject((): Promise<{ default: (proc: NodeJS.Process) => Promise<ReturnType<typeof util.parseArgs>>}> => import('../../src/process/parseArgV')).then(done).catch(done);
     }) satisfies Promise<void>;
     //
 
     //
-    test.it('import (async)', { signal: suiteContext_imports.signal, timeout: timeout }, (ctx) => {
-      return ctx.assert.doesNotThrow(async (): Promise<{ default: (proc: NodeJS.Process) => Promise<ReturnType<typeof util.parseArgs>>}> => await import('../../src/process/parseArgV'));
+    test.it('import (async)', { timeout: timeout, signal: suiteContext_imports.signal }, (ctx, done) => {
+      const t: void = ctx.assert.doesNotThrow(async (): Promise<{ default: (proc: NodeJS.Process) => Promise<ReturnType<typeof util.parseArgs>> }> => await import('../../src/process/parseArgV'));
+      return done(t);
     }) satisfies Promise<void>;
     //
 

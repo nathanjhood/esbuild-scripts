@@ -12,13 +12,17 @@ test.suite('cli', { timeout: timeout }, (suiteContext_cli) => {
 
   //
   test.afterEach((ctx, done) => {
+    //
     mock.restoreAll();
-    done();
+    return done();
+    //
   }, { signal: suiteContext_cli.signal }) satisfies void;
   //
   test.after((ctx, done) => {
+    //
     mock.reset();
-    done();
+    return done();
+    //
   }, { signal: suiteContext_cli.signal }) satisfies void;
   //
 
@@ -27,26 +31,28 @@ test.suite('cli', { timeout: timeout }, (suiteContext_cli) => {
     //
 
     //
-    test.test('require', { timeout: timeout, signal: suiteContext_imports.signal }, (testContextA) => {
-      return testContextA.assert.doesNotThrow((): typeof import('../src/cli') => require('../src/cli'));
+    test.test('require', { timeout: timeout, signal: suiteContext_imports.signal }, (ctx, done) => {
+      const t: void = ctx.assert.doesNotThrow((): typeof import('../src/cli') => require('../src/cli'));
+      return done(t);
     }) satisfies Promise<void>;
     //
 
     //
-    test.test('import', { timeout: timeout, signal: suiteContext_imports.signal }, (testContextA) => {
-      return testContextA.assert.doesNotReject(import('../src/cli'));
+    test.test('import', { timeout: timeout, signal: suiteContext_imports.signal }, (ctx, done) => {
+      ctx.assert.doesNotReject(import('../src/cli')).then(done).catch(done);
     }) satisfies Promise<void>;
     //
 
     //
-    test.test('import <Promise>', { timeout: timeout, signal: suiteContext_imports.signal }, (testContextA) => {
-      return testContextA.assert.doesNotReject(() => import('../src/cli'));
+    test.test('import <Promise>', { timeout: timeout, signal: suiteContext_imports.signal }, (ctx, done) => {
+      ctx.assert.doesNotReject(() => import('../src/cli')).then(done).catch(done);
     }) satisfies Promise<void>;
     //
 
     //
-    test.test('import (async)', { timeout: timeout, signal: suiteContext_imports.signal }, (testContextA) => {
-      return testContextA.assert.doesNotThrow(async (): Promise<{ default: (proc: NodeJS.Process) => void }> => await import('../src/cli'));
+    test.test('import (async)', { timeout: timeout, signal: suiteContext_imports.signal }, (ctx, done) => {
+      const t: void = ctx.assert.doesNotThrow(async (): Promise<{ default: (proc: NodeJS.Process) => void }> => await import('../src/cli'));
+      return done(t);
     }) satisfies Promise<void>;
     //
 
