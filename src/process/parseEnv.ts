@@ -1,6 +1,6 @@
 type ParseEnvOptions = {
   sync?: true | false;
-}
+};
 
 interface parseEnv {
   default?(proc: NodeJS.Process): Promise<NodeJS.ProcessEnv>;
@@ -14,15 +14,14 @@ interface parseEnvSync {
   (proc: NodeJS.Process, options?: ParseEnvOptions): NodeJS.ProcessEnv;
 }
 
-const parseEnv: parseEnv = (proc: NodeJS.Process, options?: ParseEnvOptions) => {
+const parseEnv: parseEnv = (
+  proc: NodeJS.Process,
+  options?: ParseEnvOptions
+) => {
   //
 
   //
-  const {
-    cwd: getCwd,
-    loadEnvFile: loadEnvFile,
-    env
-  } = proc;
+  const { cwd: getCwd, loadEnvFile: loadEnvFile, env } = proc;
   //
   const cwd = getCwd();
   // //
@@ -34,7 +33,7 @@ const parseEnv: parseEnv = (proc: NodeJS.Process, options?: ParseEnvOptions) => 
     //
     loadEnvFile(cwd + '/.env');
     //
-    return resolveEnv(env)
+    return resolveEnv(env);
   }).catch((err) => {
     throw err;
   });
@@ -42,24 +41,20 @@ const parseEnv: parseEnv = (proc: NodeJS.Process, options?: ParseEnvOptions) => 
 
   //
   return result;
-}
+};
 
 export = parseEnv;
 
 if (require.main === module) {
   ((proc: NodeJS.Process, options: ParseEnvOptions) => {
     parseEnv(proc, options)
-    .then(
-      (env) => {
+      .then((env) => {
         console.log(env);
         return env;
-      }
-    )
-    .catch(
-      (reason) => {
+      })
+      .catch((reason) => {
         console.error(reason);
         throw reason;
-      }
-    )
-  })(global.process, { sync: true })
+      });
+  })(global.process, { sync: true });
 }

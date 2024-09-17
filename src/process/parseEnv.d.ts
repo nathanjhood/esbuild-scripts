@@ -3,7 +3,6 @@
  *
  */
 
-
 declare type ParseEnvOptions = {
   sync?: true | false;
 };
