@@ -4,11 +4,11 @@
  */
 
 /** */
-import util = require("node:util");
+import util = require('node:util');
 
 type ParseCommandOptions = {
   sync?: true | false;
-}
+};
 
 type ParsedCommand = ReturnType<typeof util.parseArgs>;
 
@@ -18,13 +18,22 @@ interface parseCommand {
   default?(proc: NodeJS.Process): Promise<ParsedCommand>;
 }
 
-const parseCommand: parseCommand = (proc: NodeJS.Process, options?: ParseCommandOptions) => {
+const parseCommand: parseCommand = (
+  proc: NodeJS.Process,
+  options?: ParseCommandOptions
+) => {
   //
   type ParsedCommands = ReturnType<typeof util.parseArgs>;
   //
-  const { argv0: nodeExecutable, execArgv: nodeArgs, allowedNodeEnvironmentFlags } = proc;
+  const {
+    argv0: nodeExecutable,
+    execArgv: nodeArgs,
+    allowedNodeEnvironmentFlags,
+  } = proc;
   //
-  const parseArgsOptionsConfig: { [key: string]: { type: 'string' | 'boolean' } } = {};
+  const parseArgsOptionsConfig: {
+    [key: string]: { type: 'string' | 'boolean' };
+  } = {};
   const args: string[] = [];
   const allowedList: string[] = [];
 
@@ -32,7 +41,7 @@ const parseCommand: parseCommand = (proc: NodeJS.Process, options?: ParseCommand
   return new Promise<ParsedCommands>((resolveCommand, rejectCommand) => {
     // push node executable to args[0], and nodeArgs[x] to args[x+1]
     args.push(nodeExecutable);
-    nodeArgs.forEach(arg => args.push(arg));
+    nodeArgs.forEach((arg) => args.push(arg));
     // gather permissable flags from current process
     allowedNodeEnvironmentFlags.forEach((flag) => {
       // formatting...
@@ -46,29 +55,30 @@ const parseCommand: parseCommand = (proc: NodeJS.Process, options?: ParseCommand
       // push allowed flags from running process into allowedList[]
       allowedList.push(flag);
       return flag;
-    })
+    });
     // push node args from allowedList[] to the 'options' object
-    allowedList.forEach(key => parseArgsOptionsConfig[key] = { type: 'string' });
+    allowedList.forEach(
+      (key) => (parseArgsOptionsConfig[key] = { type: 'string' })
+    );
 
     // parse the executor and it's args
     const {
       values: values,
       positionals: positionals,
-      tokens: tokens
+      tokens: tokens,
     } = util.parseArgs({
       args: args,
       strict: true,
       allowNegative: true,
       tokens: true,
       allowPositionals: true,
-      options: parseArgsOptionsConfig
+      options: parseArgsOptionsConfig,
     });
     // return the parsed executor (at value[0]) and args
     return resolveCommand({ values, positionals, tokens });
   }).catch((err) => {
     throw err;
   });
-
 };
 
 export = parseCommand;
@@ -76,19 +86,16 @@ export = parseCommand;
 if (require.main === module) {
   ((proc: NodeJS.Process, options?: ParseCommandOptions) => {
     return parseCommand(proc)
-    .then(
-      (command) => {
+      .then((command) => {
         const { values, positionals, tokens } = command;
-        console.log("values:", values);
-        console.log("positionals:", positionals);
-        console.log("tokens:", tokens);
+        console.log('values:', values);
+        console.log('positionals:', positionals);
+        console.log('tokens:', tokens);
         return command;
-      }
-    ).catch(
-      (reason) => {
+      })
+      .catch((reason) => {
         console.error(reason);
         throw reason;
-      }
-    );
+      });
   })(global.process, { sync: true });
 }

@@ -3,7 +3,7 @@
  *
  */
 
-import util = require("node:util");
+import util = require('node:util');
 
 declare type ParseCommandOptions = {
   sync?: true | false;
