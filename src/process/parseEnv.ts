@@ -1,36 +1,65 @@
-import process = require("node:process");
-import util = require("node:util");
-import path = require("node:path");
-import fs = require("node:fs");
+type ParseEnvOptions = {
+  sync?: true | false;
+}
 
-const parseEnv = (proc: NodeJS.Process) => {
+interface parseEnv {
+  default?(proc: NodeJS.Process): Promise<NodeJS.ProcessEnv>;
+  (proc: NodeJS.Process): Promise<NodeJS.ProcessEnv>;
+  (proc: NodeJS.Process, options?: ParseEnvOptions): Promise<NodeJS.ProcessEnv>;
+}
 
-  return new Promise<NodeJS.ProcessEnv>((resolveEnv, rejectEnv) => {
-      //
+interface parseEnvSync {
+  default?(proc: NodeJS.Process): NodeJS.ProcessEnv;
+  (proc: NodeJS.Process): NodeJS.ProcessEnv;
+  (proc: NodeJS.Process, options?: ParseEnvOptions): NodeJS.ProcessEnv;
+}
+
+const parseEnv: parseEnv = (proc: NodeJS.Process, options?: ParseEnvOptions) => {
+  //
+
+  //
   const {
     cwd: getCwd,
     loadEnvFile: loadEnvFile,
+    env
   } = proc;
   //
   const cwd = getCwd();
+  // //
+  // const nodeEnv = env['NODE_ENV'];
   //
+
+  //
+  const result = new Promise<NodeJS.ProcessEnv>((resolveEnv, rejectEnv) => {
     //
     loadEnvFile(cwd + '/.env');
     //
-    return resolveEnv(proc.env)
+    return resolveEnv(env)
   }).catch((err) => {
-    throw new Error("parseEnv failed", { cause: err })
+    throw err;
   });
+  //
+
+  //
+  return result;
 }
 
 export = parseEnv;
 
 if (require.main === module) {
-  parseEnv(process)
+  ((proc: NodeJS.Process, options: ParseEnvOptions) => {
+    parseEnv(proc, options)
     .then(
-      (env)     => console.log(env)
+      (env) => {
+        console.log(env);
+        return env;
+      }
     )
     .catch(
-      (reason)  => console.error(reason)
+      (reason) => {
+        console.error(reason);
+        throw reason;
+      }
     )
+  })(global.process, { sync: true })
 }
