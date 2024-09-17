@@ -14,6 +14,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
+  PROJECT_NAME: 'esbuild-scripts'
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   NODE_ENV: 'production'
   BUILD_DIR: 'dist'
@@ -46,11 +47,6 @@ jobs:
         working-directory: ${{ github.workspace }}
         run: yarn
 
-      - name: Build
-        shell: bash
-        working-directory: ${{ github.workspace }}
-        run: yarn build
-
       - name: Test
         shell: bash
         env:
@@ -58,15 +54,22 @@ jobs:
         working-directory: ${{ github.workspace }}
         run: yarn test
 
+      - name: Build
+        shell: bash
+        env:
+          NODE_ENV: production
+        working-directory: ${{ github.workspace }}
+        run: yarn build
+
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: esbuild-scripts-${{ matrix.os }}-node-v${{ matrix.node-version }}
+          name: ${{ env.PROJECT_NAME }}-${{ matrix.os }}-node-v${{ matrix.node-version }}
           path: '${{ github.workspace }}/${{ env.BUILD_DIR }}'
 
       - name: Download Artifact
         uses: actions/download-artifact@v4
         with:
-          name: esbuild-scripts-${{ matrix.os }}-node-v${{ matrix.node-version }}
+          name: ${{ env.PROJECT_NAME }}-${{ matrix.os }}-node-v${{ matrix.node-version }}
           path: '${{ github.workspace }}/${{ env.BUILD_DIR }}'
           github-token: ${{ env.GITHUB_TOKEN }}
