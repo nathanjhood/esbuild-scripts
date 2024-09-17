@@ -36,7 +36,7 @@ const options: Readonly<NodeTestRunnerOptions> = Object.freeze<NodeTestRunnerOpt
     // Log test failures to console
     testsStream.on('test:fail', (testFail) => {
       console.error(testFail);
-      process.exitCode = 1;
+      process.exitCode = 1; // must be != 0, to avoid false positives in CI pipelines
     });
     // coverage reporter: spec
     testsStream.compose(reporters.spec).pipe(process.stdout);

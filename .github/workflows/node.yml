@@ -42,6 +42,11 @@ jobs:
           cache: yarn
           cache-dependency-path: yarn.lock
 
+      - name: Environment
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        run: cp .env.example .env
+
       - name: Install
         shell: bash
         working-directory: ${{ github.workspace }}
