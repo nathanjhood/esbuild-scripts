@@ -4,17 +4,21 @@
  * @copyright 2024 MIT License
  */
 
+/**
+ *
+ */
+import process = require("node:process");
 import util = require("node:util");
-
+//
 type Args = util.ParseArgsConfig['options'];
-// type Positionals = ReturnType<typeof util.parseArgs>['positionals'];
-// type Values = ReturnType<typeof util.parseArgs>['values'];
-// type Tokens = ReturnType<typeof util.parseArgs>['tokens'];
+type Positionals = ReturnType<typeof util.parseArgs>['positionals'];
+type Values = ReturnType<typeof util.parseArgs>['values'];
+type Tokens = ReturnType<typeof util.parseArgs>['tokens'];
 type Scripts = string[];
 
-const parseArgV = (process: NodeJS.Process) => {
+const parseArgV = (proc: NodeJS.Process) => {
   //
-  const { argv: argv } = process;
+  const { argv: argv } = proc;
   //
   const args: string[] = argv.slice(2);
   //

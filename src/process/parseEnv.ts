@@ -1,3 +1,4 @@
+import process = require("node:process");
 import util = require("node:util");
 import path = require("node:path");
 import fs = require("node:fs");

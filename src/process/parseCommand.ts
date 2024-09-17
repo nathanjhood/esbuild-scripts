@@ -3,11 +3,13 @@
  *
  */
 
+/** */
+import process = require("node:process");
 import util = require("node:util");
 
-const parseCommand = (process: NodeJS.Process) => {
+const parseCommand = (proc: NodeJS.Process) => {
   //
-  const { argv0: nodeExecutable, execArgv: nodeArgs, allowedNodeEnvironmentFlags } = process;
+  const { argv0: nodeExecutable, execArgv: nodeArgs, allowedNodeEnvironmentFlags } = proc;
   //
   const options: { [key: string]: { type: 'string' | 'boolean' } } = {};
   const args: string[] = [];
