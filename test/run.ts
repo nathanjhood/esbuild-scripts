@@ -14,54 +14,26 @@ import path = require("node:path");
 import os = require("node:os");
 import constants = require("node:constants");
 
+import options = require("./setupTests");
+
 type NodeTestRunnerParameters = Required<Parameters<typeof test.run>>;
 type NodeTestRunnerOptions = NodeTestRunnerParameters[0];
 type NodeTestRunnerReturnType = ReturnType<typeof test.run>;
 
-const abortController = new AbortController();
-
-const options = Object.freeze<NodeTestRunnerOptions>({
-  files: [
-    path.resolve(path.join(__dirname, '/config/env/index.test.ts')),
-    path.resolve(path.join(__dirname, '/config/paths/index.test.ts')),
-    path.resolve(path.join(__dirname, '/cli.test.ts')),
-  ],
-  concurrency: os.availableParallelism() - 1,
-  forceExit: false,
-  only: false,
-  timeout: Infinity,
-  signal: abortController.signal,
-  setup(testsStream) {
-    // Log test failures to console
-    testsStream.on('test:fail', (testFail) => {
-      console.error(testFail)
-      process.exitCode = 1;
-    });
-    // coverage reporter: spec
-    testsStream.compose(reporters.spec).pipe(process.stdout);
-  },
-  // testNamePatterns: [
-  //   "**/*.test.?(c|m)js",
-  //   "**/*-test.?(c|m)js",
-  //   "**/*_test.?(c|m)js",
-  //   "**/test-*.?(c|m)js",
-  //   "**/test.?(c|m)js",
-  //   "**/test/**/*.?(c|m)js"
-  // ],
-})
+// const abortController: AbortController = new AbortController();
 
 const run = (process: NodeJS.Process) => {
   //
   process.on('uncaughtException', (error) => {
     const e = new Error('uncaughtException', { cause: error })
-    abortController.abort(e);
+    // abortController.abort(e);
     process.exitCode = 1;
     throw error;
   });
   //
   process.on('unhandledRejection', (error) => {
     const e = new Error('unhandledRejection', { cause: error })
-    abortController.abort(e);
+    // abortController.abort(e);
     process.exitCode = 1;
     throw error;
   });
