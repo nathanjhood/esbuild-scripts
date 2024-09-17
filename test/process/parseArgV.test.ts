@@ -63,7 +63,23 @@ test.suite('parseArgV', { timeout: timeout }, (suiteContext_parseArgV) => {
 
   //
   }) satisfies Promise<void>;
+  // suiteContext_imports
+
   //
+  test.describe('runs', { signal: suiteContext_parseArgV.signal, timeout: timeout }, (suiteContext_runs) => {
+  //
+
+    //
+    test.it('parses commands passed to running cli instance', { timeout: timeout, signal: suiteContext_runs.signal }, (ctx, done) => {
+      //
+      const parseArgV: typeof import("../../src/process/parseArgV") = require("../../src/process/parseArgV");
+      parseArgV(process).then((args) => ctx.assert.ok(args)).then(done).catch(done);
+      //
+    }) satisfies Promise<void>;
+    //
+
+  //
+  }) satisfies Promise<void>;
 
 //
 }) satisfies Promise<void>;

@@ -6,8 +6,26 @@
 
 import util = require("node:util");
 
-export = parseArgV;
+declare type ParseArgVOptions = {
+  sync?: true | false;
+}
 
-declare const parseArgV: (proc: NodeJS.Process) => Promise<ReturnType<typeof util.parseArgs>>;
+declare type ParsedArgV = ReturnType<typeof util.parseArgs>;
+
+declare interface parseArgV {
+  default?(proc: NodeJS.Process): Promise<ParsedArgV>;
+  (proc: NodeJS.Process): Promise<ParsedArgV>;
+  (proc: NodeJS.Process, options?: ParseArgVOptions): Promise<ParsedArgV>;
+}
+
+declare interface parseArgVSync {
+  default?(proc: NodeJS.Process): ParsedArgV;
+  (proc: NodeJS.Process): ParsedArgV;
+  (proc: NodeJS.Process, options?: ParseArgVOptions): ParsedArgV;
+}
+
+declare const parseArgV: parseArgV;
+
+export = parseArgV;
 
 // declare const parseArgVSync: (proc: NodeJS.Process) => ReturnType<typeof util.parseArgs>;

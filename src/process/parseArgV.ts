@@ -4,25 +4,41 @@
  * @copyright 2024 MIT License
  */
 
-/**
- *
- */
-import process = require("node:process");
+/** */
 import util = require("node:util");
-//
-type Args = util.ParseArgsConfig['options'];
-type Positionals = ReturnType<typeof util.parseArgs>['positionals'];
-type Values = ReturnType<typeof util.parseArgs>['values'];
-type Tokens = ReturnType<typeof util.parseArgs>['tokens'];
-type Scripts = string[];
 
-const parseArgV = (proc: NodeJS.Process) => {
+type ParseArgVOptions = {
+  sync?: true | false;
+}
+
+type ParsedArgV = ReturnType<typeof util.parseArgs>;
+
+interface parseArgV {
+  default?(proc: NodeJS.Process): Promise<ParsedArgV>;
+  (proc: NodeJS.Process): Promise<ParsedArgV>;
+  (proc: NodeJS.Process, options?: ParseArgVOptions): Promise<ParsedArgV>;
+}
+
+interface parseArgVSync {
+  default?(proc: NodeJS.Process): ParsedArgV;
+  (proc: NodeJS.Process): ParsedArgV;
+  (proc: NodeJS.Process, options?: ParseArgVOptions): ParsedArgV;
+}
+
+const parseArgV: parseArgV = (proc: NodeJS.Process, options?: ParseArgVOptions) => {
+  //
+  type ArgV = util.ParseArgsConfig['options'];
+  type ParsedArgV = ReturnType<typeof util.parseArgs>;
+  type Positionals = ParsedArgV['positionals'];
+  type Values = ParsedArgV['values'];
+  type Tokens = ParsedArgV['tokens'];
+  type Scripts = string[];
   //
   const { argv: argv } = proc;
   //
   const args: string[] = argv.slice(2);
   //
-  const options: Args = {
+  const parseArgsOptionsConfig: ArgV = {
     //
     'verbose': { type: 'boolean' },
     'no-verbose': { type: 'boolean' },
@@ -38,7 +54,9 @@ const parseArgV = (proc: NodeJS.Process) => {
     'init'
   ];
   //
-  return new Promise<ReturnType<typeof util.parseArgs>>((resolveArgV, rejectArgV) => {
+
+  //
+  const result = new Promise<ParsedArgV>((resolveArgV, rejectArgV) => {
     //
     const {
       values: values,
@@ -46,7 +64,7 @@ const parseArgV = (proc: NodeJS.Process) => {
       tokens: tokens
     } = util.parseArgs({
       args: args,
-      options: options,
+      options: parseArgsOptionsConfig,
       strict: true,
       allowNegative: true,
       tokens: true,
@@ -84,13 +102,34 @@ const parseArgV = (proc: NodeJS.Process) => {
       positionals: positionals,
       tokens: tokens
     })
-  }).catch((err) => {
-    throw new Error("parseArgV failed", { cause: err })
-  });
+  }).catch(
+    (err) => {
+      throw err;
+    }
+  ); // result
+
+  //
+  return result;
 }
 
 export = parseArgV;
 
 if (require.main === module) {
-  parseArgV(process);
+  ((proc: NodeJS.Process, options?: ParseArgVOptions) => {
+    parseArgV(proc)
+    .then(
+      (args) => {
+        const { values, positionals, tokens } = args;
+        console.log("values:", values);
+        console.log("positionals:", positionals);
+        console.log("tokens:", tokens);
+        return args;
+      }
+  ).catch(
+    (reason) => {
+      console.error(new Error("require.main.parseArgV failed", { cause: reason }));
+      throw reason;
+    }
+  );
+  })(global.process, { sync: true });
 }
