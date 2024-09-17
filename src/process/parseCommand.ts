@@ -4,19 +4,32 @@
  */
 
 /** */
-import process = require("node:process");
 import util = require("node:util");
 
-const parseCommand = (proc: NodeJS.Process) => {
+type ParseCommandOptions = {
+  sync?: true | false;
+}
+
+type ParsedCommand = ReturnType<typeof util.parseArgs>;
+
+interface parseCommand {
+  (proc: NodeJS.Process): Promise<ParsedCommand>;
+  (proc: NodeJS.Process, options?: ParseCommandOptions): Promise<ParsedCommand>;
+  default?(proc: NodeJS.Process): Promise<ParsedCommand>;
+}
+
+const parseCommand: parseCommand = (proc: NodeJS.Process, options?: ParseCommandOptions) => {
+  //
+  type ParsedCommands = ReturnType<typeof util.parseArgs>;
   //
   const { argv0: nodeExecutable, execArgv: nodeArgs, allowedNodeEnvironmentFlags } = proc;
   //
-  const options: { [key: string]: { type: 'string' | 'boolean' } } = {};
+  const parseArgsOptionsConfig: { [key: string]: { type: 'string' | 'boolean' } } = {};
   const args: string[] = [];
   const allowedList: string[] = [];
 
   //
-  return new Promise<ReturnType<typeof util.parseArgs>>((resolveCommand, rejectCommand) => {
+  return new Promise<ParsedCommands>((resolveCommand, rejectCommand) => {
     // push node executable to args[0], and nodeArgs[x] to args[x+1]
     args.push(nodeExecutable);
     nodeArgs.forEach(arg => args.push(arg));
@@ -35,7 +48,7 @@ const parseCommand = (proc: NodeJS.Process) => {
       return flag;
     })
     // push node args from allowedList[] to the 'options' object
-    allowedList.forEach(key => options[key] = { type: 'string' });
+    allowedList.forEach(key => parseArgsOptionsConfig[key] = { type: 'string' });
 
     // parse the executor and it's args
     const {
@@ -48,12 +61,12 @@ const parseCommand = (proc: NodeJS.Process) => {
       allowNegative: true,
       tokens: true,
       allowPositionals: true,
-      options: options
+      options: parseArgsOptionsConfig
     });
     // return the parsed executor (at value[0]) and args
     return resolveCommand({ values, positionals, tokens });
   }).catch((err) => {
-    throw new Error("parseCommand failed", { cause: err })
+    throw err;
   });
 
 };
@@ -61,5 +74,21 @@ const parseCommand = (proc: NodeJS.Process) => {
 export = parseCommand;
 
 if (require.main === module) {
-  parseCommand(process);
+  ((proc: NodeJS.Process, options?: ParseCommandOptions) => {
+    return parseCommand(proc)
+    .then(
+      (command) => {
+        const { values, positionals, tokens } = command;
+        console.log("values:", values);
+        console.log("positionals:", positionals);
+        console.log("tokens:", tokens);
+        return command;
+      }
+    ).catch(
+      (reason) => {
+        console.error(reason);
+        throw reason;
+      }
+    );
+  })(global.process, { sync: true });
 }

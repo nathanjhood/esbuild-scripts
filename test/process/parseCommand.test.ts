@@ -63,6 +63,23 @@ test.describe('parseCommand', { timeout: timeout }, (suiteContext_parseCommand) 
     //
 
     //
+    test.describe('runs', { signal: suiteContext_parseCommand.signal, timeout: timeout }, (suiteContext_runs) => {
+    //
+
+      //
+      test.it('parses commands passed to running NodeJS instance', { timeout: timeout, signal: suiteContext_runs.signal }, (ctx, done) => {
+        //
+        const parseCommand: typeof import("../../src/process/parseCommand") = require("../../src/process/parseCommand");
+        parseCommand(process).then((env) => ctx.assert.ok(env)).then(done).catch(done);
+        //
+      }) satisfies Promise<void>;
+      //
+
+    //
+    }) satisfies Promise<void>;
+    //
+
+    //
   }) satisfies Promise<void>;
   //
 
