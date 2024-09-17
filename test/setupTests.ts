@@ -33,11 +33,11 @@ const options: Readonly<NodeTestRunnerOptions> = Object.freeze<NodeTestRunnerOpt
   timeout: Infinity,
   signal: abortController.signal,
   setup(testsStream) {
-  //   // Log test failures to console
-  //   testsStream.on('test:fail', (testFail) => {
-  //     console.error(testFail)
-  //     process.exitCode = 1;
-  //   });
+    // Log test failures to console
+    testsStream.on('test:fail', (testFail) => {
+      console.error(testFail);
+      process.exitCode = 1;
+    });
     // coverage reporter: spec
     testsStream.compose(reporters.spec).pipe(process.stdout);
   },
