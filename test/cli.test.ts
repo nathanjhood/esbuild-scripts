@@ -1,5 +1,5 @@
 import test = require("node:test");
-import cliTestingLibrary = require("cli-testing-library");
+// import cliTestingLibrary = require("cli-testing-library");
 
 const timeout = 10000;
 
