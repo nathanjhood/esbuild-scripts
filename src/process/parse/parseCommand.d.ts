@@ -1,6 +1,7 @@
 /**
  * @file parseCommand.d.ts
- *
+ * @author Nathan J. Hood <nathanjhood@googlemail.com>
+ * @copyright 2024 MIT License
  */
 
 import util = require('node:util');

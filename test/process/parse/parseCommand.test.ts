@@ -30,6 +30,8 @@ test.suite(
       { timeout: timeout, signal: suiteContext_parseCommand.signal }
     ) satisfies void;
     //
+
+    //
     test.after(
       (ctx, done) => {
         //
@@ -54,8 +56,8 @@ test.suite(
           { timeout: timeout, signal: suiteContext_imports.signal },
           (ctx, done) => {
             const t: void = ctx.assert.doesNotThrow(
-              (): typeof import('../../src/process/parseCommand') =>
-                require('../../src/process/parseCommand')
+              (): typeof import('../../../src/process/parse/parseCommand') =>
+                require('../../../src/process/parse/parseCommand')
             );
             return done(t);
           }
@@ -68,7 +70,7 @@ test.suite(
           { timeout: timeout, signal: suiteContext_imports.signal },
           (ctx, done) => {
             ctx.assert
-              .doesNotReject(import('../../src/process/parseCommand'))
+              .doesNotReject(import('../../../src/process/parse/parseCommand'))
               .then(done)
               .catch(done);
           }
@@ -86,7 +88,7 @@ test.suite(
                   default: (
                     proc: NodeJS.Process
                   ) => Promise<ReturnType<typeof util.parseArgs>>;
-                }> => import('../../src/process/parseCommand')
+                }> => import('../../../src/process/parse/parseCommand')
               )
               .then(done)
               .catch(done);
@@ -104,7 +106,7 @@ test.suite(
                 default: (
                   proc: NodeJS.Process
                 ) => Promise<ReturnType<typeof util.parseArgs>>;
-              }> => await import('../../src/process/parseCommand')
+              }> => await import('../../../src/process/parse/parseCommand')
             );
             return done(t);
           }
@@ -129,7 +131,7 @@ test.suite(
           { timeout: timeout, signal: suiteContext_runs.signal },
           (ctx, done) => {
             //
-            const parseCommand: typeof import('../../src/process/parseCommand') = require('../../src/process/parseCommand');
+            const parseCommand: typeof import('../../../src/process/parse/parseCommand') = require('../../../src/process/parse/parseCommand');
             parseCommand(process)
               .then((env) => ctx.assert.ok(env))
               .then(done)
