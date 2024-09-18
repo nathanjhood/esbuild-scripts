@@ -15,10 +15,10 @@ out/
 .env.development.local
 .env.test.local
 .env.production.local
-!.env.example
-!.env.development.example
-!.env.test.example
-!.env.production.example
+# !.env.example
+# !.env.development.example
+# !.env.test.example
+# !.env.production.example
 
 # binary assets
 #

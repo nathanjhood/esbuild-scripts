@@ -5,7 +5,7 @@
  */
 
 import test = require('node:test');
-import process = require('node:process');
+// import process = require('node:process');
 
 const timeout = 10000;
 
@@ -66,8 +66,8 @@ test.suite('parseEnv', { timeout: timeout }, (suiteContext_parseEnv) => {
         { timeout: timeout, signal: suiteContext_imports.signal },
         (ctx, done) => {
           const t: void = ctx.assert.doesNotThrow(
-            (): typeof import('../../src/process/parseEnv') =>
-              require('../../src/process/parseEnv')
+            (): typeof import('../../../src/process/parse/parseEnv') =>
+              require('../../../src/process/parse/parseEnv')
           );
           return done(t);
         }
@@ -80,7 +80,7 @@ test.suite('parseEnv', { timeout: timeout }, (suiteContext_parseEnv) => {
         { timeout: timeout, signal: suiteContext_imports.signal },
         (ctx, done) => {
           ctx.assert
-            .doesNotReject(import('../../src/process/parseEnv'))
+            .doesNotReject(import('../../../src/process/parse/parseEnv'))
             .then(done)
             .catch(done);
         }
@@ -96,7 +96,7 @@ test.suite('parseEnv', { timeout: timeout }, (suiteContext_parseEnv) => {
             .doesNotReject(
               (): Promise<{
                 default: (proc: NodeJS.Process) => Promise<NodeJS.ProcessEnv>;
-              }> => import('../../src/process/parseEnv')
+              }> => import('../../../src/process/parse/parseEnv')
             )
             .then(done)
             .catch(done);
@@ -112,7 +112,7 @@ test.suite('parseEnv', { timeout: timeout }, (suiteContext_parseEnv) => {
           const t: void = ctx.assert.doesNotThrow(
             async (): Promise<{
               default: (proc: NodeJS.Process) => Promise<NodeJS.ProcessEnv>;
-            }> => await import('../../src/process/parseEnv')
+            }> => await import('../../../src/process/parse/parseEnv')
           );
           return done(t);
         }
@@ -131,21 +131,61 @@ test.suite('parseEnv', { timeout: timeout }, (suiteContext_parseEnv) => {
     (suiteContext_runs) => {
       //
 
-      //
       test.it(
-        'loads .env from cwd()',
+        'as a module',
         { timeout: timeout, signal: suiteContext_runs.signal },
-        (ctx, done) => {
+        async (testContext_asAModule) => {
           //
-          const parseEnv: typeof import('../../src/process/parseEnv') = require('../../src/process/parseEnv');
-          parseEnv(process)
-            .then((env) => ctx.assert.ok(env))
-            .then(done)
-            .catch(done);
+          const parseEnv: typeof import('../../../src/process/parse/parseEnv') = require('../../../src/process/parse/parseEnv');
           //
+
+          //
+          const loadEnvFileSpy = testContext_asAModule.mock.fn(
+            (
+              path?: Parameters<(typeof import('node:process'))['loadEnvFile']>
+            ): (typeof import('node:process'))['loadEnvFile'] =>
+              require('node:process')['loadEnvFile'](path)
+          );
+          //
+
+          //
+          const parseEnvSpy = testContext_asAModule.mock.fn(
+            (proc: NodeJS.Process) => parseEnv(proc)
+          );
+          //
+
+          //
+          (await test.it(
+            'loads .env from cwd()',
+            { timeout: timeout, signal: testContext_asAModule.signal },
+            (ctx: test.TestContext, done) => {
+              //
+              parseEnv(process)
+                .then((env) => ctx.assert.ok(env))
+                .then(done)
+                .catch(done);
+              //
+            }
+          )) satisfies void; // 'loads .env from cwd()'
+          //
+
+          (await test.it(
+            'mutates process.env correctly',
+            { timeout: timeout, signal: testContext_asAModule.signal },
+            (ctx: test.TestContext, done) => {
+              const before = global.process.env.FAST_REFRESH;
+              parseEnv(global.process)
+                .then((env) => {
+                  const after = env.FAST_REFRESH;
+                  ctx.assert.notStrictEqual(after, before);
+                  return;
+                })
+                .then(done)
+                .catch(done);
+            }
+          )) satisfies void; // 'mutates process.env correctly'
         }
-      ) satisfies Promise<void>; // 'loads .env from cwd()'
-      //
+      ); // testcontext_asAModule
 
       //
     }

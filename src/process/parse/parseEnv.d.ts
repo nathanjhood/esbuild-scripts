@@ -1,10 +1,12 @@
 /**
  * @file parseEnv.d.ts
- *
+ * @author Nathan J. Hood <nathanjhood@googlemail.com>
+ * @copyright 2024 MIT License
  */
 
 declare type ParseEnvOptions = {
   sync?: true | false;
+  path?: string | URL | Buffer;
 };
 
 declare interface parseEnv {

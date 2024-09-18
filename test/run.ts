@@ -7,13 +7,6 @@
  */
 
 import test = require('node:test');
-import assert = require('node:assert');
-import assertStrict = require('node:assert/strict');
-import reporters = require('node:test/reporters');
-import path = require('node:path');
-import os = require('node:os');
-import constants = require('node:constants');
-
 import options = require('./setupTests');
 
 type NodeTestRunnerParameters = Required<Parameters<typeof test.run>>;
