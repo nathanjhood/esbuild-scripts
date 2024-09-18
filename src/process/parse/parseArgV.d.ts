@@ -18,13 +18,15 @@ declare interface parseArgV {
   (proc: NodeJS.Process, options?: ParseArgVOptions): Promise<ParsedArgV>;
 }
 
+declare const parseArgV: parseArgV;
+
 declare interface parseArgVSync {
   default?(proc: NodeJS.Process): ParsedArgV;
   (proc: NodeJS.Process): ParsedArgV;
   (proc: NodeJS.Process, options?: ParseArgVOptions): ParsedArgV;
 }
 
-declare const parseArgV: parseArgV;
+declare const parseArgVSync: parseArgVSync;
 
 export = parseArgV;
 

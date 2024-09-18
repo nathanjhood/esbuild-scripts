@@ -21,6 +21,7 @@
   "bin": {
     "parseCwd": "./dist/process/parse/parseCwd.js",
     "parseCommand": "./dist/process/parse/parseCommand.js",
+    "parseArgV": "./dist/process/parse/parseArgV.js",
     "parseEnv": "./dist/process/parse/parseEnv.js",
     "build": "./dist/scripts/build.js",
     "esbuild-scripts": "./dist/cli.js"

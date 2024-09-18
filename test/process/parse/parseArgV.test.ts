@@ -53,8 +53,8 @@ test.suite('parseArgV', { timeout: timeout }, (suiteContext_parseArgV) => {
         { timeout: timeout, signal: suiteContext_imports.signal },
         (ctx, done) => {
           const t: void = ctx.assert.doesNotThrow(
-            (): typeof import('../../src/process/parseArgV') =>
-              require('../../src/process/parseArgV')
+            (): typeof import('../../../src/process/parse/parseArgV') =>
+              require('../../../src/process/parse/parseArgV')
           );
           return done(t);
         }
@@ -67,7 +67,7 @@ test.suite('parseArgV', { timeout: timeout }, (suiteContext_parseArgV) => {
         { timeout: timeout, signal: suiteContext_imports.signal },
         (ctx, done) => {
           ctx.assert
-            .doesNotReject(import('../../src/process/parseArgV'))
+            .doesNotReject(import('../../../src/process/parse/parseArgV'))
             .then(done)
             .catch(done);
         }
@@ -84,7 +84,7 @@ test.suite('parseArgV', { timeout: timeout }, (suiteContext_parseArgV) => {
                 default: (
                   proc: NodeJS.Process
                 ) => Promise<ReturnType<typeof util.parseArgs>>;
-              }> => import('../../src/process/parseArgV')
+              }> => import('../../../src/process/parse/parseArgV')
             )
             .then(done)
             .catch(done);
@@ -102,7 +102,7 @@ test.suite('parseArgV', { timeout: timeout }, (suiteContext_parseArgV) => {
               default: (
                 proc: NodeJS.Process
               ) => Promise<ReturnType<typeof util.parseArgs>>;
-            }> => await import('../../src/process/parseArgV')
+            }> => await import('../../../src/process/parse/parseArgV')
           );
           return done(t);
         }
@@ -127,7 +127,7 @@ test.suite('parseArgV', { timeout: timeout }, (suiteContext_parseArgV) => {
         { timeout: timeout, signal: suiteContext_runs.signal },
         (ctx, done) => {
           //
-          const parseArgV: typeof import('../../src/process/parseArgV') = require('../../src/process/parseArgV');
+          const parseArgV: typeof import('../../../src/process/parse/parseArgV') = require('../../../src/process/parse/parseArgV');
           parseArgV(process)
             .then((args) => ctx.assert.ok(args))
             .then(done)
