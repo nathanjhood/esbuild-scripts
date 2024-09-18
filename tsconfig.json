@@ -35,9 +35,11 @@
     // recommended
     "verbatimModuleSyntax": true,
     // custom
+    "composite": true,
     "declaration": true,
     "emitDeclarationOnly": true,
-    "skipLibCheck": false
+    "skipLibCheck": false,
+    "tsBuildInfoFile": ".cache/.tsbuildinfo"
   },
   "include": [
     "**/**/*.d.ts",
@@ -52,6 +54,7 @@
     "eslint.config.mjs",
     "prettier.config.mjs",
     "node_modules",
-    "dist"
+    "build",
+    "dist",
   ]
 }
