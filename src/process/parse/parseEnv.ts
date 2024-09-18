@@ -6,9 +6,7 @@
 
 /** */
 import path = require('node:path');
-import util = require('node:util');
 import fs = require('node:fs');
-import assert = require('node:assert');
 
 type ParseEnvOptions = {
   sync?: true | false;
@@ -114,10 +112,6 @@ const parseEnv: parseEnv = (
       // PORT: PORT ? parseInt(PORT) : 3000
     };
 
-    // const after = proc.env.FAST_REFRESH;
-
-    // assert.deepStrictEqual(before, after);
-
     if (errors.length < 0)
       return rejectEnv(new Error('parseEnv() failed', { cause: errors }));
 
@@ -125,7 +119,6 @@ const parseEnv: parseEnv = (
     const raw = Object.keys(proc.env)
       .filter((key) => REACT_APP.test(key))
       .reduce<NodeJS.ProcessEnv>((env, key, index, array) => {
-        // const key = _key as keyof NodeJS.ProcessEnv;
         env[key] = proc.env[key];
         return env;
       }, envDefaults);
@@ -140,8 +133,6 @@ const parseEnv: parseEnv = (
         raw
       ),
     };
-
-    // const server_parsed = util.parseEnv(JSON.stringify(dotenvFile));
 
     if (options && options.debug) console.log('raw:', raw);
     if (options && options.debug) console.log('stringified:', stringified);
