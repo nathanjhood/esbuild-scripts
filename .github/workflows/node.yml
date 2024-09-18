@@ -45,7 +45,12 @@ jobs:
       - name: Environment
         shell: bash
         working-directory: ${{ github.workspace }}
-        run: cp .env.example .env
+        run: |
+          cp .env.example .env
+          cp .env.example .env.local
+          cp .env.test .env.test.local
+          cp .env.development .env.development.local
+          cp .env.production .env.production.local
 
       - name: Install
         shell: bash
@@ -78,7 +83,7 @@ jobs:
         env:
           NODE_ENV: production
         working-directory: ${{ github.workspace }}
-        run: yarn start
+        run: yarn start build
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4

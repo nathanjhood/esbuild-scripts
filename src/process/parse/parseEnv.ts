@@ -79,7 +79,7 @@ const parseEnv: parseEnv = (
         //
       } else {
         const error = new Error("no '.env' file found", { cause: dotenvFile });
-        // errors.push(error);
+        errors.push(error);
       }
     });
 
