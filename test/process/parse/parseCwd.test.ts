@@ -54,8 +54,8 @@ test.suite('parseCwd', { timeout: timeout }, (suiteContext_parseCwd) => {
         { timeout: timeout, signal: suiteContext_imports.signal },
         (ctx, done) => {
           const t: void = ctx.assert.doesNotThrow(
-            (): typeof import('../../src/process/parseCwd') =>
-              require('../../src/process/parseCwd')
+            (): typeof import('../../../src/process/parse/parseCwd') =>
+              require('../../../src/process/parse/parseCwd')
           );
           return done(t);
         }
@@ -68,7 +68,7 @@ test.suite('parseCwd', { timeout: timeout }, (suiteContext_parseCwd) => {
         { timeout: timeout, signal: suiteContext_imports.signal },
         (ctx, done) => {
           ctx.assert
-            .doesNotReject(import('../../src/process/parseCwd'))
+            .doesNotReject(import('../../../src/process/parse/parseCwd'))
             .then(done)
             .catch(done);
         }
@@ -84,7 +84,7 @@ test.suite('parseCwd', { timeout: timeout }, (suiteContext_parseCwd) => {
             .doesNotReject(
               (): Promise<{
                 default: (proc: NodeJS.Process) => Promise<path.ParsedPath>;
-              }> => import('../../src/process/parseCwd')
+              }> => import('../../../src/process/parse/parseCwd')
             )
             .then(done)
             .catch(done);
@@ -100,7 +100,7 @@ test.suite('parseCwd', { timeout: timeout }, (suiteContext_parseCwd) => {
           const t: void = ctx.assert.doesNotThrow(
             async (): Promise<{
               default: (proc: NodeJS.Process) => Promise<path.ParsedPath>;
-            }> => await import('../../src/process/parseCwd')
+            }> => await import('../../../src/process/parse/parseCwd')
           );
           return done(t);
         }
@@ -125,7 +125,7 @@ test.suite('parseCwd', { timeout: timeout }, (suiteContext_parseCwd) => {
         { timeout: timeout, signal: suiteContext_runs.signal },
         (ctx, done) => {
           //
-          const parseCwd: typeof import('../../src/process/parseCwd') = require('../../src/process/parseCwd');
+          const parseCwd: typeof import('../../../src/process/parse/parseCwd') = require('../../../src/process/parse/parseCwd');
           parseCwd(process)
             .then((cwd) => ctx.assert.ok(cwd))
             .then(done)

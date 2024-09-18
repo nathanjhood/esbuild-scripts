@@ -24,7 +24,14 @@ const parseCwd: parseCwd = (
   options?: ParseCwdOptions
 ) => {
   //
-  const result = new Promise<ParsedCwd>((resolveCwd, rejectCwd) => {
+
+  //
+  const errors: Error[] = [];
+  proc.exitCode = errors.length;
+  //
+
+  //
+  return new Promise<ParsedCwd>((resolveCwd, rejectCwd) => {
     //
     const { cwd: getCwd } = proc;
     //
@@ -33,6 +40,13 @@ const parseCwd: parseCwd = (
     const parsedPath = path.parse(cwd);
     //
     const { base, dir, ext, name, root } = parsedPath;
+    //
+
+    //
+    if (errors.length < 0)
+      return rejectCwd(new Error('parseCwd() failed', { cause: errors }));
+    //
+
     //
     return resolveCwd({
       base: base,
@@ -45,8 +59,6 @@ const parseCwd: parseCwd = (
   }).catch((err) => {
     throw err;
   });
-  //
-  return result;
 };
 
 export = parseCwd;

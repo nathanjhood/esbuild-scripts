@@ -19,6 +19,7 @@
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.cts",
   "bin": {
+    "parseCwd": "./dist/process/parse/parseCwd.js",
     "parseEnv": "./dist/process/parse/parseEnv.js",
     "build": "./dist/scripts/build.js",
     "esbuild-scripts": "./dist/cli.js"
