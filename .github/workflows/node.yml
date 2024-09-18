@@ -59,12 +59,26 @@ jobs:
         working-directory: ${{ github.workspace }}
         run: yarn test
 
+      - name: Dev
+        shell: bash
+        env:
+          NODE_ENV: development
+        working-directory: ${{ github.workspace }}
+        run: yarn dev build
+
       - name: Build
         shell: bash
         env:
           NODE_ENV: production
         working-directory: ${{ github.workspace }}
         run: yarn build
+
+      - name: Start
+        shell: bash
+        env:
+          NODE_ENV: production
+        working-directory: ${{ github.workspace }}
+        run: yarn start
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
