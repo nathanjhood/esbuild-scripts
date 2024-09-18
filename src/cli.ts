@@ -90,7 +90,7 @@ const cli = async (proc: NodeJS.Process, options?: CliOptions) => {
 
                   const result: childProcess.SpawnSyncReturns<Buffer> =
                     childProcess.spawnSync(
-                      joinedRtArgs[0]!,
+                      path.resolve(`${joinedRtArgs[0]!}`),
                       joinedRtArgs
                         .slice(1)
                         .concat(
@@ -102,11 +102,11 @@ const cli = async (proc: NodeJS.Process, options?: CliOptions) => {
                         ),
                       {
                         stdio: 'inherit',
-                        cwd: path.format(cwd),
-                        argv0: joinedRtArgs[0],
+                        cwd: path.resolve(path.format(cwd)),
+                        argv0: path.resolve(joinedRtArgs[0]!),
                         env: proc.env, // from 'parseEnv()'
                         signal: abortController.signal,
-                        shell: true, // depends...
+                        // shell: true, // depends...
                       }
                     );
                   //
