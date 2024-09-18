@@ -7,19 +7,18 @@
 /**
  *
  */
-// import parseCommand = require("./process/parseCommand");
-// import parseArgV = require("./process/parseArgV");
-
-import type parseArgV from './process/parseArgV.d';
-import type parseCommand from './process/parseCommand.d';
-import type parseEnv from './process/parseEnv.d';
+import parseCommand = require('./process/parse/parseCommand');
+import parseArgV = require('./process/parse/parseArgV');
+import parseCwd = require('./process/parse/parseCwd');
+import parseEnv = require('./process/parse/parseEnv');
 
 export = index;
 
 declare interface Index {
-  parseCommand: parseCommand;
-  parseArgV: parseArgV;
-  parseEnv: parseEnv;
+  parseCommand: typeof parseCommand;
+  parseArgV: typeof parseArgV;
+  parseCwd: typeof parseCwd;
+  parseEnv: typeof parseEnv;
 }
 
 declare const index: Index;
