@@ -164,16 +164,16 @@ interface parseEnvSync {
 
 export = parseEnv;
 
-if (require.main === module) {
-  ((proc: NodeJS.Process, options: ParseEnvOptions) => {
-    parseEnv(proc, options)
-      .then((env) => {
-        // console.log(env);
-        return env;
-      })
-      .catch((reason) => {
-        console.error(reason);
-        throw reason;
-      });
-  })(global.process, { sync: true, debug: true });
-}
+// if (require.main === module) {
+//   ((proc: NodeJS.Process, options: ParseEnvOptions) => {
+//     parseEnv(proc, options)
+//       .then((env) => {
+//         // console.log(env);
+//         return env;
+//       })
+//       .catch((reason) => {
+//         console.error(reason);
+//         throw reason;
+//       });
+//   })(global.process, { sync: true, debug: true });
+// }

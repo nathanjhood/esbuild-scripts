@@ -103,24 +103,24 @@ const parseCommand: parseCommand = (
 
 export = parseCommand;
 
-if (require.main === module) {
-  ((proc: NodeJS.Process, options?: ParseCommandOptions) => {
-    //
-    const errors: Error[] = [];
-    proc.exitCode = errors.length;
-    //
-    return parseCommand(proc)
-      .then((command) => {
-        //
-        const { values, positionals, tokens } = command;
-        console.log('values:', values);
-        console.log('positionals:', positionals);
-        console.log('tokens:', tokens);
-        return command;
-      })
-      .catch((reason) => {
-        console.error(reason);
-        throw reason;
-      });
-  })(global.process, { sync: true });
-}
+// if (require.main === module) {
+//   ((proc: NodeJS.Process, options?: ParseCommandOptions) => {
+//     //
+//     const errors: Error[] = [];
+//     proc.exitCode = errors.length;
+//     //
+//     return parseCommand(proc)
+//       .then((command) => {
+//         //
+//         const { values, positionals, tokens } = command;
+//         console.log('values:', values);
+//         console.log('positionals:', positionals);
+//         console.log('tokens:', tokens);
+//         return command;
+//       })
+//       .catch((reason) => {
+//         console.error(reason);
+//         throw reason;
+//       });
+//   })(global.process, { sync: true });
+// }

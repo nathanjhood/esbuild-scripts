@@ -230,21 +230,21 @@ const parseArgVSync: parseArgVSync = (
 
 export = parseArgV;
 
-if (require.main === module) {
-  ((proc: NodeJS.Process, options?: ParseArgVOptions) => {
-    parseArgV(proc)
-      .then((args) => {
-        const { values, positionals, tokens } = args;
-        console.log('values:', values);
-        console.log('positionals:', positionals);
-        console.log('tokens:', tokens);
-        return args;
-      })
-      .catch((reason) => {
-        console.error(
-          new Error('require.main.parseArgV failed', { cause: reason })
-        );
-        throw reason;
-      });
-  })(global.process, { sync: true });
-}
+// if (require.main === module) {
+//   ((proc: NodeJS.Process, options?: ParseArgVOptions) => {
+//     parseArgV(proc)
+//       .then((args) => {
+//         const { values, positionals, tokens } = args;
+//         console.log('values:', values);
+//         console.log('positionals:', positionals);
+//         console.log('tokens:', tokens);
+//         return args;
+//       })
+//       .catch((reason) => {
+//         console.error(
+//           new Error('require.main.parseArgV failed', { cause: reason })
+//         );
+//         throw reason;
+//       });
+//   })(global.process, { sync: true });
+// }

@@ -63,23 +63,23 @@ const parseCwd: parseCwd = (
 
 export = parseCwd;
 
-if (require.main === module) {
-  ((proc: NodeJS.Process, options?: ParseCwdOptions) => {
-    return parseCwd(proc)
-      .then((cwd) => {
-        console.log({
-          base: cwd.base,
-          dir: cwd.dir,
-          ext: cwd.ext,
-          name: cwd.name,
-          root: cwd.root,
-        });
-        return cwd;
-      })
-      .catch((reason) => {
-        console.error(reason);
-        throw reason;
-      });
-    //
-  })(global.process, { sync: true });
-}
+// if (require.main === module) {
+//   ((proc: NodeJS.Process, options?: ParseCwdOptions) => {
+//     return parseCwd(proc)
+//       .then((cwd) => {
+//         console.log({
+//           base: cwd.base,
+//           dir: cwd.dir,
+//           ext: cwd.ext,
+//           name: cwd.name,
+//           root: cwd.root,
+//         });
+//         return cwd;
+//       })
+//       .catch((reason) => {
+//         console.error(reason);
+//         throw reason;
+//       });
+//     //
+//   })(global.process, { sync: true });
+// }
