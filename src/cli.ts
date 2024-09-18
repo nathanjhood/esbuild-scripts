@@ -10,105 +10,151 @@ import process = require('node:process');
 import Module = require('node:module');
 
 import packageJson = require('../package.json');
-import parseCommand = require('./process/parseCommand');
-import parseArgV = require('./process/parseArgV');
-import parseEnv = require('./process/parseEnv');
+import parseCommand = require('./process/parse/parseCommand');
+import parseArgV = require('./process/parse/parseArgV');
+import parseEnv = require('./process/parse/parseEnv');
+import parseCwd = require('./process/parse/parseCwd');
+
+type CliOptions = {
+  sync?: true | false;
+  verbose?: true | false;
+  debug?: true | false;
+};
 
 /**
  *
  * @param {NodeJS.Process} proc
  * @returns
  */
-const cli = (proc: NodeJS.Process) => {
+const cli = async (proc: NodeJS.Process, options?: CliOptions) => {
+  //
+
+  //
+  const errors: Error[] = [];
+  //
+
+  proc.exitCode = errors.length; // TODO: collecting an integer number of recursive 'error.cause' objects (+1 for current-level) would be better...
+
   //
   proc.on('unhandledRejection', (err, origin) => {
-    throw err;
+    const error = new Error('cli.unhandledRejection', { cause: origin });
+    errors.push(error);
+    throw error;
   });
   //
+
+  //
   const abortController = new AbortController();
+  //
+
+  const debug = options && options.debug;
+  const verbose = options && options.verbose;
+
   //
   return parseCommand(proc)
     .then((runtime) => {
       //
+      if (debug) console.debug(runtime.tokens);
+      //
       return parseArgV(proc)
         .then((args) => {
-          return parseEnv(proc)
-            .then((env) => {
+          //
+          if (debug) console.debug(args.tokens);
+          //
+          return parseCwd(proc)
+            .then((cwd) => {
               //
-              const joinedRtArgs: string[] = [];
+              if (debug) console.debug(cwd);
               //
-              if (runtime.tokens)
-                runtime.tokens.forEach((token) => {
-                  if (token.kind === 'option') {
-                    joinedRtArgs.push(`${token.rawName}`);
-                    if (token.value) joinedRtArgs.push(`${token.value}`);
-                  } else if (token.kind === 'positional') {
-                    joinedRtArgs.push(`${token.value}`);
-                  }
+              return parseEnv(proc)
+                .then((env) => {
+                  //
+                  if (debug || verbose) console.debug(env);
+                  //
+
+                  //
+                  const joinedRtArgs: string[] = [];
+                  //
+
+                  //
+                  if (runtime.tokens)
+                    runtime.tokens.forEach((token) => {
+                      if (token.kind === 'option') {
+                        joinedRtArgs.push(`${token.rawName}`);
+                        if (token.value) joinedRtArgs.push(`${token.value}`);
+                      } else if (token.kind === 'positional') {
+                        joinedRtArgs.push(`${token.value}`);
+                      }
+                    });
+                  //
+
+                  const result: childProcess.SpawnSyncReturns<Buffer> =
+                    childProcess.spawnSync(
+                      joinedRtArgs[0]!,
+                      joinedRtArgs
+                        .slice(1)
+                        .concat(
+                          path.resolve(
+                            __dirname,
+                            'scripts',
+                            args.positionals[0]!
+                          )
+                        ),
+                      {
+                        stdio: 'inherit',
+                        cwd: path.format(cwd),
+                        argv0: joinedRtArgs[0],
+                        env: proc.env, // from 'parseEnv()'
+                        signal: abortController.signal,
+                        shell: true, // depends...
+                      }
+                    );
+                  //
+
+                  //
+                  const { error, output, pid, signal, status, stderr, stdout } =
+                    result;
+
+                  //
+                  if (error) errors.push(error);
+                  //
+
+                  //
+                  return { error, output, pid, signal, status, stderr, stdout };
+                  //
+                })
+                .catch<void>((err) => {
+                  abortController.abort(err);
+                  errors.push(err);
+                  throw new Error('cli.parseEnv() failed', { cause: err });
                 });
-              //
-
-              const result: childProcess.SpawnSyncReturns<Buffer> =
-                childProcess.spawnSync(
-                  joinedRtArgs[0]!,
-                  joinedRtArgs
-                    .slice(1)
-                    .concat(
-                      require.resolve('./scripts/' + args.positionals[0])
-                    ),
-                  {
-                    stdio: 'inherit',
-                    cwd: proc.cwd(),
-                    argv0: joinedRtArgs[0],
-                    env: env, // from 'parseEnv()'
-                    signal: abortController.signal,
-                    shell: true, // depends...
-                  }
-                );
-              //
-
-              //
-              const { error, output, pid, signal, status, stderr, stdout } =
-                result;
-
-              //
-              return { error, output, pid, signal, status, stderr, stdout };
-              //
             })
             .catch<void>((err) => {
               abortController.abort(err);
-              proc.exitCode = 1;
-              throw err;
+              errors.push(err);
+              throw new Error('cli.parseCwd failed', { cause: err });
             });
         })
         .catch<void>((err) => {
           abortController.abort(err);
-          proc.exitCode = 1;
-          throw err;
+          errors.push(err);
+          throw new Error('cli.parseArgs() failed', { cause: err });
         });
     })
     .catch<void>((err) => {
       abortController.abort(err);
-      proc.exitCode = 1;
-      throw err;
+      errors.push(err);
+      throw new Error('cli.parseCommand() failed', { cause: err });
     });
 };
 
 export = cli;
 
 if (require.main === module) {
-  cli(process)
-    .then((proc) => {
-      if (!proc)
-        throw new Error('no child process returned from spawnSync()', {
-          cause: proc,
-        });
-      return proc;
-    })
-    .catch((reason) => {
-      console.error(new Error('node process', { cause: reason }));
-      process.exitCode = 1;
-    });
+  ((proc: NodeJS.Process, options?: CliOptions) => cli(proc))(global.process, {
+    sync: true,
+    debug: true,
+  });
 }
 
 // const _cli = (process: NodeJS.Process) => {
