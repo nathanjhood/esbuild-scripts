@@ -1,0 +1,87 @@
+# Simple workflow for deploying static content to GitHub Pages
+name: github-pages
+
+on:
+  # Runs on pushes targeting the default branch
+  push:
+    branches:
+      - production
+      - release/*
+      - "!preview/*"
+      - "!development/*"
+  pull_request:
+    branches:
+      - production
+      - release/*
+      - "!preview/*"
+      - "!development/*"
+  # A push is made to a GitHub Pages-enabled branch
+  page_build:
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+env:
+  GITHUB_PAGES: true
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  NODE_ENV: "production"
+  BUILD_DIR: "dist"
+  PUBLIC_URL: "https://nathanjhood.github.io/"
+  HOST: "nathanjhood.github.io"
+  PORT: 80
+  HTTPS: true
+  TSC_COMPILE_ON_ERROR: false
+  # fast refresh probably does nothing in prod...
+  FAST_REFRESH: true
+
+jobs:
+  # Single deploy job since we're just deploying
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup
+        uses: actions/setup-node@v4
+        with:
+          cache: yarn
+          cache-dependency-path: yarn.lock
+      - name: Install
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        run: yarn
+      - name: Build
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        run: yarn build
+      - name: Fix permissions
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        run: |
+          chmod -c -R +rX ${{ github.workspace }}/${{ env.BUILD_DIR }}/ | while read line; do
+            echo "::warning title=Invalid file permissions automatically fixed::$line"
+          done
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Upload build output
+          path: ${{ github.workspace }}/${{ env.BUILD_DIR }}/
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
