@@ -1,13 +1,14 @@
 #!/usr/bin/env -S yarn tsx
 
 /**
- * @file setupTests.ts
+ * @file run.ts
  * @author Nathan J. Hood <nathanjhood@googlemail.com>
  * @copyright 2024 MIT License
  */
 
 import test = require('node:test');
-import options = require('./setupTests');
+import parseEnv = require('../src/process/parseEnv');
+import setupTests = require('./setupTests');
 
 type NodeTestRunnerParameters = Required<Parameters<typeof test.run>>;
 type NodeTestRunnerOptions = NodeTestRunnerParameters[0];
@@ -15,32 +16,33 @@ type NodeTestRunnerReturnType = ReturnType<typeof test.run>;
 
 // const abortController: AbortController = new AbortController();
 
-const run = (process: NodeJS.Process) => {
+const run = (proc: NodeJS.Process, options?: NodeTestRunnerOptions) => {
   //
-  process.on('uncaughtException', (error) => {
+  proc.on('uncaughtException', (error) => {
     const e = new Error('uncaughtException', { cause: error });
     // abortController.abort(e);
-    process.exitCode = 1;
+    proc.exitCode = 1;
     throw error;
   });
   //
-  process.on('unhandledRejection', (error) => {
+  proc.on('unhandledRejection', (error) => {
     const e = new Error('unhandledRejection', { cause: error });
     // abortController.abort(e);
-    process.exitCode = 1;
+    proc.exitCode = 1;
     throw error;
   });
   //
-  process.on('beforeExit', (code) => {
-    console.info('process', process.pid, 'exiting with code', code);
+  proc.on('beforeExit', (code) => {
+    console.info('process', proc.pid, 'exiting with code', code);
   });
   //
-  process.on('exit', (code) => {
-    console.info('process', process.pid, 'exited with code', code);
+  proc.on('exit', (code) => {
+    console.info('process', proc.pid, 'exited with code', code);
   });
-  if (process.env.NODE_ENV === undefined)
+  parseEnv(proc);
+  if (proc.env.NODE_ENV === undefined)
     throw new Error("'NODE_ENV' should be 'test', but it was undefined");
-  if (process.env.NODE_ENV !== 'test')
+  if (proc.env.NODE_ENV !== 'test')
     throw new Error(
       "'NODE_ENV' should be 'test', but it was '" + process.env.NODE_ENV + "'"
     );
@@ -51,5 +53,5 @@ const run = (process: NodeJS.Process) => {
 };
 
 if (require.main === module) {
-  run(process);
+  run(global.process, setupTests);
 }
