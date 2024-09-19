@@ -24,7 +24,7 @@ const options: Readonly<NodeTestRunnerOptions> =
       path.resolve(path.join(__dirname, '/process/parse/parseCwd.test.ts')),
       path.resolve(path.join(__dirname, '/process/parse/parseEnv.test.ts')),
       path.resolve(path.join(__dirname, '/process/parse/parseCommand.test.ts')),
-      path.resolve(path.join(__dirname, '/process/parse/parseArgV.test.ts')),
+      path.resolve(path.join(__dirname, '/process/parseArgv.test.ts')),
       path.resolve(path.join(__dirname, '/cli.test.ts')),
     ],
     concurrency: os.availableParallelism() - 1,

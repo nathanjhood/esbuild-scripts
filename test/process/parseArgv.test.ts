@@ -9,7 +9,7 @@ import util = require('node:util');
 
 const timeout = 10000;
 
-test.suite('parseArgV', { timeout: timeout }, (suiteContext_parseArgV) => {
+test.suite('parseArgv', { timeout: timeout }, (suiteContext_parseArgV) => {
   //
 
   //
@@ -20,6 +20,7 @@ test.suite('parseArgV', { timeout: timeout }, (suiteContext_parseArgV) => {
   test.afterEach(
     (ctx, done) => {
       //
+      console.warn(ctx.name, 'calling mock.restoreAll()');
       mock.restoreAll();
       return done();
       //
@@ -32,6 +33,7 @@ test.suite('parseArgV', { timeout: timeout }, (suiteContext_parseArgV) => {
   test.after(
     (ctx, done) => {
       //
+      console.warn(ctx.name, 'calling mock.reset()');
       mock.reset();
       return done();
       //
@@ -53,8 +55,8 @@ test.suite('parseArgV', { timeout: timeout }, (suiteContext_parseArgV) => {
         { timeout: timeout, signal: suiteContext_imports.signal },
         (ctx, done) => {
           const t: void = ctx.assert.doesNotThrow(
-            (): typeof import('../../../src/process/parse/parseArgV') =>
-              require('../../../src/process/parse/parseArgV')
+            (): typeof import('../../src/process/parseArgv') =>
+              require('../../src/process/parseArgv')
           );
           return done(t);
         }
@@ -67,7 +69,7 @@ test.suite('parseArgV', { timeout: timeout }, (suiteContext_parseArgV) => {
         { timeout: timeout, signal: suiteContext_imports.signal },
         (ctx, done) => {
           ctx.assert
-            .doesNotReject(import('../../../src/process/parse/parseArgV'))
+            .doesNotReject(import('../../src/process/parseArgv'))
             .then(done)
             .catch(done);
         }
@@ -83,8 +85,8 @@ test.suite('parseArgV', { timeout: timeout }, (suiteContext_parseArgV) => {
               (): Promise<{
                 default: (
                   proc: NodeJS.Process
-                ) => Promise<ReturnType<typeof util.parseArgs>>;
-              }> => import('../../../src/process/parse/parseArgV')
+                ) => ReturnType<typeof util.parseArgs>;
+              }> => import('../../src/process/parseArgv')
             )
             .then(done)
             .catch(done);
@@ -101,8 +103,8 @@ test.suite('parseArgV', { timeout: timeout }, (suiteContext_parseArgV) => {
             async (): Promise<{
               default: (
                 proc: NodeJS.Process
-              ) => Promise<ReturnType<typeof util.parseArgs>>;
-            }> => await import('../../../src/process/parse/parseArgV')
+              ) => ReturnType<typeof util.parseArgs>;
+            }> => await import('../../src/process/parseArgv')
           );
           return done(t);
         }
@@ -125,14 +127,42 @@ test.suite('parseArgV', { timeout: timeout }, (suiteContext_parseArgV) => {
       test.it(
         'parses commands passed to running cli instance',
         { timeout: timeout, signal: suiteContext_runs.signal },
-        (ctx, done) => {
+        async (ctx: test.TestContext) => {
           //
-          const parseArgV: typeof import('../../../src/process/parse/parseArgV') = require('../../../src/process/parse/parseArgV');
-          parseArgV(process)
-            .then((args) => ctx.assert.ok(args))
-            .then(done)
-            .catch(done);
-          //
+          const parseArgv: typeof import('../../src/process/parseArgv') = require('../../src/process/parseArgv');
+          const parseArgvSpy = ctx.mock.fn(parseArgv);
+
+          (await ctx.test(
+            'ok',
+            {
+              timeout: timeout,
+              signal: ctx.signal,
+            },
+            (ctx_ok: test.TestContext, done) => {
+              const argv = parseArgvSpy(process);
+              ctx_ok.assert.ok(argv);
+              parseArgvSpy.mock.resetCalls();
+              return done();
+            }
+          )) satisfies void;
+          (await ctx.test(
+            'callcount',
+            {
+              timeout: timeout,
+              signal: ctx.signal,
+            },
+            (ctx_callcount: test.TestContext, done) => {
+              // call parseEnv 5 times consecutively
+              for (let i = 0; i < 5; i++) {
+                parseArgvSpy(process);
+                ctx_callcount.assert.deepStrictEqual(
+                  parseArgvSpy.mock.callCount(),
+                  i + 1 // assert the callcount each time
+                );
+              }
+              return done();
+            }
+          )) satisfies void;
         }
       ) satisfies Promise<void>; // 'parses commands passed to running cli instance'
       //
