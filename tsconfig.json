@@ -4,9 +4,7 @@
   "compilerOptions": {
     // from @tsconfig/node20
     "target": "es2022",
-    "lib": [
-      "es2023"
-    ],
+    "lib": ["es2023"],
     // taken from @tsconfig/strictest
     "strict": true,
     "allowUnusedLabels": false,
@@ -53,8 +51,8 @@
   "exclude": [
     "eslint.config.mjs",
     "prettier.config.mjs",
-    "node_modules",
-    "build",
-    "dist",
+    "./node_modules",
+    "./build",
+    "./dist"
   ]
 }
