@@ -138,11 +138,11 @@ const parseArgv: parseArgv<ParseArgsConfig> = (
 
 export = parseArgv;
 
-if (require.main === module) {
-  ((proc: NodeJS.Process, options?: ParseArgvOptions) => {
-    parseArgv(proc, options);
-  })(global.process, {
-    verbose: global.process.env['VERBOSE'] !== undefined ? true : false,
-    debug: global.process.env['DEBUG'] !== undefined ? true : false,
-  });
-}
+// if (require.main === module) {
+//   ((proc: NodeJS.Process, options?: ParseArgvOptions) => {
+//     parseArgv(proc, options);
+//   })(global.process, {
+//     verbose: global.process.env['VERBOSE'] !== undefined ? true : false,
+//     debug: global.process.env['DEBUG'] !== undefined ? true : false,
+//   });
+// }

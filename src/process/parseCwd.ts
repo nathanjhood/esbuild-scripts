@@ -72,9 +72,12 @@ const parseCwd: parseCwd = (
 
 export = parseCwd;
 
-if (require.main === module) {
-  ((proc: NodeJS.Process, options?: ParseCwdOptions) => {
-    return parseCwd(proc);
-    //
-  })(global.process, { sync: true });
-}
+// if (require.main === module) {
+//   ((proc: NodeJS.Process, options?: ParseCwdOptions) => {
+//     return parseCwd(proc, options);
+//     //
+//   })(global.process, {
+//     //     verbose: global.process.env['VERBOSE'] !== undefined ? true : false,
+//     //     debug: global.process.env['DEBUG'] !== undefined ? true : false,
+//   });
+// }

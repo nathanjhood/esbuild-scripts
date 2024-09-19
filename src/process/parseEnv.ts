@@ -10,9 +10,10 @@ import fs = require('node:fs');
 
 type ParseEnvOptions = {
   sync?: true | false;
-  path?: string | URL | Buffer;
+  verbose?: true | false;
   debug?: true | false;
-  encoding?: 'utf8';
+  path?: string | URL | Buffer;
+  encoding?: BufferEncoding;
 };
 
 interface parseEnv {
@@ -48,11 +49,8 @@ const parseEnv: parseEnv = (
   const { cwd: getCwd, loadEnvFile: loadEnvFile } = proc;
   //
   const cwd = getCwd();
-  //
-  // const nodeEnv = env['NODE_ENV'];
-  //
-  const encoding = options && options.encoding ? options.encoding : 'utf8';
-  const debug: boolean = Boolean(options && options.debug);
+  // const encoding = options && options.encoding ? options.encoding : 'utf-8';
+  // const debug: boolean = Boolean(options && options.debug);
   //
 
   const paths = {
@@ -80,7 +78,7 @@ const parseEnv: parseEnv = (
     if (fs.existsSync(dotenvFile.toString())) {
       //
       const parsedEnvPath = path.parse(dotenvFile.toString());
-      const formattedEnvPath = path.format(parsedEnvPath);
+      // const formattedEnvPath = path.format(parsedEnvPath);
       //
       console.info(`parseEnv('${parsedEnvPath.base}')`);
       //
@@ -152,6 +150,9 @@ export = parseEnv;
 
 if (require.main === module) {
   ((proc: NodeJS.Process, options: ParseEnvOptions) => {
-    const env = parseEnv(proc, options);
-  })(global.process, { sync: true, debug: true });
+    parseEnv(proc, options);
+  })(global.process, {
+    verbose: global.process.env['VERBOSE'] !== undefined ? true : false,
+    debug: global.process.env['DEBUG'] !== undefined ? true : false,
+  });
 }

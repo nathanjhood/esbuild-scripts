@@ -7,10 +7,10 @@
 /**
  *
  */
-import parseCommand = require('./process/parse/parseCommand');
-import parseArgV = require('./process/parse/parseArgV');
-import parseCwd = require('./process/parse/parseCwd');
-import parseEnv = require('./process/parse/parseEnv');
+import parseCommand = require('./process/parseCommand');
+import parseArgV = require('./process/parseArgv');
+import parseCwd = require('./process/parseCwd');
+import parseEnv = require('./process/parseEnv');
 
 export = index;
 

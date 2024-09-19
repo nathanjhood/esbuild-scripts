@@ -138,11 +138,11 @@ const parseCommand: parseCommand<ParseArgsConfig> = (
 
 export = parseCommand;
 
-if (require.main === module) {
-  ((proc: NodeJS.Process, options?: ParseCommandOptions) => {
-    parseCommand(proc, options);
-  })(global.process, {
-    verbose: global.process.env['VERBOSE'] !== undefined ? true : false,
-    debug: global.process.env['DEBUG'] !== undefined ? true : false,
-  });
-}
+// if (require.main === module) {
+//   ((proc: NodeJS.Process, options?: ParseCommandOptions) => {
+//     parseCommand(proc, options);
+//   })(global.process, {
+//     verbose: global.process.env['VERBOSE'] !== undefined ? true : false,
+//     debug: global.process.env['DEBUG'] !== undefined ? true : false,
+//   });
+// }

@@ -8,6 +8,8 @@ export = parseEnv;
 
 declare type ParseEnvOptions = {
   sync?: true | false;
+  verbose?: true | false;
+  debug?: true | false;
   path?: string | URL | Buffer;
 };
 
