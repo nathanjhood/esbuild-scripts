@@ -56,8 +56,8 @@ test.suite(
           { timeout: timeout, signal: suiteContext_imports.signal },
           (ctx, done) => {
             const t: void = ctx.assert.doesNotThrow(
-              (): typeof import('../../../src/process/parse/parseCommand') =>
-                require('../../../src/process/parse/parseCommand')
+              (): typeof import('../../src/process/parseCommand') =>
+                require('../../src/process/parseCommand')
             );
             return done(t);
           }
@@ -70,7 +70,7 @@ test.suite(
           { timeout: timeout, signal: suiteContext_imports.signal },
           (ctx, done) => {
             ctx.assert
-              .doesNotReject(import('../../../src/process/parse/parseCommand'))
+              .doesNotReject(import('../../src/process/parseCommand'))
               .then(done)
               .catch(done);
           }
@@ -87,8 +87,8 @@ test.suite(
                 (): Promise<{
                   default: (
                     proc: NodeJS.Process
-                  ) => Promise<ReturnType<typeof util.parseArgs>>;
-                }> => import('../../../src/process/parse/parseCommand')
+                  ) => ReturnType<typeof util.parseArgs>;
+                }> => import('../../src/process/parseCommand')
               )
               .then(done)
               .catch(done);
@@ -105,8 +105,8 @@ test.suite(
               async (): Promise<{
                 default: (
                   proc: NodeJS.Process
-                ) => Promise<ReturnType<typeof util.parseArgs>>;
-              }> => await import('../../../src/process/parse/parseCommand')
+                ) => ReturnType<typeof util.parseArgs>;
+              }> => await import('../../src/process/parseCommand')
             );
             return done(t);
           }
@@ -129,14 +129,41 @@ test.suite(
         test.it(
           'parses commands passed to running NodeJS instance',
           { timeout: timeout, signal: suiteContext_runs.signal },
-          (ctx, done) => {
+          async (ctx) => {
             //
-            const parseCommand: typeof import('../../../src/process/parse/parseCommand') = require('../../../src/process/parse/parseCommand');
-            parseCommand(process)
-              .then((env) => ctx.assert.ok(env))
-              .then(done)
-              .catch(done);
-            //
+            const parseCommand: typeof import('../../src/process/parseCommand') = require('../../src/process/parseCommand');
+            const parseCommandSpy = ctx.mock.fn(parseCommand);
+            (await ctx.test(
+              'ok',
+              {
+                timeout: timeout,
+                signal: ctx.signal,
+              },
+              (ctx_ok: test.TestContext, done) => {
+                const argv = parseCommandSpy(process);
+                ctx_ok.assert.ok(argv);
+                parseCommandSpy.mock.resetCalls();
+                return done();
+              }
+            )) satisfies void;
+            (await ctx.test(
+              'callcount',
+              {
+                timeout: timeout,
+                signal: ctx.signal,
+              },
+              (ctx_callcount: test.TestContext, done) => {
+                // call parseEnv 5 times consecutively
+                for (let i = 0; i < 5; i++) {
+                  parseCommandSpy(process);
+                  ctx_callcount.assert.deepStrictEqual(
+                    parseCommandSpy.mock.callCount(),
+                    i + 1 // assert the callcount each time
+                  );
+                }
+                return done();
+              }
+            )) satisfies void;
           }
         ) satisfies Promise<void>; // 'parses commands passed to running NodeJS instance'
         //
