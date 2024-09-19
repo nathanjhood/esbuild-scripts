@@ -119,7 +119,7 @@ declare namespace NodeJS {
      * images.
      */
     readonly IMAGE_INLINE_SIZE_LIMIT?: '10000' | string | undefined;
-    readonly VERBOSE?: string | undefined;
-    readonly DEBUG?: string | undefined;
+    readonly VERBOSE?: 'true' | 'false' | undefined;
+    readonly DEBUG?: 'true' | 'false' | undefined;
   }
 }
