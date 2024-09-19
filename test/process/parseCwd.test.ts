@@ -17,10 +17,11 @@ test.suite('parseCwd', { timeout: timeout }, (suiteContext_parseCwd) => {
   const mock = test.mock;
   //
 
-  //
+//
   test.afterEach(
     (ctx, done) => {
       //
+      console.warn(ctx.name, 'calling mock.restoreAll()');
       mock.restoreAll();
       return done();
       //
@@ -33,12 +34,15 @@ test.suite('parseCwd', { timeout: timeout }, (suiteContext_parseCwd) => {
   test.after(
     (ctx, done) => {
       //
+      console.warn(ctx.name, 'calling mock.reset()');
       mock.reset();
       return done();
       //
     },
     { timeout: timeout, signal: suiteContext_parseCwd.signal }
   ) satisfies void;
+  //
+  
   //
 
   //
@@ -125,8 +129,12 @@ test.suite('parseCwd', { timeout: timeout }, (suiteContext_parseCwd) => {
         { timeout: timeout, signal: suiteContext_runs.signal },
         async (ctx: test.TestContext) => {
           //
+
+          //
           const parseCwd: typeof import('../../src/process/parseCwd') = require('../../src/process/parseCwd');
           const parseCwdSpy = ctx.mock.fn(parseCwd);
+          //
+          
           //
           (await ctx.test(
             'ok',
@@ -141,6 +149,9 @@ test.suite('parseCwd', { timeout: timeout }, (suiteContext_parseCwd) => {
               return done();
             }
           )) satisfies void;
+          //
+
+          //
           (await ctx.test(
             'callcount',
             {
@@ -159,6 +170,8 @@ test.suite('parseCwd', { timeout: timeout }, (suiteContext_parseCwd) => {
               return done();
             }
           )) satisfies void;
+          //
+          
         }
       ) satisfies Promise<void>; // 'parses cwd()'
       //
