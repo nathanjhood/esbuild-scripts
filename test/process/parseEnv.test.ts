@@ -13,6 +13,9 @@ test.suite('parseEnv', { timeout: timeout }, (suiteContext_parseEnv) => {
 
   //
   const mock = test.mock;
+  //
+
+  //
   const env = {
     NODE_ENV: 'test',
   };
@@ -163,6 +166,7 @@ test.suite('parseEnv', { timeout: timeout }, (suiteContext_parseEnv) => {
           )) satisfies void; // 'loads .env from cwd()'
           //
 
+          //
           (await test.it(
             'mutates process.env correctly',
             { timeout: timeout, signal: testContext_asAModule.signal },
@@ -174,8 +178,11 @@ test.suite('parseEnv', { timeout: timeout }, (suiteContext_parseEnv) => {
               return done();
             }
           )) satisfies void; // 'mutates process.env correctly'
+          //
+
+          //
         }
-      );
+      ) satisfies void; // 'parses '.env' files from cwd()';
 
       //
     }
