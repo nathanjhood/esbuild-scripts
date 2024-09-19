@@ -5,7 +5,6 @@
  */
 
 import test = require('node:test');
-// import process = require('node:process');
 
 const timeout = 10000;
 
@@ -66,8 +65,8 @@ test.suite('parseEnv', { timeout: timeout }, (suiteContext_parseEnv) => {
         { timeout: timeout, signal: suiteContext_imports.signal },
         (ctx, done) => {
           const t: void = ctx.assert.doesNotThrow(
-            (): typeof import('../../../src/process/parse/parseEnv') =>
-              require('../../../src/process/parse/parseEnv')
+            (): typeof import('../../src/process/parseEnv') =>
+              require('../../src/process/parseEnv')
           );
           return done(t);
         }
@@ -80,7 +79,7 @@ test.suite('parseEnv', { timeout: timeout }, (suiteContext_parseEnv) => {
         { timeout: timeout, signal: suiteContext_imports.signal },
         (ctx, done) => {
           ctx.assert
-            .doesNotReject(import('../../../src/process/parse/parseEnv'))
+            .doesNotReject(import('../../src/process/parseEnv'))
             .then(done)
             .catch(done);
         }
@@ -95,8 +94,11 @@ test.suite('parseEnv', { timeout: timeout }, (suiteContext_parseEnv) => {
           ctx.assert
             .doesNotReject(
               (): Promise<{
-                default: (proc: NodeJS.Process) => Promise<NodeJS.ProcessEnv>;
-              }> => import('../../../src/process/parse/parseEnv')
+                default: (proc: NodeJS.Process) => Promise<{
+                  raw: NodeJS.ProcessEnv;
+                  stringified: { 'process.env': NodeJS.ProcessEnv };
+                }>;
+              }> => import('../../src/process/parseEnv')
             )
             .then(done)
             .catch(done);
@@ -111,8 +113,11 @@ test.suite('parseEnv', { timeout: timeout }, (suiteContext_parseEnv) => {
         (ctx, done) => {
           const t: void = ctx.assert.doesNotThrow(
             async (): Promise<{
-              default: (proc: NodeJS.Process) => Promise<NodeJS.ProcessEnv>;
-            }> => await import('../../../src/process/parse/parseEnv')
+              default: (proc: NodeJS.Process) => {
+                raw: NodeJS.ProcessEnv;
+                stringified: { 'process.env': NodeJS.ProcessEnv };
+              };
+            }> => await import('../../src/process/parseEnv')
           );
           return done(t);
         }
@@ -132,26 +137,14 @@ test.suite('parseEnv', { timeout: timeout }, (suiteContext_parseEnv) => {
       //
 
       test.it(
-        'as a module',
+        'parses .env files from cwd()',
         { timeout: timeout, signal: suiteContext_runs.signal },
-        async (testContext_asAModule) => {
-          //
-          const parseEnv: typeof import('../../../src/process/parse/parseEnv') = require('../../../src/process/parse/parseEnv');
+        async (testContext_asAModule: test.TestContext) => {
           //
 
           //
-          const loadEnvFileSpy = testContext_asAModule.mock.fn(
-            (
-              path?: Parameters<(typeof import('node:process'))['loadEnvFile']>
-            ): (typeof import('node:process'))['loadEnvFile'] =>
-              require('node:process')['loadEnvFile'](path)
-          );
-          //
-
-          //
-          const parseEnvSpy = testContext_asAModule.mock.fn(
-            (proc: NodeJS.Process) => parseEnv(proc)
-          );
+          const parseEnv: typeof import('../../src/process/parseEnv') = require('../../src/process/parseEnv');
+          const parseEnvSpy = testContext_asAModule.mock.fn(parseEnv);
           //
 
           //
@@ -160,10 +153,9 @@ test.suite('parseEnv', { timeout: timeout }, (suiteContext_parseEnv) => {
             { timeout: timeout, signal: testContext_asAModule.signal },
             (ctx: test.TestContext, done) => {
               //
-              parseEnv(process)
-                .then((env) => ctx.assert.ok(env))
-                .then(done)
-                .catch(done);
+              const env = parseEnvSpy(process);
+              ctx.assert.ok(env);
+              return done();
               //
             }
           )) satisfies void; // 'loads .env from cwd()'
@@ -174,18 +166,14 @@ test.suite('parseEnv', { timeout: timeout }, (suiteContext_parseEnv) => {
             { timeout: timeout, signal: testContext_asAModule.signal },
             (ctx: test.TestContext, done) => {
               const before = global.process.env.FAST_REFRESH;
-              parseEnv(global.process)
-                .then((env) => {
-                  const after = env.FAST_REFRESH;
-                  ctx.assert.notStrictEqual(after, before);
-                  return;
-                })
-                .then(done)
-                .catch(done);
+              parseEnvSpy(global.process);
+              const after = global.process.env.FAST_REFRESH;
+              ctx.assert.deepStrictEqual(after, before);
+              return done();
             }
           )) satisfies void; // 'mutates process.env correctly'
         }
-      ); // testcontext_asAModule
+      );
 
       //
     }
