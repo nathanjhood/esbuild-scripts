@@ -17,7 +17,7 @@ test.suite('parseCwd', { timeout: timeout }, (suiteContext_parseCwd) => {
   const mock = test.mock;
   //
 
-//
+  //
   test.afterEach(
     (ctx, done) => {
       //
