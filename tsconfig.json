@@ -51,8 +51,9 @@
   "exclude": [
     "eslint.config.mjs",
     "prettier.config.mjs",
-    "./node_modules",
-    "./build",
-    "./dist"
+    "node_modules",
+    "coverage",
+    "build",
+    "dist"
   ]
 }
