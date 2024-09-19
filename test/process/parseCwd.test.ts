@@ -54,8 +54,8 @@ test.suite('parseCwd', { timeout: timeout }, (suiteContext_parseCwd) => {
         { timeout: timeout, signal: suiteContext_imports.signal },
         (ctx, done) => {
           const t: void = ctx.assert.doesNotThrow(
-            (): typeof import('../../../src/process/parse/parseCwd') =>
-              require('../../../src/process/parse/parseCwd')
+            (): typeof import('../../src/process/parseCwd') =>
+              require('../../src/process/parseCwd')
           );
           return done(t);
         }
@@ -68,7 +68,7 @@ test.suite('parseCwd', { timeout: timeout }, (suiteContext_parseCwd) => {
         { timeout: timeout, signal: suiteContext_imports.signal },
         (ctx, done) => {
           ctx.assert
-            .doesNotReject(import('../../../src/process/parse/parseCwd'))
+            .doesNotReject(import('../../src/process/parseCwd'))
             .then(done)
             .catch(done);
         }
@@ -83,8 +83,8 @@ test.suite('parseCwd', { timeout: timeout }, (suiteContext_parseCwd) => {
           ctx.assert
             .doesNotReject(
               (): Promise<{
-                default: (proc: NodeJS.Process) => Promise<path.ParsedPath>;
-              }> => import('../../../src/process/parse/parseCwd')
+                default: (proc: NodeJS.Process) => path.ParsedPath;
+              }> => import('../../src/process/parseCwd')
             )
             .then(done)
             .catch(done);
@@ -99,8 +99,8 @@ test.suite('parseCwd', { timeout: timeout }, (suiteContext_parseCwd) => {
         (ctx, done) => {
           const t: void = ctx.assert.doesNotThrow(
             async (): Promise<{
-              default: (proc: NodeJS.Process) => Promise<path.ParsedPath>;
-            }> => await import('../../../src/process/parse/parseCwd')
+              default: (proc: NodeJS.Process) => path.ParsedPath;
+            }> => await import('../../src/process/parseCwd')
           );
           return done(t);
         }
@@ -123,14 +123,42 @@ test.suite('parseCwd', { timeout: timeout }, (suiteContext_parseCwd) => {
       test.it(
         'parses cwd()',
         { timeout: timeout, signal: suiteContext_runs.signal },
-        (ctx, done) => {
+        async (ctx: test.TestContext) => {
           //
-          const parseCwd: typeof import('../../../src/process/parse/parseCwd') = require('../../../src/process/parse/parseCwd');
-          parseCwd(process)
-            .then((cwd) => ctx.assert.ok(cwd))
-            .then(done)
-            .catch(done);
+          const parseCwd: typeof import('../../src/process/parseCwd') = require('../../src/process/parseCwd');
+          const parseCwdSpy = ctx.mock.fn(parseCwd);
           //
+          (await ctx.test(
+            'ok',
+            {
+              timeout: timeout,
+              signal: ctx.signal,
+            },
+            (ctx_ok: test.TestContext, done) => {
+              const argv = parseCwdSpy(process);
+              ctx_ok.assert.ok(argv);
+              parseCwdSpy.mock.resetCalls();
+              return done();
+            }
+          )) satisfies void;
+          (await ctx.test(
+            'callcount',
+            {
+              timeout: timeout,
+              signal: ctx.signal,
+            },
+            (ctx_callcount: test.TestContext, done) => {
+              // call parseEnv 5 times consecutively
+              for (let i = 0; i < 5; i++) {
+                parseCwdSpy(process);
+                ctx_callcount.assert.deepStrictEqual(
+                  parseCwdSpy.mock.callCount(),
+                  i + 1 // assert the callcount each time
+                );
+              }
+              return done();
+            }
+          )) satisfies void;
         }
       ) satisfies Promise<void>; // 'parses cwd()'
       //
