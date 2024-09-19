@@ -32,11 +32,12 @@ test.suite('parseEnv', { timeout: timeout }, (suiteContext_parseEnv) => {
   test.afterEach(
     (ctx, done) => {
       //
+      console.warn(ctx.name, 'calling mock.restoreAll()');
       mock.restoreAll();
       return done();
       //
     },
-    { signal: suiteContext_parseEnv.signal }
+    { timeout: timeout, signal: suiteContext_parseEnv.signal }
   ) satisfies void;
   //
 
@@ -44,11 +45,12 @@ test.suite('parseEnv', { timeout: timeout }, (suiteContext_parseEnv) => {
   test.after(
     (ctx, done) => {
       //
+      console.warn(ctx.name, 'calling mock.reset()');
       mock.reset();
       return done();
       //
     },
-    { signal: suiteContext_parseEnv.signal }
+    { timeout: timeout, signal: suiteContext_parseEnv.signal }
   ) satisfies void;
   //
 
