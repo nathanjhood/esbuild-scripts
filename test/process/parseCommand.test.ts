@@ -10,7 +10,7 @@ import util = require('node:util');
 const timeout = 10000;
 
 test.suite(
-  'parseCommand',
+  'parseCommand()',
   { timeout: timeout },
   (suiteContext_parseCommand) => {
     //
@@ -20,10 +20,30 @@ test.suite(
     //
 
     //
+    test.before(
+      (ctx, done) => {
+        //
+        if (global.process.env['VERBOSE'] === 'true')
+          global.console.info(suiteContext_parseCommand.name, ctx.name);
+        return done();
+        //
+      },
+      { timeout: timeout, signal: suiteContext_parseCommand.signal }
+    ) satisfies void;
+    //
+
+    //
     test.afterEach(
       (ctx, done) => {
         //
-        console.warn(ctx.name, 'calling mock.restoreAll()');
+        if (ctx.signal.aborted) {
+          global.console.error(suiteContext_parseCommand.name, ctx.name);
+        }
+        //
+        else if (global.process.env['VERBOSE'] === 'true') {
+          global.console.info(suiteContext_parseCommand.name, ctx.name);
+        }
+        //
         mock.restoreAll();
         return done();
         //
@@ -36,7 +56,8 @@ test.suite(
     test.after(
       (ctx, done) => {
         //
-        console.warn(ctx.name, 'calling mock.reset()');
+        if (global.process.env['VERBOSE'] === 'true')
+          global.console.info(suiteContext_parseCommand.name, ctx.name);
         mock.reset();
         return done();
         //
@@ -57,11 +78,14 @@ test.suite(
           'require',
           { timeout: timeout, signal: suiteContext_imports.signal },
           (ctx, done) => {
+            //
             const t: void = ctx.assert.doesNotThrow(
               (): typeof import('../../src/process/parseCommand') =>
                 require('../../src/process/parseCommand')
             );
+            //
             return done(t);
+            //
           }
         ) satisfies Promise<void>;
         //
@@ -71,6 +95,7 @@ test.suite(
           'import',
           { timeout: timeout, signal: suiteContext_imports.signal },
           (ctx, done) => {
+            //
             ctx.assert
               .doesNotReject(import('../../src/process/parseCommand'))
               .then(done)
@@ -84,6 +109,7 @@ test.suite(
           'import <Promise>',
           { timeout: timeout, signal: suiteContext_imports.signal },
           (ctx, done) => {
+            //
             ctx.assert
               .doesNotReject(
                 (): Promise<{
@@ -103,6 +129,7 @@ test.suite(
           'import (async)',
           { timeout: timeout, signal: suiteContext_imports.signal },
           (ctx, done) => {
+            //
             const t: void = ctx.assert.doesNotThrow(
               async (): Promise<{
                 default: (
@@ -110,7 +137,9 @@ test.suite(
                 ) => ReturnType<typeof util.parseArgs>;
               }> => await import('../../src/process/parseCommand')
             );
+            //
             return done(t);
+            //
           }
         ) satisfies Promise<void>;
         //
@@ -147,14 +176,20 @@ test.suite(
                 signal: ctx.signal,
               },
               (ctx_ok: test.TestContext, done) => {
-                const argv = parseCommandSpy(process);
+                //
+                const argv = parseCommandSpy(process, {
+                  verbose:
+                    global.process.env['VERBOSE'] === 'true' ? true : false,
+                });
                 ctx_ok.assert.ok(argv);
                 parseCommandSpy.mock.resetCalls();
+                //
                 return done();
+                //
               }
             )) satisfies void;
             //
-            
+
             //
             (await ctx.test(
               'callcount',
@@ -171,7 +206,9 @@ test.suite(
                     i + 1 // assert the callcount each time
                   );
                 }
+                //
                 return done();
+                //
               }
             )) satisfies void;
             //

@@ -8,7 +8,7 @@ import test = require('node:test');
 
 const timeout = 10000;
 
-test.suite('parseEnv', { timeout: timeout }, (suiteContext_parseEnv) => {
+test.suite('parseEnv()', { timeout: timeout }, (suiteContext_parseEnv) => {
   //
 
   //
@@ -32,10 +32,30 @@ test.suite('parseEnv', { timeout: timeout }, (suiteContext_parseEnv) => {
   //
 
   //
+  test.before(
+    (ctx, done) => {
+      //
+      if (global.process.env['VERBOSE'] === 'true')
+        global.console.warn(suiteContext_parseEnv.name, ctx.name);
+      return done();
+      //
+    },
+    { timeout: timeout, signal: suiteContext_parseEnv.signal }
+  ) satisfies void;
+  //
+
+  //
   test.afterEach(
     (ctx, done) => {
       //
-      console.warn(ctx.name, 'calling mock.restoreAll()');
+      if (ctx.signal.aborted) {
+        global.console.error(suiteContext_parseEnv.name, ctx.name);
+      }
+      //
+      else if (global.process.env['VERBOSE'] === 'true') {
+        global.console.info(suiteContext_parseEnv.name, ctx.name);
+      }
+      //
       mock.restoreAll();
       return done();
       //
@@ -48,7 +68,8 @@ test.suite('parseEnv', { timeout: timeout }, (suiteContext_parseEnv) => {
   test.after(
     (ctx, done) => {
       //
-      console.warn(ctx.name, 'calling mock.reset()');
+      if (global.process.env['VERBOSE'] === 'true')
+        global.console.warn(suiteContext_parseEnv.name, ctx.name);
       mock.reset();
       return done();
       //
@@ -69,10 +90,12 @@ test.suite('parseEnv', { timeout: timeout }, (suiteContext_parseEnv) => {
         'require',
         { timeout: timeout, signal: suiteContext_imports.signal },
         (ctx, done) => {
+          //
           const t: void = ctx.assert.doesNotThrow(
             (): typeof import('../../src/process/parseEnv') =>
               require('../../src/process/parseEnv')
           );
+          //
           return done(t);
         }
       ) satisfies Promise<void>;
@@ -83,6 +106,7 @@ test.suite('parseEnv', { timeout: timeout }, (suiteContext_parseEnv) => {
         'import',
         { timeout: timeout, signal: suiteContext_imports.signal },
         (ctx, done) => {
+          //
           ctx.assert
             .doesNotReject(import('../../src/process/parseEnv'))
             .then(done)
@@ -96,13 +120,14 @@ test.suite('parseEnv', { timeout: timeout }, (suiteContext_parseEnv) => {
         'import <Promise>',
         { timeout: timeout, signal: suiteContext_imports.signal },
         (ctx, done) => {
+          //
           ctx.assert
             .doesNotReject(
               (): Promise<{
-                default: (proc: NodeJS.Process) => Promise<{
+                default: (proc: NodeJS.Process) => {
                   raw: NodeJS.ProcessEnv;
                   stringified: { 'process.env': NodeJS.ProcessEnv };
-                }>;
+                };
               }> => import('../../src/process/parseEnv')
             )
             .then(done)
@@ -116,6 +141,7 @@ test.suite('parseEnv', { timeout: timeout }, (suiteContext_parseEnv) => {
         'import (async)',
         { timeout: timeout, signal: suiteContext_imports.signal },
         (ctx, done) => {
+          //
           const t: void = ctx.assert.doesNotThrow(
             async (): Promise<{
               default: (proc: NodeJS.Process) => {
@@ -124,7 +150,9 @@ test.suite('parseEnv', { timeout: timeout }, (suiteContext_parseEnv) => {
               };
             }> => await import('../../src/process/parseEnv')
           );
+          //
           return done(t);
+          //
         }
       ) satisfies Promise<void>;
       //
@@ -158,8 +186,13 @@ test.suite('parseEnv', { timeout: timeout }, (suiteContext_parseEnv) => {
             { timeout: timeout, signal: testContext_asAModule.signal },
             (ctx: test.TestContext, done) => {
               //
-              const env = parseEnvSpy(process);
+              const env = parseEnvSpy(process, {
+                verbose:
+                  global.process.env['VERBOSE'] === 'true' ? true : false,
+              });
+              //
               ctx.assert.ok(env);
+              //
               return done();
               //
             }
@@ -171,10 +204,16 @@ test.suite('parseEnv', { timeout: timeout }, (suiteContext_parseEnv) => {
             'mutates process.env correctly',
             { timeout: timeout, signal: testContext_asAModule.signal },
             (ctx: test.TestContext, done) => {
+              //
               const before = global.process.env.FAST_REFRESH;
-              parseEnvSpy(global.process);
+              parseEnvSpy(global.process, {
+                verbose:
+                  global.process.env['VERBOSE'] === 'true' ? true : false,
+              });
               const after = global.process.env.FAST_REFRESH;
+              //
               ctx.assert.deepStrictEqual(after, before);
+              //
               return done();
             }
           )) satisfies void; // 'mutates process.env correctly'
@@ -182,7 +221,7 @@ test.suite('parseEnv', { timeout: timeout }, (suiteContext_parseEnv) => {
 
           //
         }
-      ) satisfies void; // 'parses '.env' files from cwd()';
+      ) satisfies Promise<void>; // 'parses '.env' files from cwd()';
 
       //
     }

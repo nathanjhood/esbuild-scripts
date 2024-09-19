@@ -9,7 +9,7 @@ import util = require('node:util');
 
 const timeout = 10000;
 
-test.suite('parseArgv', { timeout: timeout }, (suiteContext_parseArgV) => {
+test.suite('parseArgv()', { timeout: timeout }, (suiteContext_parseArgV) => {
   //
 
   //
@@ -17,10 +17,30 @@ test.suite('parseArgv', { timeout: timeout }, (suiteContext_parseArgV) => {
   //
 
   //
+  test.before(
+    (ctx, done) => {
+      //
+      if (global.process.env['VERBOSE'] === 'true')
+        global.console.info(suiteContext_parseArgV.name, ctx.name);
+      return done();
+      //
+    },
+    { timeout: timeout, signal: suiteContext_parseArgV.signal }
+  ) satisfies void;
+  //
+
+  //
   test.afterEach(
     (ctx, done) => {
       //
-      console.warn(ctx.name, 'calling mock.restoreAll()');
+      if (ctx.signal.aborted) {
+        global.console.error(suiteContext_parseArgV.name, ctx.name);
+      }
+      //
+      else if (global.process.env['VERBOSE'] === 'true') {
+        global.console.info(suiteContext_parseArgV.name, ctx.name);
+      }
+      //
       mock.restoreAll();
       return done();
       //
@@ -33,7 +53,8 @@ test.suite('parseArgv', { timeout: timeout }, (suiteContext_parseArgV) => {
   test.after(
     (ctx, done) => {
       //
-      console.warn(ctx.name, 'calling mock.reset()');
+      if (global.process.env['VERBOSE'] === 'true')
+        global.console.info(suiteContext_parseArgV.name, ctx.name);
       mock.reset();
       return done();
       //
@@ -54,6 +75,7 @@ test.suite('parseArgv', { timeout: timeout }, (suiteContext_parseArgV) => {
         'require',
         { timeout: timeout, signal: suiteContext_imports.signal },
         (ctx, done) => {
+          //
           const t: void = ctx.assert.doesNotThrow(
             (): typeof import('../../src/process/parseArgv') =>
               require('../../src/process/parseArgv')
@@ -68,6 +90,7 @@ test.suite('parseArgv', { timeout: timeout }, (suiteContext_parseArgV) => {
         'import',
         { timeout: timeout, signal: suiteContext_imports.signal },
         (ctx, done) => {
+          //
           ctx.assert
             .doesNotReject(import('../../src/process/parseArgv'))
             .then(done)
@@ -80,6 +103,7 @@ test.suite('parseArgv', { timeout: timeout }, (suiteContext_parseArgV) => {
         'import <Promise>',
         { timeout: timeout, signal: suiteContext_imports.signal },
         (ctx, done) => {
+          //
           ctx.assert
             .doesNotReject(
               (): Promise<{
@@ -99,6 +123,7 @@ test.suite('parseArgv', { timeout: timeout }, (suiteContext_parseArgV) => {
         'import (async)',
         { timeout: timeout, signal: suiteContext_imports.signal },
         (ctx, done) => {
+          //
           const t: void = ctx.assert.doesNotThrow(
             async (): Promise<{
               default: (
@@ -106,15 +131,17 @@ test.suite('parseArgv', { timeout: timeout }, (suiteContext_parseArgV) => {
               ) => ReturnType<typeof util.parseArgs>;
             }> => await import('../../src/process/parseArgv')
           );
+          //
           return done(t);
+          //
         }
       ) satisfies Promise<void>;
       //
 
       //
     }
-  ) satisfies Promise<void>;
-  // suiteContext_imports
+  ) satisfies Promise<void>; // suiteContext_imports
+  //
 
   //
   test.describe(
@@ -129,9 +156,12 @@ test.suite('parseArgv', { timeout: timeout }, (suiteContext_parseArgV) => {
         { timeout: timeout, signal: suiteContext_runs.signal },
         async (ctx: test.TestContext) => {
           //
+
+          //
           const parseArgv: typeof import('../../src/process/parseArgv') = require('../../src/process/parseArgv');
           const parseArgvSpy = ctx.mock.fn(parseArgv);
 
+          //
           (await ctx.test(
             'ok',
             {
@@ -139,12 +169,21 @@ test.suite('parseArgv', { timeout: timeout }, (suiteContext_parseArgV) => {
               signal: ctx.signal,
             },
             (ctx_ok: test.TestContext, done) => {
-              const argv = parseArgvSpy(process);
+              //
+              const argv = parseArgvSpy(process, {
+                verbose:
+                  global.process.env['VERBOSE'] === 'true' ? true : false,
+              });
               ctx_ok.assert.ok(argv);
               parseArgvSpy.mock.resetCalls();
+              //
               return done();
+              //
             }
           )) satisfies void;
+          //
+
+          //
           (await ctx.test(
             'callcount',
             {
@@ -154,15 +193,23 @@ test.suite('parseArgv', { timeout: timeout }, (suiteContext_parseArgV) => {
             (ctx_callcount: test.TestContext, done) => {
               // call parseEnv 5 times consecutively
               for (let i = 0; i < 5; i++) {
-                parseArgvSpy(process);
+                parseArgvSpy(process, {
+                  verbose:
+                    global.process.env['VERBOSE'] === 'true' ? true : false,
+                });
                 ctx_callcount.assert.deepStrictEqual(
                   parseArgvSpy.mock.callCount(),
                   i + 1 // assert the callcount each time
                 );
               }
+              //
               return done();
+              //
             }
           )) satisfies void;
+          //
+
+          //
         }
       ) satisfies Promise<void>; // 'parses commands passed to running cli instance'
       //
@@ -170,6 +217,7 @@ test.suite('parseArgv', { timeout: timeout }, (suiteContext_parseArgV) => {
       //
     }
   ) satisfies Promise<void>; // suiteContext_runs
+  //
 
   //
 }) satisfies Promise<void>; // suiteContext_parseArgV
