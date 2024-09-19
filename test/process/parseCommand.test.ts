@@ -23,6 +23,7 @@ test.suite(
     test.afterEach(
       (ctx, done) => {
         //
+        console.warn(ctx.name, 'calling mock.restoreAll()');
         mock.restoreAll();
         return done();
         //
@@ -35,6 +36,7 @@ test.suite(
     test.after(
       (ctx, done) => {
         //
+        console.warn(ctx.name, 'calling mock.reset()');
         mock.reset();
         return done();
         //
@@ -131,8 +133,13 @@ test.suite(
           { timeout: timeout, signal: suiteContext_runs.signal },
           async (ctx) => {
             //
+
+            //
             const parseCommand: typeof import('../../src/process/parseCommand') = require('../../src/process/parseCommand');
             const parseCommandSpy = ctx.mock.fn(parseCommand);
+            //
+
+            //
             (await ctx.test(
               'ok',
               {
@@ -146,6 +153,9 @@ test.suite(
                 return done();
               }
             )) satisfies void;
+            //
+            
+            //
             (await ctx.test(
               'callcount',
               {
@@ -164,6 +174,9 @@ test.suite(
                 return done();
               }
             )) satisfies void;
+            //
+
+            //
           }
         ) satisfies Promise<void>; // 'parses commands passed to running NodeJS instance'
         //
