@@ -1,5 +1,5 @@
 /**
- * @file parseEnv.ts
+ * @file process/parseEnv.ts
  * @author Nathan J. Hood <nathanjhood@googlemail.com>
  * @copyright 2024 MIT License
  */
@@ -9,35 +9,27 @@ import path = require('node:path');
 import fs = require('node:fs');
 
 type ParseEnvOptions = {
-  sync?: true | false;
   verbose?: true | false;
   debug?: true | false;
-  path?: string | URL | Buffer;
+  cwd?: string | URL | Buffer;
   encoding?: BufferEncoding;
 };
 
+type ParseEnvResult = {
+  raw: NodeJS.ProcessEnv;
+  stringified: { 'process.env': NodeJS.ProcessEnv };
+};
+
 interface parseEnv {
-  default?(proc: NodeJS.Process): {
-    raw: NodeJS.ProcessEnv;
-    stringified: { 'process.env': NodeJS.ProcessEnv };
-  };
-  (proc: NodeJS.Process): {
-    raw: NodeJS.ProcessEnv;
-    stringified: { 'process.env': NodeJS.ProcessEnv };
-  };
-  (
-    proc: NodeJS.Process,
-    options?: ParseEnvOptions
-  ): {
-    raw: NodeJS.ProcessEnv;
-    stringified: { 'process.env': NodeJS.ProcessEnv };
-  };
+  default?(proc: NodeJS.Process): ParseEnvResult;
+  (proc: NodeJS.Process): ParseEnvResult;
+  (proc: NodeJS.Process, options?: ParseEnvOptions): ParseEnvResult;
 }
 
 const parseEnv: parseEnv = (
   proc: NodeJS.Process,
   options?: ParseEnvOptions
-) => {
+): ParseEnvResult => {
   //
 
   //
@@ -45,16 +37,32 @@ const parseEnv: parseEnv = (
   proc.exitCode = errors.length;
   //
 
+  // rename 'cwd()' but not 'loadEnvFile()'
+  const { loadEnvFile, cwd: useCwd }: NodeJS.Process = proc;
   //
-  const { cwd: getCwd, loadEnvFile: loadEnvFile } = proc;
-  //
-  const cwd = getCwd();
-  // const encoding = options && options.encoding ? options.encoding : 'utf-8';
-  // const debug: boolean = Boolean(options && options.debug);
-  //
+  const cwd: string | URL | Buffer =
+    options && options.cwd ? options.cwd : useCwd();
+  const encoding: BufferEncoding =
+    options && options.encoding ? options.encoding : 'utf-8';
+  const verbose: boolean =
+    options && options.verbose
+      ? options.verbose
+      : global.process.env['VERBOSE'] !== undefined
+        ? true
+        : false;
+  const debug: boolean =
+    options && options.debug
+      ? options.debug
+      : global.process.env['DEBUG'] !== undefined
+        ? true
+        : false;
 
-  const paths = {
-    dotenv: path.resolve(cwd, '.env'), // TODO: this should come from 'configs/paths'
+  const paths: {
+    dotenv: string;
+  } = {
+    // TODO: this should come from 'configs/paths' when used in the CLI...
+    // we can use `parseEnv(proc, { cwd: paths.dotenv })` there when calling :)
+    dotenv: path.resolve(cwd.toString(), '.env'),
   };
 
   const isNotLocalTestEnv =
@@ -70,7 +78,7 @@ const parseEnv: parseEnv = (
   //
 
   // Load environment variables from .env* files. Suppress warnings using silent
-  // if this file is missing. dotenv will never modify any environment variables
+  // if this file is missing. Never modify any environment variables
   // that have already been set.  Variable expansion is supported in .env files.
   // https://github.com/motdotla/dotenv
   // https://github.com/motdotla/dotenv-expand
@@ -80,7 +88,7 @@ const parseEnv: parseEnv = (
       const parsedEnvPath = path.parse(dotenvFile.toString());
       // const formattedEnvPath = path.format(parsedEnvPath);
       //
-      console.info(`parseEnv('${parsedEnvPath.base}')`);
+      if (verbose && !debug) console.info(`parseEnv('${parsedEnvPath.base}')`);
       //
       loadEnvFile(dotenvFile); // throws internally, or changes 'proc.env'
       //
@@ -91,8 +99,17 @@ const parseEnv: parseEnv = (
   });
 
   const REACT_APP: RegExp = /^REACT_APP_/i;
+  const NODE: RegExp = /^NODE_/i;
 
-  const envDefaults = {
+  const envDefaults: {
+    NODE_ENV: 'development' | 'test' | 'production';
+    PUBLIC_URL: string;
+    WDS_SOCKET_HOST: string | undefined;
+    WDS_SOCKET_PATH: string;
+    WDS_SOCKET_PORT: string | undefined;
+    FAST_REFRESH: 'true' | 'false';
+    __TEST_VARIABLE__: string | undefined;
+  } = {
     // Useful for determining whether we’re running in production mode.
     // Most importantly, it switches React into the correct mode.
     NODE_ENV: proc.env.NODE_ENV || 'development',
@@ -117,32 +134,37 @@ const parseEnv: parseEnv = (
     // HTTPS: HTTPS !== "false",
     // HOST: HOST ? HOST : "0.0.0.0",
     // PORT: PORT ? parseInt(PORT) : 3000
+    __TEST_VARIABLE__: proc.env.__TEST_VARIABLE__ || undefined,
   };
 
   if (errors.length < 0)
     throw new Error('parseEnv() failed', { cause: errors });
 
   //
-  const raw = Object.keys(proc.env)
+  const raw: NodeJS.ProcessEnv = Object.keys(proc.env)
     .filter((key) => REACT_APP.test(key))
     .reduce<NodeJS.ProcessEnv>((env, key) => {
       env[key] = proc.env[key];
       return env;
     }, envDefaults);
 
-  // Stringify all values so we can feed into esbuild defines
-  const stringified = {
-    'process.env': Object.keys(raw).reduce<typeof raw>((env, key) => {
-      env[key] = JSON.stringify(raw[key]);
-      return env;
-    }, raw),
+  // Stringify all values (except 'NODE_*') so we can feed into esbuild defines
+  const stringified: {
+    'process.env': NodeJS.ProcessEnv;
+  } = {
+    'process.env': Object.keys(raw)
+      .filter((key) => NODE.test(key))
+      .reduce<NodeJS.ProcessEnv>((env, key) => {
+        env[key] = JSON.stringify(raw[key]);
+        return env;
+      }, raw),
   };
 
   if (options && options.debug) console.log('raw:', raw);
   if (options && options.debug) console.log('stringified:', stringified);
 
   //
-  return { raw, stringified };
+  return { raw, stringified } satisfies ParseEnvResult;
   //
 };
 
