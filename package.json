@@ -8,10 +8,14 @@
     "directory": "packages/@nathanjhood/esbuild-scripts"
   },
   "scripts": {
-    "build": "pkgroll --build",
-    "start": "node dist/cli.js",
-    "dev": "tsx src/cli.ts",
     "test": "tsx test/run.ts",
+    "dev": "tsx src/cli.ts",
+    "start": "node dist/cli.js",
+    "build": "pkgroll --build",
+    "watch": "pkgroll --watch",
+    "minify": "pkgroll --minify",
+    "sourcemap": "pkgroll --sourcemap",
+    "type-check": "tsc --noEmit",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --check ./**/*.{js,jsx,ts,tsx,css,md,json} --config ./prettier.config.mjs",
