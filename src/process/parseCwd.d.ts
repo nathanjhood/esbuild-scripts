@@ -1,11 +1,11 @@
 /**
- * @file parseCwd.d.ts
+ * @file process/parseCwd.d.ts
  * @author Nathan J. Hood <nathanjhood@googlemail.com>
  * @copyright 2024 MIT License
  */
 
 /** */
-import path = require('node:path');
+import type Path = require('node:path');
 
 export = parseCwd;
 
@@ -15,7 +15,7 @@ declare type ParseCwdOptions = {
   debug?: true | false;
 };
 
-declare type ParseCwdResult = path.ParsedPath;
+declare type ParseCwdResult = Path.ParsedPath;
 
 declare interface parseCwd {
   default?(proc: NodeJS.Process): ParseCwdResult;

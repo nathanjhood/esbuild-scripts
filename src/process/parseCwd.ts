@@ -1,10 +1,11 @@
 /**
- * @file parseCwd.ts
+ * @file process/parseCwd.ts
  * @author Nathan J. Hood <nathanjhood@googlemail.com>
  * @copyright 2024 MIT License
  */
 
 /** */
+import type Path = require('node:path');
 import path = require('node:path');
 
 type ParseCwdOptions = {
@@ -13,7 +14,7 @@ type ParseCwdOptions = {
   debug?: true | false;
 };
 
-type ParseCwdResult = path.ParsedPath;
+type ParseCwdResult = Path.ParsedPath;
 
 interface parseCwd {
   default?(proc: NodeJS.Process): ParseCwdResult;
