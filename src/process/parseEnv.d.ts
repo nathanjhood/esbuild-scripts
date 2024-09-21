@@ -11,7 +11,6 @@ declare type ParseEnvOptions = {
   verbose?: true | false;
   debug?: true | false;
   cwd?: string | URL | Buffer;
-  encoding?: BufferEncoding;
 };
 
 declare type ParseEnvResult = NodeJS.ProcessEnv;

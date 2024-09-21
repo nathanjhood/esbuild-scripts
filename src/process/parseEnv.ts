@@ -5,6 +5,7 @@
  */
 
 /** */
+import type Path = require('node:path');
 import path = require('node:path');
 import fs = require('node:fs');
 
@@ -12,7 +13,6 @@ type ParseEnvOptions = {
   verbose?: true | false;
   debug?: true | false;
   cwd?: string | URL | Buffer;
-  encoding?: BufferEncoding;
 };
 
 type ParseEnvResult = {
@@ -42,8 +42,6 @@ const parseEnv: parseEnv = (
   //
   const cwd: string | URL | Buffer =
     options && options.cwd ? options.cwd : useCwd();
-  const encoding: BufferEncoding =
-    options && options.encoding ? options.encoding : 'utf-8';
   const verbose: boolean =
     options && options.verbose
       ? options.verbose
@@ -85,7 +83,7 @@ const parseEnv: parseEnv = (
   dotenvFiles.forEach((dotenvFile) => {
     if (fs.existsSync(dotenvFile.toString())) {
       //
-      const parsedEnvPath = path.parse(dotenvFile.toString());
+      const parsedEnvPath: Path.ParsedPath = path.parse(dotenvFile.toString());
       // const formattedEnvPath = path.format(parsedEnvPath);
       //
       if (verbose && !debug) console.info(`parseEnv('${parsedEnvPath.base}')`);
@@ -160,8 +158,8 @@ const parseEnv: parseEnv = (
       }, raw),
   };
 
-  if (options && options.debug) console.log('raw:', raw);
-  if (options && options.debug) console.log('stringified:', stringified);
+  if (debug) console.log('raw:', raw);
+  if (debug) console.log('stringified:', stringified);
 
   //
   return { raw, stringified } satisfies ParseEnvResult;
