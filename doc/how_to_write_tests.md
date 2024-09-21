@@ -2,6 +2,18 @@
 
 ... using NodeJS test runner with Typescript and [tsx](https://tsx.is/).
 
+```ts
+import test = require('node:test');
+
+const { describe, it } = test;
+
+describe('the foo() function', () => {
+  it('accepts an input', () => {});
+  it('returns a value', () => {});
+  it('throws an error', () => {})
+});
+```
+
 ---
 
 ##
