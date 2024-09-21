@@ -3,29 +3,67 @@
 import fs = require('node:fs');
 import path = require('node:path');
 // import childProcess = require('node:child_process');
-import util = require('node:util');
 import console = require('node:console');
 
-import parseCommand = require('./process/parseCommand');
-import parseArgv = require('./process/parseArgv');
-import parseCwd = require('./process/parseCwd');
-import parseEnv = require('./process/parseEnv');
+import Process = require('./process');
+
+const MAX_SAFE_INTEGER = 2147483647;
 
 type CliOptions = {
   sync?: true | false;
   verbose?: true | false;
   debug?: true | false;
+  signal?: AbortSignal;
+  timeoutMs?: number;
 };
 
+/**
+ *
+ * @param proc Shlip it in
+ * @param options
+ */
 const cli = (proc: NodeJS.Process, options?: CliOptions) => {
   //
 
-  const abortController = new AbortController();
-
   //
   proc.on('unhandledRejection', (err) => {
-    abortController.abort(err);
     throw err;
+  });
+
+  const ac = new AbortController();
+
+  // defaults
+  const sync = options && options.sync ? options.sync : true;
+  const verbose =
+    options && options.verbose
+      ? options.verbose
+      : global.process.env['VERBOSE'] !== undefined
+        ? true
+        : false;
+  const debug =
+    options && options.debug
+      ? options.debug
+      : global.process.env['DEBUG'] !== undefined
+        ? true
+        : false;
+  const signal = options && options.signal ? options.signal : ac.signal;
+  const timeoutMs =
+    options && options.timeoutMs ? options.timeoutMs : MAX_SAFE_INTEGER;
+
+  signal.addEventListener(
+    'abort',
+    (event) => {
+      console.log(event);
+      // rl.close();
+    },
+    { once: true }
+  );
+
+  const { parseArgv, parseCommand, parseCwd, parseEnv } = Process;
+
+  ((reason?: any, ms?: number) => setTimeout(() => ac.abort(reason), ms))({
+    reason: 'timeout',
+    ms: 100000,
   });
 
   const cwd = parseCwd(proc, { debug: false });
@@ -61,7 +99,7 @@ const cli = (proc: NodeJS.Process, options?: CliOptions) => {
         (() => global.console.log('env:', env.stringified))();
         //
       } else {
-        global.console.warn('Unkown script: ' + token.value);
+        global.console.warn('Unknown script: ' + token.value);
         global.console.warn('Perhaps you need to update esbuild-scripts?');
         global.console.warn(
           'See: https://githubcom/nathanjhood/esbuild-scripts'
@@ -79,6 +117,9 @@ if (require.main === module) {
     {
       verbose: true, // global.process.env['VERBOSE'] !== undefined ? true : false,
       debug: global.process.env['DEBUG'] !== undefined ? true : false,
+      signal: new AbortController().signal,
+      timeoutMs: MAX_SAFE_INTEGER,
     }
   );
 }
+
