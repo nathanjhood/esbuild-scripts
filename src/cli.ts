@@ -1,16 +1,18 @@
 #!/usr/bin/env -S yarn tsx
 
-import fs = require('node:fs');
-import path = require('node:path');
-// import childProcess = require('node:child_process');
-import console = require('node:console');
+/**
+ * @file cli.ts
+ * @author Nathan J. Hood <nathanjhood@googlemail.com>
+ * @copyright 2024 MIT License
+ */
 
-// import Process = require('./process');
+// import path = require('node:path');
+// import childProcess = require('node:child_process');
+
 import parseEnv = require('./process/parseEnv');
 import parseCommand = require('./process/parseCommand');
 import parseCwd = require('./process/parseCwd');
 import parseArgv = require('./process/parseArgv');
-
 
 const MAX_SAFE_INTEGER = 2147483647;
 
@@ -22,11 +24,6 @@ type CliOptions = {
   timeoutMs?: number;
 };
 
-/**
- *
- * @param proc Shlip it in
- * @param options
- */
 const cli = (proc: NodeJS.Process, options?: CliOptions) => {
   //
 
@@ -64,9 +61,10 @@ const cli = (proc: NodeJS.Process, options?: CliOptions) => {
     { once: true }
   );
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ((reason?: any, ms?: number) => setTimeout(() => ac.abort(reason), ms))({
     reason: 'timeout',
-    ms: 100000,
+    ms: timeoutMs,
   });
 
   const cwd = parseCwd(proc, { debug: false });
@@ -79,7 +77,7 @@ const cli = (proc: NodeJS.Process, options?: CliOptions) => {
 
   const scripts: string[] = ['build', 'start', 'test'];
 
-  // (shouldn't happen (empty array !== 'undefined'); handles 'undefined' case)
+  // (shouldn't happen; handles 'undefined' case)
   if (!argv.tokens) throw new Error('parseArgv returned no tokens');
 
   // validate argv
