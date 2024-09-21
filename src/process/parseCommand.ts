@@ -1,17 +1,20 @@
 /**
- * @file parseCommand.ts
+ * @file process/parseCommand.ts
  * @author Nathan J. Hood <nathanjhood@googlemail.com>
  * @copyright 2024 MIT License
  */
 
 /** */
+import type Util = require('node:util');
 import util = require('node:util');
 
-type ParseArgsConfig = util.ParseArgsConfig;
+type ParseCommandConfig = Util.ParseArgsConfig;
 
-type ParseArgs<T extends ParseArgsConfig> = typeof util.parseArgs<T>;
+type ParseCommand<T extends ParseCommandConfig> = typeof util.parseArgs<T>;
 
-type ParsedResult<T extends ParseArgsConfig> = ReturnType<ParseArgs<T>>;
+type ParseCommandResult<T extends ParseCommandConfig> = ReturnType<
+  ParseCommand<T>
+>;
 
 type ParseCommandOptions = {
   sync?: true | false;
@@ -19,24 +22,24 @@ type ParseCommandOptions = {
   debug?: true | false;
   throws?: true | false;
   env?: NodeJS.ProcessEnv;
-  parseArgsConfig?: ParseArgsConfig;
+  parseCommandConfig?: ParseCommandConfig;
 };
 
-interface parseCommand<T extends ParseArgsConfig> {
-  (proc: NodeJS.Process): ParsedResult<T>;
-  (proc: NodeJS.Process, options?: ParseCommandOptions): ParsedResult<T>;
+interface parseCommand<T extends ParseCommandConfig> {
+  (proc: NodeJS.Process): ParseCommandResult<T>;
+  (proc: NodeJS.Process, options?: ParseCommandOptions): ParseCommandResult<T>;
 }
 
 /**
  *
  * @param {NodeJS.Process} proc
  * @param {ParseCommandOptions} options
- * @returns {ParsedResult<ParseArgsConfig>}
+ * @returns {ParseCommandResult<ParseCommandConfig>}
  */
-const parseCommand: parseCommand<ParseArgsConfig> = (
+const parseCommand: parseCommand<ParseCommandConfig> = (
   proc: NodeJS.Process,
   options?: ParseCommandOptions
-): ParsedResult<ParseArgsConfig> => {
+): ParseCommandResult<ParseCommandConfig> => {
   //
 
   //
@@ -87,7 +90,7 @@ const parseCommand: parseCommand<ParseArgsConfig> = (
   );
 
   // 5) parse argv0
-  const { values, positionals, tokens } = util.parseArgs<ParseArgsConfig>({
+  const { values, positionals, tokens } = util.parseArgs<ParseCommandConfig>({
     args: args,
     strict: true, // throws internally if 'strict: true'
     allowNegative: true,
@@ -133,7 +136,7 @@ const parseCommand: parseCommand<ParseArgsConfig> = (
     values: values,
     positionals: positionals,
     tokens: tokens,
-  } satisfies ParsedResult<ParseArgsConfig>;
+  } satisfies ParseCommandResult<ParseCommandConfig>;
 };
 
 export = parseCommand;
