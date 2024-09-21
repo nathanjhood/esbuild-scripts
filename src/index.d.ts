@@ -4,21 +4,14 @@
  * @copyright 2024 MIT License
  */
 
-/**
- *
- */
-import parseCommand = require('./process/parseCommand');
-import parseArgV = require('./process/parseArgv');
-import parseCwd = require('./process/parseCwd');
-import parseEnv = require('./process/parseEnv');
+/** */
+
+import type process = require('./process/index.d');
 
 export = index;
 
-declare interface Index {
-  parseCommand: typeof parseCommand;
-  parseArgV: typeof parseArgV;
-  parseCwd: typeof parseCwd;
-  parseEnv: typeof parseEnv;
-}
+declare type index = {
+  process: typeof process;
+};
 
-declare const index: Index;
+declare const index: index;
