@@ -1,8 +1,16 @@
+/**
+ * @file process/parseArgv.d.ts
+ * @author Nathan J. Hood <nathanjhood@googlemail.com>
+ * @copyright 2024 MIT License
+ */
+
+/** */
+import type Util = require('node:util');
 import util = require('node:util');
 
 export = parseArgv;
 
-declare type ParseArgsConfig = util.ParseArgsConfig;
+declare type ParseArgsConfig = Util.ParseArgsConfig;
 
 declare type ParseArgs<T extends ParseArgsConfig> = typeof util.parseArgs<T>;
 

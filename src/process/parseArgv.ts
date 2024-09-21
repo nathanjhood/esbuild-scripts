@@ -1,13 +1,14 @@
 /**
- * @file parseArgv.ts
+ * @file process/parseArgv.ts
  * @author Nathan J. Hood <nathanjhood@googlemail.com>
  * @copyright 2024 MIT License
  */
 
 /** */
+import type Util = require('node:util');
 import util = require('node:util');
 
-type ParseArgsConfig = util.ParseArgsConfig;
+type ParseArgsConfig = Util.ParseArgsConfig;
 
 type ParseArgs<T extends ParseArgsConfig> = typeof util.parseArgs<T>;
 
