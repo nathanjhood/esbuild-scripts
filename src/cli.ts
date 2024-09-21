@@ -5,7 +5,12 @@ import path = require('node:path');
 // import childProcess = require('node:child_process');
 import console = require('node:console');
 
-import Process = require('./process');
+// import Process = require('./process');
+import parseEnv = require('./process/parseEnv');
+import parseCommand = require('./process/parseCommand');
+import parseCwd = require('./process/parseCwd');
+import parseArgv = require('./process/parseArgv');
+
 
 const MAX_SAFE_INTEGER = 2147483647;
 
@@ -58,8 +63,6 @@ const cli = (proc: NodeJS.Process, options?: CliOptions) => {
     },
     { once: true }
   );
-
-  const { parseArgv, parseCommand, parseCwd, parseEnv } = Process;
 
   ((reason?: any, ms?: number) => setTimeout(() => ac.abort(reason), ms))({
     reason: 'timeout',
