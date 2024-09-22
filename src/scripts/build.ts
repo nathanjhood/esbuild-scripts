@@ -1,66 +1,134 @@
-#!/usr/bin/env -S yarn tsx
+// import type Url = require('node:url');
+// import type Path = require('node:path');
+// import url = require('node:url');
+import util = require('node:util');
+// import path = require('node:path');
+import fs = require('node:fs');
+import node_console = require('node:console');
+import esbuild = require('esbuild');
 
-import url = require("node:url");
-import path = require("node:path");
-import fs = require("node:fs");
-import util = require("node:util");
-import os = require("node:os");
-import console = require("node:console");
-import childProcess = require("node:child_process");
-import process = require("node:process");
+// const file: Readonly<Path.ParsedPath> = path.parse(__filename);
+// const dir: Readonly<Path.ParsedPath> = path.parse(__dirname);
 
-// import Module = require("node:module");
-// const __filename: string = url.fileURLToPath(import.meta.url);
-// const __dirname: string = path.dirname(__filename);
-// const require: NodeRequire = Module.createRequire(__filename);
-// module.id = __filename;
-// module.filename = __filename;
-// module.path = __dirname;
-// module.require = require;
+const build: (
+  proc: NodeJS.Process,
+  options?: esbuild.BuildOptions
+) => Promise<esbuild.BuildResult<esbuild.BuildOptions>> = async (
+  proc: NodeJS.Process,
+  options?: esbuild.BuildOptions
+): Promise<esbuild.BuildResult<esbuild.BuildOptions>> => {
+  //
 
-// // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-var
-// var main: NodeModule = {
-//   id: url.fileURLToPath(import.meta.url),
-//   filename: url.fileURLToPath(import.meta.url),
-//   path: path.dirname(__filename),
-//   require: await import("node:module").then((mod) => mod.default.createRequire(url.fileURLToPath(import.meta.url)))
-// }
+  //
+  proc.on(
+    'uncaughtException',
+    (err: Error, origin: NodeJS.UncaughtExceptionOrigin) => {
+      fs.writeSync(proc.stderr.fd, util.format(err, origin), null, 'utf8');
+      throw err;
+    }
+  );
+  //
 
-const build = (process: NodeJS.Process) => {
+  const MAX_SAFE_INTEGER = 2147483647;
+
+  //
   const {
     assert: assert,
+    log: log,
     info: info,
     warn: warn,
     error: error,
     debug: debug,
     time: time,
     timeLog: timeLog,
-    timeEnd: timeEnd
-  } = new console.Console({
-    stdout: process.stdout,
-    stderr: process.stdout,
-    ignoreErrors: false,
-    groupIndentation: 2
-  })
-  //
-  process.on('uncaughtException', (err: Error, origin: NodeJS.UncaughtExceptionOrigin) => {
-    error(origin, err);
-    throw err;
+    timeEnd: timeEnd,
+  } = new node_console.Console({
+    groupIndentation: 2,
+    ignoreErrors: options && options.logLevel === 'error' ? true : false,
+    stdout: proc.stdout,
+    stderr: proc.stderr,
+    inspectOptions: {
+      depth: MAX_SAFE_INTEGER,
+      breakLength: 80,
+      colors: options && options.color,
+      compact: options && options.logLevel === 'verbose' ? true : false,
+    },
   });
   //
-  info("info message");
-  warn("warn message");
-  error("error message");
-  debug("debug message");
-  assert(false, "assert message");
+
   //
-  return;
-}
+  const logName: string = 'esbuild-scripts build';
+  time(logName);
+  //
+
+  // //
+  // const MIMETypes: Util.MIMEType[] = [
+  //   new util.MIMEType('image/png'),
+  //   new util.MIMEType('image/gif'),
+  //   new util.MIMEType('text/javascript'),
+  //   new util.MIMEType('text/typescript'),
+  //   new util.MIMEType('text/ecmascript'),
+  // ];
+  // //
+
+  //
+  log(logName, 'log message');
+  info(logName, 'info message');
+  warn(logName, 'warn message');
+  error(logName, 'error message');
+  debug(logName, 'debug message');
+  assert(false, logName + ' assert message');
+  timeLog(logName);
+  //
+
+  //
+  return esbuild
+    .build<esbuild.BuildOptions>(options ? options : {})
+    .then((result) => {
+      const { warnings, errors, metafile, outputFiles, mangleCache } = result;
+      debug(mangleCache);
+      error(errors);
+      warn(warnings);
+      info(outputFiles);
+      log(metafile);
+      return result;
+    })
+    .catch((err) => {
+      throw err;
+    })
+    .finally(() => {
+      timeEnd(logName);
+    });
+};
+
+const buildAsync: (
+  proc: NodeJS.Process,
+  options?: esbuild.BuildOptions
+) => Promise<esbuild.BuildResult<esbuild.BuildOptions>> = util.promisify<
+  NodeJS.Process,
+  esbuild.BuildOptions | undefined,
+  esbuild.BuildResult<esbuild.BuildOptions>
+>(build);
 
 if (require.main === module) {
-  build(process);
-}
+  (async (proc: NodeJS.Process, options?: esbuild.BuildOptions) => {
+    //
 
-// export = module.exports = exports = build;
+    //
+    await buildAsync(proc, options)
+      .then((result) => {
+        return result;
+      })
+      .catch((err) => {
+        throw err;
+      });
+    //
+
+    //
+  })(global.process, {
+    logLevel: 'verbose',
+    color: global.process.stdout.hasColors(),
+  });
+}
 
 export = build;
