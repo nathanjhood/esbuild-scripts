@@ -1,5 +1,5 @@
-import type Util = require('node:util');
-import util = require('node:util');
+// import type Util = require('node:util');
+// import util = require('node:util');
 import esbuild = require('esbuild');
 
 const start: (
@@ -44,15 +44,15 @@ const start: (
   time(logName);
   //
 
-  //
-  const MIMETypes: Util.MIMEType[] = [
-    new util.MIMEType('image/png'),
-    new util.MIMEType('image/gif'),
-    new util.MIMEType('text/javascript'),
-    new util.MIMEType('text/typescript'),
-    new util.MIMEType('text/ecmascript'),
-  ];
-  //
+  // //
+  // const MIMETypes: Util.MIMEType[] = [
+  //   new util.MIMEType('image/png'),
+  //   new util.MIMEType('image/gif'),
+  //   new util.MIMEType('text/javascript'),
+  //   new util.MIMEType('text/typescript'),
+  //   new util.MIMEType('text/ecmascript'),
+  // ];
+  // //
 
   //
   info('info message');
