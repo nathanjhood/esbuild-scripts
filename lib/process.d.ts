@@ -2,7 +2,8 @@
 
 declare namespace NodeJS {
   interface ProcessEnv extends NodeJS.Dict<string> {
-    readonly NODE_ENV: 'development' | 'test' | 'production';
+    NODE_PATH?: string | undefined;
+    readonly NODE_ENV?: 'development' | 'test' | 'production';
     readonly HOST?: '127.0.0.1' | 'localhost' | string | undefined;
     readonly PORT?: string | undefined;
     readonly HTTPS?: 'true' | 'false' | undefined;
@@ -12,6 +13,7 @@ declare namespace NodeJS {
      * An alias for `NODE_DISABLE_COLORS`. The value of the environment variable
      * is arbitrary.
      */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     readonly NO_COLOR?: any | string | undefined;
     /**
      * The FORCE_COLOR environment variable is used to enable ANSI colorized
@@ -121,5 +123,6 @@ declare namespace NodeJS {
     readonly IMAGE_INLINE_SIZE_LIMIT?: '10000' | string | undefined;
     readonly VERBOSE?: 'true' | 'false' | undefined;
     readonly DEBUG?: 'true' | 'false' | undefined;
+    readonly __TEST_VARIABLE__?: '0' | '1' | string | undefined;
   }
 }
