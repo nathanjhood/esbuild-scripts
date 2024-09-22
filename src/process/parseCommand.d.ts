@@ -8,15 +8,14 @@
 import type Util = require('node:util');
 import util = require('node:util');
 
+export as namespace ParseCommand;
+
 export = parseCommand;
 
 declare type ParseCommandConfig = Util.ParseArgsConfig;
 
-declare type ParseCommand<T extends ParseCommandConfig> =
-  typeof util.parseArgs<T>;
-
 declare type ParseCommandResult<T extends ParseCommandConfig> = ReturnType<
-  ParseCommand<T>
+  typeof util.parseArgs<T>
 >;
 
 declare type ParseCommandOptions = {
@@ -34,5 +33,3 @@ declare interface parseCommand<T extends ParseCommandConfig> {
 }
 
 declare const parseCommand: parseCommand<ParseCommandConfig>;
-
-declare namespace parseCommand {}

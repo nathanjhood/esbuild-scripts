@@ -10,10 +10,8 @@ import util = require('node:util');
 
 type ParseCommandConfig = Util.ParseArgsConfig;
 
-type ParseCommand<T extends ParseCommandConfig> = typeof util.parseArgs<T>;
-
 type ParseCommandResult<T extends ParseCommandConfig> = ReturnType<
-  ParseCommand<T>
+  typeof util.parseArgs<T>
 >;
 
 type ParseCommandOptions = {
