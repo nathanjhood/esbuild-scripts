@@ -127,7 +127,7 @@ if (require.main === module) {
     //
   })(global.process, {
     logLevel: 'verbose',
-    color: global.process.stdout.hasColors(),
+    // color: global.process.stdout.hasColors(),
   });
 }
 
