@@ -126,7 +126,7 @@ const cli = (proc: NodeJS.Process, options?: CliOptions): void => {
     inspectOptions: {
       depth: MAX_SAFE_INTEGER,
       breakLength: 80,
-      colors: proc.stdout.hasColors(),
+      // colors: proc.stdout.hasColors(),
       compact: verbose,
     },
   });
