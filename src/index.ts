@@ -6,14 +6,14 @@
 
 /** */
 
-import process = require('./process');
+import Process = require('./process');
 
 type index = {
-  process: typeof process;
+  process: typeof Process;
 };
 
 const index: index = {
-  process: process,
+  process: Process,
 };
 
 export = index;
