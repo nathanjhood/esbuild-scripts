@@ -16,17 +16,20 @@ type NodeTestRunnerReturnType = ReturnType<typeof test.run>;
 
 // const abortController: AbortController = new AbortController();
 
-const run = (proc: NodeJS.Process, options?: NodeTestRunnerOptions) => {
+const run = (
+  proc: NodeJS.Process,
+  options?: NodeTestRunnerOptions
+): NodeTestRunnerReturnType => {
   //
   proc.on('uncaughtException', (error) => {
-    const e = new Error('uncaughtException', { cause: error });
+    // const e = new Error('uncaughtException', { cause: error });
     // abortController.abort(e);
     proc.exitCode = 1;
     throw error;
   });
   //
   proc.on('unhandledRejection', (error) => {
-    const e = new Error('unhandledRejection', { cause: error });
+    // const e = new Error('unhandledRejection', { cause: error });
     // abortController.abort(e);
     proc.exitCode = 1;
     throw error;
