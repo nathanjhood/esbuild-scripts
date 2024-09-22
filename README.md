@@ -2,9 +2,7 @@
 
 esbuild-flavoured `react-scripts`.
 
-## Usage
-
-This repository is intended to - eventually - be consumed as an ECMAscript module via being an npm package. It's main purpose is to provide Javascript/Typescript projects, targeting browsers and/or NodeJS, with some simple commands for developing with popular libraries and frameworks such as React and React Native Web.
+## Under construction
 
 For the time being while working towards a suitable `v0.0.1` baseline, a fully-working draft of this entire project, including the four commands *and* react/react-native-web project templates, can be found at:
 
@@ -13,24 +11,5 @@ For the time being while working towards a suitable `v0.0.1` baseline, a fully-w
 - [`nathanjhood.github.io`](https://github.com/nathanjhood/nathanjhood.github.io) - my under-construction GitHub page, which is the intended final consumer of `esbuild-scripts`, and was created from the `ts-esbuild-react-native-web` template; it shall mostly resemble the template but serve as an eventual landing page, linking together all of my individual GitHub Pages under one root URL
 
 *this repository has been created as a means to centralize further extended development of the concepts demonstrated in the above-mentioned projects. In time, their script contents shall be replaced with `esbuild-scripts`.
-
-Once development is complete, the installed `esbuild-scripts` package will provide a simple command-line interface which exposes four primary commands: `build` for bundling the application, `test` for running unit test files found in the project, `start` for running a local development server with modern features such as hot reloading/fast-refresh and error overlay middleware, and `init` for quickly drafting up a new project from a chosen template. Additionally, `eject` *might* also provided, which transforms the application into a deployable bundle, containing the scripts described above, along with other dependencies.
-
----
-
-## Motivations
-
-Personal gains. I am very interested in improving my knowledge and skills in the following areas;
-
-- the core NodeJS API and it's extended features
-- getting to the bottom of the `commonjs`/`module` paradigm
-- deeper understanding of modern transpilers and bundlers
-- deeper integration with React Native Web
-- NodeJS test runner and v8 coverage reporting
-- extending esbuild with plugins
-
-I look forward to updating this documentation shortly with actual usage instructions and less concepts; readers, please take a look at the above-mentioned projects for a better glimpse of actual working functionality, until the initial `esbuild-scripts` baseline version is established.
-
-Please feel welcome to express some interest in the project; it might encourage me to allocate more time on it than I currently am.
 
 ---
