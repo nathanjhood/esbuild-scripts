@@ -5,7 +5,6 @@
  */
 
 import type Test = require('node:test');
-import type Path = require('node:path');
 import test = require('node:test');
 import path = require('node:path');
 
