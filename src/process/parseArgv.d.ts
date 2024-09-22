@@ -33,5 +33,3 @@ declare interface parseArgv<T extends ParseArgsConfig> {
 }
 
 declare const parseArgv: parseArgv<ParseArgsConfig>;
-
-declare namespace parseArgv {}
