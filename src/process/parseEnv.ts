@@ -21,7 +21,6 @@ type ParseEnvResult = {
 };
 
 interface parseEnv {
-  default?(proc: NodeJS.Process): ParseEnvResult;
   (proc: NodeJS.Process): ParseEnvResult;
   (proc: NodeJS.Process, options?: ParseEnvOptions): ParseEnvResult;
 }
@@ -38,10 +37,10 @@ const parseEnv: parseEnv = (
   //
 
   // rename 'cwd()' but not 'loadEnvFile()'
-  const { loadEnvFile, cwd: useCwd }: NodeJS.Process = proc;
+  const { loadEnvFile }: NodeJS.Process = proc;
   //
   const cwd: string | URL | Buffer =
-    options && options.cwd ? options.cwd : useCwd();
+    options && options.cwd ? options.cwd : proc.cwd();
   const verbose: boolean =
     options && options.verbose
       ? options.verbose

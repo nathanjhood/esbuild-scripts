@@ -4,6 +4,8 @@
  * @copyright 2024 MIT License
  */
 
+export as namespace ParseEnv;
+
 export = parseEnv;
 
 declare type ParseEnvOptions = {
@@ -16,7 +18,6 @@ declare type ParseEnvOptions = {
 declare type ParseEnvResult = NodeJS.ProcessEnv;
 
 declare interface parseEnv {
-  default?(proc: NodeJS.Process): ParseEnvResult;
   (proc: NodeJS.Process): ParseEnvResult;
   (proc: NodeJS.Process, options?: ParseEnvOptions): ParseEnvResult;
 }
@@ -24,11 +25,8 @@ declare interface parseEnv {
 declare const parseEnv: parseEnv;
 
 declare interface parseEnvAsync {
-  default?(proc: NodeJS.Process): Promise<ParseEnvResult>;
   (proc: NodeJS.Process): Promise<ParseEnvResult>;
   (proc: NodeJS.Process, options?: ParseEnvOptions): Promise<ParseEnvResult>;
 }
 
 declare const parseEnvAsync: parseEnvAsync;
-
-declare namespace parseEnv {}
