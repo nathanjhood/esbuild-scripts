@@ -17,7 +17,6 @@ type ParseCwdOptions = {
 type ParseCwdResult = Path.ParsedPath;
 
 interface parseCwd {
-  default?(proc: NodeJS.Process): ParseCwdResult;
   (proc: NodeJS.Process): ParseCwdResult;
   (proc: NodeJS.Process, options?: ParseCwdOptions): ParseCwdResult;
 }
@@ -68,7 +67,7 @@ const parseCwd: parseCwd = (
     ext: ext,
     name: name,
     root: root,
-  };
+  } satisfies ParseCwdResult;
 };
 
 export = parseCwd;

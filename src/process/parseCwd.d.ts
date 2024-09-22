@@ -7,6 +7,8 @@
 /** */
 import type Path = require('node:path');
 
+export as namespace ParseCwd;
+
 export = parseCwd;
 
 declare type ParseCwdOptions = {
@@ -18,11 +20,12 @@ declare type ParseCwdOptions = {
 declare type ParseCwdResult = Path.ParsedPath;
 
 declare interface parseCwd {
-  default?(proc: NodeJS.Process): ParseCwdResult;
   (proc: NodeJS.Process): ParseCwdResult;
   (proc: NodeJS.Process, options?: ParseCwdOptions): ParseCwdResult;
 }
 
 declare const parseCwd: parseCwd;
 
-declare namespace parseCwd {}
+// declare namespace parseCwd {
+//   // export default parseCwd; // not supported yet
+// }
