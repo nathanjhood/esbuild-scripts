@@ -11,18 +11,18 @@ import parseCommand = require('./parseCommand');
 import parseCwd = require('./parseCwd');
 import parseEnv = require('./parseEnv');
 
-type index = {
+type process = {
   parseCommand: typeof parseCommand;
   parseArgv: typeof parseArgv;
   parseCwd: typeof parseCwd;
   parseEnv: typeof parseEnv;
 };
 
-const index: index = {
+const process: process = {
   parseCommand: parseCommand,
   parseArgv: parseArgv,
   parseCwd: parseCwd,
   parseEnv: parseEnv,
 };
 
-export = index;
+export = process;

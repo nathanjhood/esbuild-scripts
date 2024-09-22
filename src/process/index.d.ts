@@ -6,18 +6,20 @@
 
 /** */
 
-export = index;
+export as namespace Process;
+
+export = process;
 
 import type parseArgv = require('./parseArgv.d');
 import type parseCommand = require('./parseCommand.d');
 import type parseCwd = require('./parseCwd.d');
 import type parseEnv = require('./parseEnv.d');
 
-declare type index = {
+declare type process = {
   parseCommand: typeof parseCommand;
   parseArgv: typeof parseArgv;
   parseCwd: typeof parseCwd;
   parseEnv: typeof parseEnv;
 };
 
-declare const index: index;
+declare const process: process;
