@@ -43,6 +43,10 @@
       "default": "./dist/index.mjs"
     }
   },
+  "packageManager": "yarn@1.22.22",
+  "engines": {
+    "node": ">=18"
+  },
   "dependencies": {
     "esbuild": "0.23.1",
     "ms": "^2.1.3",
