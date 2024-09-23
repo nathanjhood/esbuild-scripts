@@ -17,12 +17,12 @@ React single-web-page application projects which consume `esbuild-scripts` shall
 
 React projects which consume `esbuild-scripts` shall be able to use the above commands via `npm`/`yarn`, providing React projects with the same functionality of the usual `react-scripts` package, but using - primarily - only ESBuild and NodeJS as dependencies.
 
-## Example intended usage (development pending)
+## Example intended usage (proposal - development pending)
 
 From the root directory of your React project, add `esbuild-scripts` to your NodeJS dependencies:
 
 ```sh
-$ yarn add esbuild scripts
+$ yarn add esbuild-scripts@latest
 ```
 
 Alias the four scripts to make them available by `yarn run <name>`
