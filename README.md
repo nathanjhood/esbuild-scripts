@@ -269,6 +269,18 @@ The scripts and command-line interface shall be written Typescript-first (with U
 
 GitHub Actions shall be used to run multi-platform, multi-architecture tests, builds, and deployment, to maintain a reliable interface and baseline of functionality across future changes. The workflows shall support a specified array of NodeJS versions, with an intention to provide compatibility as far back as possible, while referencing latest changes and deprecation warnings.
 
+## Development Status
+
+- port `react-scripts` CLI to modern NodeJS Javascript API and Typescript using a 'test-and-declarations-first' approach - DONE
+- port `react-scripts build` command to the same - STARTED
+- port `react-scripts start` command to the same - PENDING
+- port `react-scripts test` command to the same - PENDING
+- port `react-scripts init` command to the same, using [`ts-esbuild-react`](https://github.com/nathanjhood/ts-esbuild-react) and [`ts-esbuild-react-native-web`](https://github.com/nathanjhood/ts-esbuild-react-native-web) as the two project skeleton templates - PENDING
+
+Initial ports of all of the above are easily found in the other "preview" projects mentioned in the "[See a Preview](#see-a-preview)" section. Those are very much ad-verbatim copies of the original `react-scripts`, with WebPack swapped out for the nearest ESBuild-equivalent functionality\*.
+
+\* *Thankfully, much of which actually translates 1-1 from one configuration to the other - it seems that WebPack provided inspiration for lots of aspects of ESBuild's interface, and the latter was clearly designed to be familiar and "easy" by building on known conventions.*
+
 ---
 
 Please feel welcome to express some interest in the project; it might encourage me to allocate more time on it than I currently intend to, post-launch.
