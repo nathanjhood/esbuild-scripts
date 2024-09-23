@@ -19,6 +19,8 @@ import parseCommand = require('./process/parseCommand');
 import parseCwd = require('./process/parseCwd');
 import parseArgv = require('./process/parseArgv');
 
+// import * as parseEnv from './process/parseEnv'
+
 import packageJson = require('../package.json');
 
 const MAX_SAFE_INTEGER = 2147483647;
@@ -83,7 +85,7 @@ const cli: (proc: NodeJS.Process, options?: CliOptions) => void = (
 
   /** defaults */
 
-  const sync: true | false = options && options.sync ? options.sync : false;
+  const sync: true | false = options && options.sync ? options.sync : true;
 
   const verbose: true | false =
     options && options.verbose
@@ -553,13 +555,13 @@ if (require.main === module) {
   })(
     /** process -> */ global.process,
     /** options -> */ {
-      sync: false,
+      sync: true,
       verbose: global.process.env['VERBOSE'] !== undefined ? true : false,
       debug: global.process.env['DEBUG'] !== undefined ? true : false,
       timeoutMs: MAX_SAFE_INTEGER,
       ignoreErrors: false,
       ignoreWarnings: false,
-      treatWarningsAsErrors: false,
+      treatWarningsAsErrors: true,
     }
   );
 }
