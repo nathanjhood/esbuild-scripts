@@ -17,6 +17,8 @@ React single-web-page application projects which consume `esbuild-scripts` shall
 
 React projects which consume `esbuild-scripts` shall be able to use the above commands via `npm`/`yarn`, providing React projects with the same functionality of the usual `react-scripts` package, but using - primarily - only ESBuild and NodeJS as dependencies.
 
+Additional features such as fast-refresh, developer error overlay, and support for both Typescript and React Native Web shall be implemented to present a similar experience to using `react-scripts` for end-consumers of `esbuild-scripts`.
+
 ## Example intended usage (proposal - development pending)
 
 From the root directory of your React project, add `esbuild-scripts` to your NodeJS dependencies:
@@ -247,7 +249,7 @@ The convention mentioned exactly matches the React (and `dotenv`) documentation,
 
 *important* - in this convention, the files with the tag `*.local` in the name should be ignored from any version control systems (i.e., add all `*.local` files to `.gitignore`). Those represent variables which are local to *your* machine; the others, including `.env` itself, shall therefore be over-ruled by the `*.local` files, meaning they can be added to version control to serve as useful default fall-backs and/or example use cases.
 
-## Previews
+## See a Preview
 
 For the time being while working towards a suitable `v0.0.1` baseline, a fully-working draft of this entire project, including the four commands *and* react/react-native-web project templates, can be found at:
 
@@ -274,3 +276,10 @@ Please feel welcome to express some interest in the project; it might encourage 
 Thanks for reading.
 
 ---
+
+## Further Reading
+
+- [esbuild](https://esbuild.github.io/getting-started/#your-first-bundle) - minimal Javascript API example using React
+- [NodeJS - Javscript API documentation](https://nodejs.org/)
+- [`react-scripts`](https://github.com/facebook/create-react-app/tree/main/packages/react-scripts) - the official, WebPack-flavoured implementation being ported to esbuild
+- [`create-react-app`](https://github.com/facebook/create-react-app/blob/main/README.md) - consumer of `react-scripts init`
