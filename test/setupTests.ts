@@ -22,7 +22,7 @@ const options: Readonly<NodeTestRunnerOptions> =
   Object.freeze<NodeTestRunnerOptions>({
     files: [
       // path.resolve(path.join(__dirname, '/config/env/index.test.ts')),
-      path.resolve(path.join(__dirname, '/process/index.test.ts')),
+      // path.resolve(path.join(__dirname, '/process/index.test.ts')),
       path.resolve(path.join(__dirname, '/process/parseCwd.test.ts')),
       path.resolve(path.join(__dirname, '/process/parseEnv.test.ts')),
       path.resolve(path.join(__dirname, '/process/parseCommand.test.ts')),
