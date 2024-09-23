@@ -279,7 +279,7 @@ GitHub Actions shall be used to run multi-platform, multi-architecture tests, bu
 
 Initial ports of all of the above are easily found in the other "preview" projects mentioned in the "[See a Preview](#see-a-preview)" section. Those are very much ad-verbatim copies of the original `react-scripts`, with WebPack swapped out for the nearest ESBuild-equivalent functionality\*.
 
-\* *Thankfully, much of which actually translates 1-1 from one configuration to the other - it seems that WebPack provided inspiration for lots of aspects of ESBuild's interface, and the latter was clearly designed to be familiar and "easy" by building on known conventions.*
+\* *Thankfully, much of which actually translates 1-1 from one configuration to the other - it seems that WebPack provided inspiration for lots of aspects of ESBuild's interface, and the latter was clearly designed to be familiar and "easy" by building on conventions to users of the former.*
 
 ---
 
