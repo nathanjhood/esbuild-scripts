@@ -4,6 +4,7 @@
  * @copyright 2024 MIT License
  */
 
+//
 import type Test = require('node:test');
 import test = require('node:test');
 
@@ -17,6 +18,24 @@ test.suite(
 
     //
     const mock = test.mock;
+
+    const defaultBrowsers: {
+      production: string[];
+      development: string[];
+    } = {
+      production: ['>0.2%', 'not dead', 'not op_mini all'],
+      development: [
+        'last 1 chrome version',
+        'last 1 firefox version',
+        'last 1 safari version',
+      ],
+    };
+
+    function shouldSetBrowsers(isInteractive: boolean) {
+      if (!isInteractive) {
+        return Promise.resolve(true);
+      }
+    }
 
     const mockBuild: Test.Mock<() => undefined> = mock.fn(() => {});
 
