@@ -4,18 +4,20 @@ esbuild-flavoured `react-scripts`.
 
 ## Under Construction
 
-Once development is complete, the installed `esbuild-scripts` package will provide a simple command-line interface which exposes four primary commands available to consumers:
+Once development is complete, the installed `esbuild-scripts` package will provide a simple command-line interface which exposes four primary commands available to consumers.
 
-- `build` for bundling the application
-- `test` for running unit test files found in the project
+React single-web-page application projects which consume `esbuild-scripts` shall be able to alias the below "script" commands via `npm`/`yarn`:
+
+- `build` for bundling React single-web-page applications
+- `test` for running unit test files for React single-web-page applications
 - `start` for running a local development server with modern features such as hot reloading/fast-refresh and error overlay middleware
-- `init` for quickly drafting up a new project from a chosen template.
-- Additionally, `eject` *might* also provided, which transforms the application into a deployable bundle, containing the scripts described above, along with other dependencies
-- Additionally, esbuild's Javascript API has some interesting other features that *might* also get scripted, such as the fast-and-minimal `transform()` method
+- `init` for quickly drafting up a new React single-web-page application project from a chosen template.
+- Additionally, `eject` *might* also provided, which transforms React single-web-page applications into deployable bundles
+- Additionally, esbuild's Javascript API has some interesting other features that *might* also get added to the list of available scripts, such as the fast-and-minimal `transform()` method
 
 React projects which consume `esbuild-scripts` shall be able to use the above commands via `npm`/`yarn`, providing React projects with the same functionality of the usual `react-scripts` package, but using - primarily - only ESBuild and NodeJS as dependencies.
 
-## Example intended usage
+## Example intended usage (development pending)
 
 From the root directory of your React project, add `esbuild-scripts` to your NodeJS dependencies:
 
