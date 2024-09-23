@@ -19,8 +19,6 @@ import parseCommand = require('./process/parseCommand');
 import parseCwd = require('./process/parseCwd');
 import parseArgv = require('./process/parseArgv');
 
-// import * as parseEnv from './process/parseEnv'
-
 import packageJson = require('../package.json');
 
 const MAX_SAFE_INTEGER = 2147483647;
