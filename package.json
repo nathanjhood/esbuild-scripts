@@ -45,7 +45,7 @@
   },
   "packageManager": "yarn@1.22.22",
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   },
   "dependencies": {
     "esbuild": "0.23.1",
