@@ -21,7 +21,7 @@ import parseArgv = require('./process/parseArgv');
 
 import packageJson = require('../package.json');
 
-const MAX_SAFE_INTEGER = 2147483647;
+const MAX_SAFE_INTEGER: number = 2147483647;
 
 type CliOptions = {
   sync?: true | false;
@@ -73,13 +73,13 @@ const cli: (proc: NodeJS.Process, options?: CliOptions) => void = (
     fs.writeSync(proc.stderr.fd, util.format(err, origin), null, 'utf8');
     // throw err;
     proc.exit(1);
-  });
+  }) satisfies NodeJS.Process;
 
   proc.on('SIGTERM', (signal) => {
     fs.writeSync(proc.stderr.fd, util.format(signal), null, 'utf8');
     ac.abort(signal);
     proc.exit();
-  });
+  }) satisfies NodeJS.Process;
 
   /** defaults */
 
@@ -182,10 +182,14 @@ const cli: (proc: NodeJS.Process, options?: CliOptions) => void = (
 
   log('├──' + '┐  ');
 
-  const cwd: ReturnType<typeof parseCwd> = parseCwd(proc, { debug: false });
+  const cwd: ReturnType<typeof parseCwd> = parseCwd(proc, {
+    debug: debug,
+    verbose: verbose,
+  });
 
   const env: ReturnType<typeof parseEnv> = parseEnv(proc, {
-    debug: false,
+    debug: debug,
+    verbose: verbose,
     cwd: path.format({
       base: cwd.base,
       dir: cwd.dir,
@@ -196,11 +200,13 @@ const cli: (proc: NodeJS.Process, options?: CliOptions) => void = (
   });
 
   const command: ReturnType<typeof parseCommand> = parseCommand(proc, {
-    debug: false,
+    debug: debug,
+    verbose: verbose,
   });
 
   const argv: ReturnType<typeof parseArgv> = parseArgv(proc, {
-    debug: false,
+    debug: debug,
+    verbose: verbose,
   });
 
   const warnings: Error[] = [];
@@ -554,12 +560,12 @@ if (require.main === module) {
     /** process -> */ global.process,
     /** options -> */ {
       sync: true,
-      verbose: global.process.env['VERBOSE'] !== undefined ? true : false,
+      verbose: true, // global.process.env['VERBOSE'] !== undefined ? true : false,
       debug: global.process.env['DEBUG'] !== undefined ? true : false,
       timeoutMs: MAX_SAFE_INTEGER,
       ignoreErrors: false,
       ignoreWarnings: false,
-      treatWarningsAsErrors: true,
+      treatWarningsAsErrors: false,
     }
   );
 }
