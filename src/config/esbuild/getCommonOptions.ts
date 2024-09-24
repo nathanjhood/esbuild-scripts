@@ -108,15 +108,16 @@ const getCommonOptions: getCommonOptions = (
     logLimit: 10,
     lineLimit: 80,
     //
-    target: browsersList(
-      isEnvProduction
-        ? ['>0.2%', 'not dead', 'not op_mini all']
-        : [
-            'last 1 chrome version',
-            'last 1 firefox version',
-            'last 1 safari version',
-          ]
-    ),
+    // target: browsersList(
+    //   isEnvProduction
+    //     ? ['>0.2%', 'not dead', 'not op_mini all']
+    //     : [
+    //         'last 1 chrome version',
+    //         'last 1 firefox version',
+    //         'last 1 safari version',
+    //       ]
+    // ),
+    // platform: 'neutral', // 'node' | browser | neutral,
     //
     define: {
       'process.env': JSON.stringify(
