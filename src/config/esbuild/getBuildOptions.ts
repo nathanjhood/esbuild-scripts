@@ -5,6 +5,7 @@ import type ESBuild = require('esbuild');
 import fs = require('node:fs');
 import path = require('node:path');
 import getClientPaths = require('../getClientPaths');
+import getCommonOptions = require('./getCommonOptions');
 import esbuild = require('esbuild');
 
 interface getBuildOptions {
@@ -37,6 +38,7 @@ const getBuildOptions: getBuildOptions = (
   //
 
   const paths = getClientPaths(proc);
+  const commonOptions = getCommonOptions(proc, env);
 
   //
   const {
@@ -155,6 +157,8 @@ const getBuildOptions: getBuildOptions = (
     resolveExtensions: paths.moduleFileExtensions
       .map((ext) => `.${ext}`)
       .filter((ext) => useTypeScript || !ext.includes('ts')),
+    //
+    ...commonOptions,
     //
   } satisfies ESBuild.BuildOptions;
 };

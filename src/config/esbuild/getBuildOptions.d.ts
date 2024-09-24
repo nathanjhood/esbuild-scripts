@@ -1,8 +1,8 @@
 import type ESBuild = require('esbuild');
 
-export = getBuildOptions;
-
 export as namespace GetBuildOptions;
+
+export = getBuildOptions;
 
 declare interface getBuildOptions {
   (
