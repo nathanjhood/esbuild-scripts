@@ -31,10 +31,11 @@ const getCommonOptions: getCommonOptions = (
   //
   proc.on('unhandledRejection', (error) => {
     throw error;
-  });
+  }) satisfies NodeJS.Process;
+  //
   proc.on('uncaughtException', (error) => {
     throw error;
-  });
+  }) satisfies NodeJS.Process;
   //
 
   const paths = getClientPaths(proc);
@@ -98,12 +99,15 @@ const getCommonOptions: getCommonOptions = (
 
   //
   return {
-    color: proc.stderr.isTTY,
+    //
     treeShaking: isEnvProduction,
     minify: isEnvProduction,
     sourcemap: isEnvDevelopment,
+    //
+    color: proc.stderr.isTTY,
     logLimit: 10,
     lineLimit: 80,
+    //
     target: browsersList(
       isEnvProduction
         ? ['>0.2%', 'not dead', 'not op_mini all']
@@ -113,22 +117,32 @@ const getCommonOptions: getCommonOptions = (
             'last 1 safari version',
           ]
     ),
+    //
     define: {
       'process.env': JSON.stringify(
         getClientEnvironment(proc, { verbose: true }).stringified['process.env']
       ),
     },
+    //
   } satisfies ESBuild.CommonOptions;
 };
 
 export = getCommonOptions;
 
 if (require.main === module) {
-  ((proc: NodeJS.Process) => {
-    const commonOptions = getCommonOptions(proc, 'production');
+  ((
+    proc: NodeJS.Process,
+    env: 'development' | 'production' | 'test',
+    options?: ESBuild.CommonOptions
+  ): ESBuild.CommonOptions => {
+    const commonOptions = getCommonOptions(
+      proc,
+      env,
+      options ? options : undefined
+    );
     global.console.log(commonOptions);
     return commonOptions;
-  })(global.process);
+  })(global.process, 'development');
 }
 
 //
