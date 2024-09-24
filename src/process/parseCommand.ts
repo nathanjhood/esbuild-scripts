@@ -7,6 +7,7 @@
 /** */
 import type Util = require('node:util');
 import util = require('node:util');
+import console = require('node:console');
 
 type ParseCommandConfig = Util.ParseArgsConfig;
 
@@ -52,6 +53,26 @@ const parseCommand: parseCommand<ParseCommandConfig> = (
   const errors: Error[] = [];
   proc.exitCode = errors.length;
   //
+
+  const {
+    // assert,
+    info,
+    // warn,
+    // error,
+    // log,
+    debug,
+    // clear,
+    // time,
+    // timeLog,
+    // timeEnd,
+  } = new console.Console({
+    stdout: proc.stdout,
+    stderr: proc.stderr,
+    groupIndentation: 2,
+    inspectOptions: {
+      breakLength: 80,
+    },
+  });
 
   //
   const {
@@ -123,11 +144,11 @@ const parseCommand: parseCommand<ParseCommandConfig> = (
         }
       }
     });
-    console.info(msg);
+    info(msg);
   }
 
   // 7) log the parsed argv0
-  if (options && options.debug) console.debug({ values, positionals, tokens });
+  if (options && options.debug) debug({ values, positionals, tokens });
 
   // 8) return the parsed argv0
   return {
