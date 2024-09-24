@@ -1,5 +1,6 @@
-// import type Url = require('node:url');
+import type Url = require('node:url');
 // import type Path = require('node:path');
+import type ESBuild = require('esbuild');
 // import url = require('node:url');
 import util = require('node:util');
 import path = require('node:path');
@@ -10,13 +11,15 @@ import esbuild = require('esbuild');
 // const file: Readonly<Path.ParsedPath> = path.parse(__filename);
 // const dir: Readonly<Path.ParsedPath> = path.parse(__dirname);
 
+const commOptions: ESBuild.CommonOptions = {};
+
 const build: (
   proc: NodeJS.Process,
-  options?: esbuild.BuildOptions
-) => Promise<esbuild.BuildResult<esbuild.BuildOptions>> = async (
+  options?: ESBuild.BuildOptions
+) => Promise<ESBuild.BuildResult<ESBuild.BuildOptions>> = async (
   proc: NodeJS.Process,
-  options?: esbuild.BuildOptions
-): Promise<esbuild.BuildResult<esbuild.BuildOptions>> => {
+  options?: ESBuild.BuildOptions
+): Promise<ESBuild.BuildResult<ESBuild.BuildOptions>> => {
   //
 
   //
@@ -77,7 +80,7 @@ const build: (
   log(logName, 'log message');
   info(logName, 'info message');
   warn(logName, 'warn message');
-  error(util.styleText('red', logName), 'error message');
+  error(logName, 'error message');
   debug(logName, 'debug message');
   assert(false, logName + ' assert message');
   timeLog(logName);
@@ -92,7 +95,7 @@ const build: (
     absWorkingDir,
     color,
     logLevel,
-  }: esbuild.BuildOptions = {
+  }: ESBuild.BuildOptions = {
     entryPoints: [path.resolve(__dirname, 'test.ts')],
     outdir: path.resolve(proc.cwd(), 'build'),
     loader: {
@@ -103,11 +106,11 @@ const build: (
     absWorkingDir: proc.cwd(),
     color: options && options.color ? options.color : false,
     logLevel: options && options.logLevel ? options.logLevel : 'info',
-  } satisfies esbuild.BuildOptions;
+  } satisfies ESBuild.BuildOptions;
 
   //
   return await esbuild
-    .build<esbuild.BuildOptions>({
+    .build<ESBuild.BuildOptions>({
       entryPoints: entryPoints,
       outdir: outdir,
       loader: loader,
@@ -158,8 +161,8 @@ const build: (
 
 const buildAsync: (
   proc: NodeJS.Process,
-  options?: esbuild.BuildOptions
-) => Promise<esbuild.BuildResult<esbuild.BuildOptions>> = util.promisify<
+  options?: ESBuild.BuildOptions
+) => Promise<ESBuild.BuildResult<ESBuild.BuildOptions>> = util.promisify<
   NodeJS.Process,
   esbuild.BuildOptions | undefined,
   esbuild.BuildResult<esbuild.BuildOptions>
@@ -168,13 +171,13 @@ const buildAsync: (
 if (require.main === module) {
   (async (
     proc: NodeJS.Process,
-    options?: esbuild.BuildOptions
-  ): Promise<esbuild.BuildResult<esbuild.BuildOptions>> => {
+    options?: ESBuild.BuildOptions
+  ): Promise<ESBuild.BuildResult<ESBuild.BuildOptions>> => {
     //
 
     //
     return build(proc, options)
-      .then((result: esbuild.BuildResult<esbuild.BuildOptions>) => {
+      .then((result: ESBuild.BuildResult<ESBuild.BuildOptions>) => {
         return result;
       })
       .catch((err) => {
