@@ -5,6 +5,10 @@
  */
 
 /** */
+import { createRequire } from 'node:module';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const require: NodeRequire = createRequire(__filename);
+
 import type Path = require('node:path');
 import path = require('node:path');
 import console = require('node:console');
