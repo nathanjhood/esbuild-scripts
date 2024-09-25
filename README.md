@@ -290,8 +290,8 @@ GitHub Actions shall be used to run multi-platform, multi-architecture tests, bu
 ## Development Status
 
 - port `react-scripts` CLI to modern NodeJS Javascript API and Typescript using a 'test-and-declarations-first' approach - DONE
-- port `react-scripts build` command to the same - STARTED
-- port `react-scripts start` command to the same - PENDING
+- port `react-scripts build` command to the same - DONE
+- port `react-scripts start` command to the same - STARTED
 - port `react-scripts test` command to the same - PENDING
 - port `react-scripts init` command to the same, using [`ts-esbuild-react`](https://github.com/nathanjhood/ts-esbuild-react) and [`ts-esbuild-react-native-web`](https://github.com/nathanjhood/ts-esbuild-react-native-web) as the two project skeleton templates - PENDING
 
