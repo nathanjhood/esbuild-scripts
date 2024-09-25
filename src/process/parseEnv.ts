@@ -5,6 +5,10 @@
  */
 
 /** */
+import { createRequire } from 'node:module';
+
+const require: NodeRequire = createRequire(__filename);
+
 import type Path = require('node:path');
 import path = require('node:path');
 import fs = require('node:fs');
@@ -188,11 +192,11 @@ const parseEnv: parseEnv = (
 
 export = parseEnv;
 
-// if (require.main === module) {
-//   ((proc: NodeJS.Process, options: ParseEnvOptions) => {
-//     parseEnv(proc, options);
-//   })(global.process, {
-//     verbose: global.process.env['VERBOSE'] !== undefined ? true : false,
-//     debug: global.process.env['DEBUG'] !== undefined ? true : false,
-//   });
-// }
+if (require.main === module) {
+  ((proc: NodeJS.Process, options: ParseEnvOptions) => {
+    parseEnv(proc, options);
+  })(global.process, {
+    verbose: global.process.env['VERBOSE'] !== undefined ? true : false,
+    debug: global.process.env['DEBUG'] !== undefined ? true : false,
+  });
+}
