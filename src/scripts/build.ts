@@ -1,22 +1,24 @@
-import type Url = require('node:url');
-// import type Path = require('node:path');
+import { createRequire } from 'node:module';
+const require: NodeRequire = createRequire(__filename);
+
 import type ESBuild = require('esbuild');
-// import url = require('node:url');
 import util = require('node:util');
-import path = require('node:path');
 import fs = require('node:fs');
 import node_console = require('node:console');
 import esbuild = require('esbuild');
 
-// const file: Readonly<Path.ParsedPath> = path.parse(__filename);
-// const dir: Readonly<Path.ParsedPath> = path.parse(__dirname);
+import getClientPaths = require('../config/getClientPaths');
+import getBuildOptions = require('../config/esbuild/getBuildOptions');
 
-const commOptions: ESBuild.CommonOptions = {};
+interface build {
+  (proc: NodeJS.Process): Promise<ESBuild.BuildResult<ESBuild.BuildOptions>>;
+  (
+    proc: NodeJS.Process,
+    options?: ESBuild.BuildOptions
+  ): Promise<ESBuild.BuildResult<ESBuild.BuildOptions>>;
+}
 
-const build: (
-  proc: NodeJS.Process,
-  options?: ESBuild.BuildOptions
-) => Promise<ESBuild.BuildResult<ESBuild.BuildOptions>> = async (
+const build: build = async (
   proc: NodeJS.Process,
   options?: ESBuild.BuildOptions
 ): Promise<ESBuild.BuildResult<ESBuild.BuildOptions>> => {
@@ -57,7 +59,7 @@ const build: (
     debug: debug,
     time: time,
     timeLog: timeLog,
-    timeEnd: timeEnd,
+    // timeEnd: timeEnd,
   } = console;
   //
 
@@ -86,40 +88,20 @@ const build: (
   timeLog(logName);
   //
 
-  const {
-    entryPoints,
-    outdir,
-    loader,
-    metafile,
-    write,
-    absWorkingDir,
-    color,
-    logLevel,
-  }: ESBuild.BuildOptions = {
-    entryPoints: [path.resolve(__dirname, 'test.ts')],
-    outdir: path.resolve(proc.cwd(), 'build'),
-    loader: {
-      '.ts': 'ts',
-    },
-    metafile: true,
-    write: true,
-    absWorkingDir: proc.cwd(),
-    color: options && options.color ? options.color : false,
-    logLevel: options && options.logLevel ? options.logLevel : 'info',
-  } satisfies ESBuild.BuildOptions;
+  const paths = getClientPaths(proc);
+
+  function copyPublicFolder() {
+    fs.cpSync(paths.appPublic, paths.appBuild, {
+      dereference: true,
+      // filter: (file) => file !== paths.appHtml,
+    });
+  }
+
+  copyPublicFolder();
 
   //
   return await esbuild
-    .build<ESBuild.BuildOptions>({
-      entryPoints: entryPoints,
-      outdir: outdir,
-      loader: loader,
-      metafile: metafile,
-      write: write,
-      absWorkingDir: absWorkingDir,
-      color: color,
-      logLevel: 'silent',
-    })
+    .build<ESBuild.BuildOptions>(getBuildOptions(proc, 'production'))
     .then(
       (result) => {
         const { warnings, errors, metafile, outputFiles, mangleCache } = result;
@@ -159,14 +141,14 @@ const build: (
   // });
 };
 
-const buildAsync: (
-  proc: NodeJS.Process,
-  options?: ESBuild.BuildOptions
-) => Promise<ESBuild.BuildResult<ESBuild.BuildOptions>> = util.promisify<
-  NodeJS.Process,
-  esbuild.BuildOptions | undefined,
-  esbuild.BuildResult<esbuild.BuildOptions>
->(build);
+// const buildAsync: (
+//   proc: NodeJS.Process,
+//   options?: ESBuild.BuildOptions
+// ) => Promise<ESBuild.BuildResult<ESBuild.BuildOptions>> = util.promisify<
+//   NodeJS.Process,
+//   esbuild.BuildOptions | undefined,
+//   esbuild.BuildResult<esbuild.BuildOptions>
+// >(build);
 
 if (require.main === module) {
   (async (
@@ -183,14 +165,6 @@ if (require.main === module) {
       .catch((err) => {
         throw err;
       });
-
-    // .then((result) => {
-    //   return result;
-    // })
-    // .catch((err) => {
-    //   throw err;
-    // });
-    //
 
     //
   })(global.process, {
