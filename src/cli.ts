@@ -7,6 +7,9 @@
  */
 
 //
+import { createRequire } from 'node:module';
+const require: NodeRequire = createRequire(__filename);
+
 import type ChildProcess = require('node:child_process');
 import path = require('node:path');
 import util = require('node:util');
