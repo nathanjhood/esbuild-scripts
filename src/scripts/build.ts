@@ -91,8 +91,9 @@ const build: build = async (
   const paths = getClientPaths(proc);
 
   function copyPublicFolder() {
-    fs.cpSync(paths.appPublic, paths.appBuild, {
+    return fs.cpSync(paths.appPublic, paths.appBuild, {
       dereference: true,
+      recursive: true,
       // filter: (file) => file !== paths.appHtml,
     });
   }
