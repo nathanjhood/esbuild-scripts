@@ -12,7 +12,7 @@ Create a new React project (Yarn version)
 $ yarn init
 ```
 ```sh
-$ yarn add react React-dom
+$ yarn add react react-dom
 ```
 
 Add `esbuild-scripts` and [esbuild](https://esbuild.github.io/api/)
@@ -26,9 +26,9 @@ Alias our scripts in your `package.json`:
 ```jsonc
 {
   "scripts": {
-    "build": "esbuild-scripts build",
-    "start": "esbuild-scripts start",
-    "test": "esbuild-scripts test",
+    "build": "esbuild-scripts build", // experimental...
+    "start": "esbuild-scripts start", // tbd...
+    "test": "esbuild-scripts test",   // tbd...
     // etc...
   },
   "dependencies": {
