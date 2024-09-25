@@ -6,15 +6,14 @@
  * @copyright 2024 MIT License
  */
 
+import type Test = require('node:test');
 import test = require('node:test');
 import parseEnv = require('../src/process/parseEnv');
 import setupTests = require('./setupTests');
 
-type NodeTestRunnerParameters = Required<Parameters<typeof test.run>>;
+type NodeTestRunnerParameters = Required<Parameters<typeof Test.run>>;
 type NodeTestRunnerOptions = NodeTestRunnerParameters[0];
-type NodeTestRunnerReturnType = ReturnType<typeof test.run>;
-
-// const abortController: AbortController = new AbortController();
+type NodeTestRunnerReturnType = ReturnType<typeof Test.run>;
 
 const run = (
   proc: NodeJS.Process,
@@ -22,15 +21,11 @@ const run = (
 ): NodeTestRunnerReturnType => {
   //
   proc.on('uncaughtException', (error) => {
-    // const e = new Error('uncaughtException', { cause: error });
-    // abortController.abort(e);
     proc.exitCode = 1;
     throw error;
   });
   //
   proc.on('unhandledRejection', (error) => {
-    // const e = new Error('unhandledRejection', { cause: error });
-    // abortController.abort(e);
     proc.exitCode = 1;
     throw error;
   });
@@ -49,12 +44,20 @@ const run = (
     throw new Error(
       "'NODE_ENV' should be 'test', but it was '" + process.env.NODE_ENV + "'"
     );
+
+  if (!options || !options.files)
+    throw new Error('no files passed to test runner');
+
   //
-  const testsStream = test.run(options);
-  //
-  return testsStream;
+  return test.run(options) satisfies NodeTestRunnerReturnType;
 };
 
 if (require.main === module) {
-  run(global.process, setupTests);
+  ((
+    proc: NodeJS.Process,
+    options?: NodeTestRunnerOptions
+  ): NodeTestRunnerReturnType => {
+    const testsStream = run(proc, options);
+    return testsStream;
+  })(global.process, setupTests);
 }

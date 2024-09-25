@@ -6,12 +6,14 @@
  * @copyright 2024 MIT License
  */
 
-import test = require('node:test');
+//
+import type Test = require('node:test');
+// import test = require('node:test');
 import reporters = require('node:test/reporters');
 import path = require('node:path');
 import os = require('node:os');
 
-type NodeTestRunnerParameters = Required<Parameters<typeof test.run>>;
+type NodeTestRunnerParameters = Required<Parameters<typeof Test.run>>;
 type NodeTestRunnerOptions = NodeTestRunnerParameters[0];
 
 const abortController: AbortController = new AbortController();
@@ -20,11 +22,12 @@ const options: Readonly<NodeTestRunnerOptions> =
   Object.freeze<NodeTestRunnerOptions>({
     files: [
       // path.resolve(path.join(__dirname, '/config/env/index.test.ts')),
-      // path.resolve(path.join(__dirname, '/config/paths/index.test.ts')),
+      // path.resolve(path.join(__dirname, '/process/index.test.ts')),
       path.resolve(path.join(__dirname, '/process/parseCwd.test.ts')),
       path.resolve(path.join(__dirname, '/process/parseEnv.test.ts')),
       path.resolve(path.join(__dirname, '/process/parseCommand.test.ts')),
       path.resolve(path.join(__dirname, '/process/parseArgv.test.ts')),
+      path.resolve(path.join(__dirname, '/scripts/build.test.ts')),
       path.resolve(path.join(__dirname, '/cli.test.ts')),
     ],
     concurrency: os.availableParallelism() - 1,

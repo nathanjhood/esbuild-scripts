@@ -5,9 +5,14 @@
  */
 
 /** */
+import { createRequire } from 'node:module';
+
+const require: NodeRequire = createRequire(__filename);
+
 import type Path = require('node:path');
 import path = require('node:path');
 import fs = require('node:fs');
+import console = require('node:console');
 
 type ParseEnvOptions = {
   verbose?: true | false;
@@ -35,6 +40,26 @@ const parseEnv: parseEnv = (
   const errors: Error[] = [];
   proc.exitCode = errors.length;
   //
+
+  const {
+    // assert,
+    info,
+    // warn,
+    // error,
+    log,
+    // debug,
+    // clear,
+    // time,
+    // timeLog,
+    // timeEnd,
+  } = new console.Console({
+    stdout: proc.stdout,
+    stderr: proc.stderr,
+    groupIndentation: 2,
+    inspectOptions: {
+      breakLength: 80,
+    },
+  });
 
   // rename 'cwd()' but not 'loadEnvFile()'
   const { loadEnvFile }: NodeJS.Process = proc;
@@ -85,7 +110,7 @@ const parseEnv: parseEnv = (
       const parsedEnvPath: Path.ParsedPath = path.parse(dotenvFile.toString());
       // const formattedEnvPath = path.format(parsedEnvPath);
       //
-      if (verbose && !debug) console.info(`parseEnv('${parsedEnvPath.base}')`);
+      if (verbose && !debug) info(`parseEnv('${parsedEnvPath.base}')`);
       //
       loadEnvFile(dotenvFile); // throws internally, or changes 'proc.env'
       //
@@ -157,8 +182,8 @@ const parseEnv: parseEnv = (
       }, raw),
   };
 
-  if (debug) console.log('raw:', raw);
-  if (debug) console.log('stringified:', stringified);
+  if (debug) log('raw:', raw);
+  if (debug) log('stringified:', stringified);
 
   //
   return { raw, stringified } satisfies ParseEnvResult;
@@ -167,11 +192,11 @@ const parseEnv: parseEnv = (
 
 export = parseEnv;
 
-// if (require.main === module) {
-//   ((proc: NodeJS.Process, options: ParseEnvOptions) => {
-//     parseEnv(proc, options);
-//   })(global.process, {
-//     verbose: global.process.env['VERBOSE'] !== undefined ? true : false,
-//     debug: global.process.env['DEBUG'] !== undefined ? true : false,
-//   });
-// }
+if (require.main === module) {
+  ((proc: NodeJS.Process, options: ParseEnvOptions) => {
+    parseEnv(proc, options);
+  })(global.process, {
+    verbose: global.process.env['VERBOSE'] !== undefined ? true : false,
+    debug: global.process.env['DEBUG'] !== undefined ? true : false,
+  });
+}

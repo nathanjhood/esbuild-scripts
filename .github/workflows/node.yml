@@ -15,6 +15,7 @@ concurrency:
 
 env:
   PROJECT_NAME: 'esbuild-scripts'
+  PROJECT_VERSION: '0.0.0-${{ github.sha }}'
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   NODE_ENV: 'production'
   BUILD_DIR: 'dist'
@@ -85,15 +86,22 @@ jobs:
         working-directory: ${{ github.workspace }}
         run: yarn start build
 
+      - name: Pack
+        shell: bash
+        env:
+          NODE_ENV: production
+        working-directory: ${{ github.workspace }}
+        run: yarn pack --filename ${{ env.PROJECT_NAME }}-${{ env.PROJECT_VERSION }}-${{ matrix.os }}-node-${{ matrix.node-version }}
+
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.PROJECT_NAME }}-${{ matrix.os }}-node-v${{ matrix.node-version }}
-          path: '${{ github.workspace }}/${{ env.BUILD_DIR }}'
+          name: ${{ env.PROJECT_NAME }}-${{ env.PROJECT_VERSION }}-${{ matrix.os }}-node-${{ matrix.node-version }}
+          path: '${{ github.workspace }}/${{ env.PROJECT_NAME }}-${{ env.PROJECT_VERSION }}-${{ matrix.os }}-node-${{ matrix.node-version }}'
 
       - name: Download Artifact
         uses: actions/download-artifact@v4
         with:
-          name: ${{ env.PROJECT_NAME }}-${{ matrix.os }}-node-v${{ matrix.node-version }}
-          path: '${{ github.workspace }}/${{ env.BUILD_DIR }}'
+          name: ${{ env.PROJECT_NAME }}-${{ env.PROJECT_VERSION }}-${{ matrix.os }}-node-${{ matrix.node-version }}
+          path: '${{ github.workspace }}'
           github-token: ${{ env.GITHUB_TOKEN }}

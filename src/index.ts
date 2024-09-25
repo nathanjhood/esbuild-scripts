@@ -5,15 +5,18 @@
  */
 
 /** */
+import { createRequire } from 'node:module';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const require: NodeRequire = createRequire(__filename);
 
-import Process = require('./process');
+import process = require('./process');
 
 type index = {
-  process: typeof Process;
+  process: typeof process;
 };
 
 const index: index = {
-  process: Process,
+  process: process,
 };
 
 export = index;

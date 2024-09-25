@@ -22,18 +22,136 @@
     "format": "prettier --check ./**/*.{js,jsx,ts,tsx,css,md,json} --config ./prettier.config.mjs",
     "format:fix": "prettier --write ./**/*.{js,jsx,ts,tsx,css,md,json} --config ./prettier.config.mjs"
   },
+  "files": [
+    "./dist"
+  ],
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.cts",
   "bin": {
-    "parseCwd": "./dist/process/parseCwd.js",
-    "parseCommand": "./dist/process/parseCommand.js",
-    "parseArgV": "./dist/process/parseArgv.js",
-    "parseEnv": "./dist/process/parseEnv.js",
-    "build": "./dist/scripts/build.js",
     "esbuild-scripts": "./dist/cli.js"
   },
   "exports": {
+    "src/process/parseCwd.ts": {
+      "require": {
+        "types": "./dist/process/parseCwd.d.cts",
+        "default": "./dist/process/parseCwd.cjs"
+      },
+      "import": {
+        "types": "./dist/process/parseCwd.d.mts",
+        "default": "./dist/process/parseCwd.mjs"
+      },
+      "types": "./dist/process/parseCwd.d.ts",
+      "default": "./dist/process/parseCwd.js"
+    },
+    "src/process/parseCommand.ts": {
+      "require": {
+        "types": "./dist/process/parseCommand.d.cts",
+        "default": "./dist/process/parseCommand.cjs"
+      },
+      "import": {
+        "types": "./dist/process/parseCommand.d.mts",
+        "default": "./dist/process/parseCommand.mjs"
+      },
+      "types": "./dist/process/parseCommand.d.ts",
+      "default": "./dist/process/parseCommand.js"
+    },
+    "src/process/parseArgv.ts": {
+      "require": {
+        "types": "./dist/process/parseArgv.d.cts",
+        "default": "./dist/process/parseArgv.cjs"
+      },
+      "import": {
+        "types": "./dist/process/parseArgv.d.mts",
+        "default": "./dist/process/parseArgv.mjs"
+      },
+      "types": "./dist/process/parseArgv.d.ts",
+      "default": "./dist/process/parseArgv.js"
+    },
+    "src/process/parseEnv.ts": {
+      "require": {
+        "types": "./dist/process/parseEnv.d.cts",
+        "default": "./dist/process/parseEnv.cjs"
+      },
+      "import": {
+        "types": "./dist/process/parseEnv.d.mts",
+        "default": "./dist/process/parseEnv.mjs"
+      },
+      "types": "./dist/process/parseEnv.d.ts",
+      "default": "./dist/process/parseEnv.js"
+    },
+    "src/config/getClientEnvironment.ts": {
+      "require": {
+        "types": "./dist/config/getClientEnvironment.d.cts",
+        "default": "./dist/config/getClientEnvironment.cjs"
+      },
+      "import": {
+        "types": "./dist/config/getClientEnvironment.d.mts",
+        "default": "./dist/config/getClientEnvironment.mjs"
+      },
+      "types": "./dist/config/getClientEnvironment.d.ts",
+      "default": "./dist/config/getClientEnvironment.js"
+    },
+    "src/config/getClientPaths.ts": {
+      "require": {
+        "types": "./dist/config/getClientPaths.d.cts",
+        "default": "./dist/config/getClientPaths.cjs"
+      },
+      "import": {
+        "types": "./dist/config/getClientPaths.d.mts",
+        "default": "./dist/config/getClientPaths.mjs"
+      },
+      "types": "./dist/config/getClientPaths.d.ts",
+      "default": "./dist/config/getClientPaths.js"
+    },
+    "src/config/getClientPublicUrlOrPath.ts": {
+      "require": {
+        "types": "./dist/config/getClientPublicUrlOrPath.d.cts",
+        "default": "./dist/config/getClientPublicUrlOrPath.cjs"
+      },
+      "import": {
+        "types": "./dist/config/getClientPublicUrlOrPath.d.mts",
+        "default": "./dist/config/getClientPublicUrlOrPath.mjs"
+      },
+      "types": "./dist/config/getClientPublicUrlOrPath.d.ts",
+      "default": "./dist/config/getClientPublicUrlOrPath.js"
+    },
+    "src/config/esbuild/getCommonOptions.ts": {
+      "require": {
+        "types": "./dist/config/esbuild/getCommonOptions.d.cts",
+        "default": "./dist/config/esbuild/getCommonOptions.cjs"
+      },
+      "import": {
+        "types": "./dist/config/esbuild/getCommonOptions.d.mts",
+        "default": "./dist/config/esbuild/getCommonOptions.mjs"
+      },
+      "types": "./dist/config/esbuild/getCommonOptions.d.ts",
+      "default": "./dist/config/esbuild/getCommonOptions.js"
+    },
+    "src/config/esbuild/getBuildOptions.ts": {
+      "require": {
+        "types": "./dist/config/esbuild/getBuildOptions.d.cts",
+        "default": "./dist/config/esbuild/getBuildOptions.cjs"
+      },
+      "import": {
+        "types": "./dist/config/esbuild/getBuildOptions.d.mts",
+        "default": "./dist/config/esbuild/getBuildOptions.mjs"
+      },
+      "types": "./dist/config/esbuild/getBuildOptions.d.ts",
+      "default": "./dist/config/esbuild/getBuildOptions.js"
+    },
+    "src/scripts/build.ts": {
+      "require": {
+        "types": "./dist/scripts/build.d.cts",
+        "default": "./dist/scripts/build.cjs"
+      },
+      "import": {
+        "types": "./dist/scripts/build.d.mts",
+        "default": "./dist/scripts/build.mjs"
+      },
+      "types": "./dist/scripts/build.d.ts",
+      "default": "./dist/scripts/build.js"
+    },
     "require": {
       "types": "./dist/index.d.cts",
       "default": "./dist/index.cjs"
@@ -47,11 +165,26 @@
   "engines": {
     "node": ">=20"
   },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
   "dependencies": {
-    "esbuild": "0.23.1",
+    "browserslist": "^4.23.3",
     "ms": "^2.1.3",
     "pkgroll": "2.5.0",
     "tsx": "4.19.1"
+  },
+  "peerDependencies": {
+    "esbuild": "0.24.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.10.0",

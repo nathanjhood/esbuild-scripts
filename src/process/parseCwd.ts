@@ -5,8 +5,13 @@
  */
 
 /** */
+import { createRequire } from 'node:module';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const require: NodeRequire = createRequire(__filename);
+
 import type Path = require('node:path');
 import path = require('node:path');
+import console = require('node:console');
 
 type ParseCwdOptions = {
   sync?: true | false;
@@ -32,6 +37,26 @@ const parseCwd: parseCwd = (
   proc.exitCode = errors.length;
   //
 
+  const {
+    // assert,
+    info,
+    // warn,
+    // error,
+    // log,
+    debug,
+    // clear,
+    // time,
+    // timeLog,
+    // timeEnd,
+  } = new console.Console({
+    stdout: proc.stdout,
+    stderr: proc.stderr,
+    groupIndentation: 2,
+    inspectOptions: {
+      breakLength: 80,
+    },
+  });
+
   //
   const { cwd: getCwd } = proc;
   //
@@ -53,12 +78,12 @@ const parseCwd: parseCwd = (
     throw new Error('parseCwd() failed', { cause: errors });
 
   if (options && options.verbose && !options.debug) {
-    console.info(formattedPath);
+    info(formattedPath);
   }
 
   if (options && options.debug) {
-    console.debug(parsedPath);
-    console.debug(formattedPath);
+    debug(parsedPath);
+    debug(formattedPath);
   }
 
   return {
