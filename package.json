@@ -26,14 +26,19 @@
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.cts",
   "bin": {
-    "parseCwd": "./dist/process/parseCwd.js",
-    "parseCommand": "./dist/process/parseCommand.js",
-    "parseArgV": "./dist/process/parseArgv.js",
-    "parseEnv": "./dist/process/parseEnv.js",
-    "build": "./dist/scripts/build.js",
     "esbuild-scripts": "./dist/cli.js"
   },
   "exports": {
+    "src/process/parseCwd.ts": "./dist/process/parseCwd.js",
+    "src/process/parseCommand.ts": "./dist/process/parseCommand.js",
+    "src/process/parseArgV.ts": "./dist/process/parseArgv.js",
+    "src/process/parseEnv.ts": "./dist/process/parseEnv.js",
+    "src/config/esbuild/getClientEnvironment.ts": "./dist/config/getClientEnvironment.js",
+    "src/config/esbuild/getClientPaths.ts": "./dist/config/getClientPaths.js",
+    "src/config/esbuild/getClientPublicUrlOrPath.ts": "./dist/config/getClientPublicUrlOrPath.js",
+    "src/config/esbuild/getCommonOptions.ts": "./dist/config/esbuild/getCommonOptions.js",
+    "src/config/esbuild/getBuildOptions.ts": "./dist/config/esbuild/getBuildOptions.js",
+    "src/scripts/build.ts": "./dist/scripts/build.js",
     "require": {
       "types": "./dist/index.d.cts",
       "default": "./dist/index.cjs"
