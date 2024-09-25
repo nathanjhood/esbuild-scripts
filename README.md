@@ -2,6 +2,51 @@
 
 esbuild-flavoured `react-scripts`.
 
+## Quickstart
+
+Create a new React project (Yarn version)
+
+```sh
+$ yarn init
+```
+```sh
+$ yarn add react React-dom
+```
+
+Add `esbuild-scripts` and [esbuild]()
+
+```sh
+$ yarn add esbuild esbuild-scripts
+```
+
+Alias our scripts in your `package.json`:
+
+```json
+{
+  "scripts": {
+    "build": "esbuild-scripts build",
+    "start": "esbuild-scripts "start,
+    "test": "esbuild-scripts test",
+    // etc...
+  },
+  "dependencies": {
+    "esbuild": "0.24.0",
+    "esbuild-scripts": "0.0.1",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    // etc...
+  }
+}
+```
+
+Power your React (and React Native Web) projects with esbuild using zero config, including Typescript support:
+
+```sh
+$ yarn build
+```
+
+*note: some commands are still under construction: see below*
+
 ---
 
 ## Under Construction
