@@ -1,3 +1,9 @@
+/**
+ * @file scripts/build.d.ts
+ * @author Nathan J. Hood <nathanjhood@googlemail.com>
+ * @copyright 2024 MIT License
+ */
+
 declare const require: NodeRequire;
 
 import type ESBuild = require('esbuild');
@@ -12,7 +18,7 @@ declare interface build {
   ): Promise<ESBuild.BuildResult<ESBuild.BuildOptions>>;
 }
 
-declare const build: build
+declare const build: build;
 // declare const buildAsync: (
 //   proc: NodeJS.Process,
 //   options?: ESBuild.BuildOptions

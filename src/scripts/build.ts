@@ -1,3 +1,10 @@
+/**
+ * @file scripts/build.ts
+ * @author Nathan J. Hood <nathanjhood@googlemail.com>
+ * @copyright 2024 MIT License
+ */
+
+/** */
 import { createRequire } from 'node:module';
 const require: NodeRequire = createRequire(__filename);
 
@@ -59,7 +66,7 @@ const build: build = async (
     debug: debug,
     time: time,
     timeLog: timeLog,
-    // timeEnd: timeEnd,
+    timeEnd: timeEnd,
   } = console;
   //
 
@@ -94,7 +101,7 @@ const build: build = async (
     return fs.cpSync(paths.appPublic, paths.appBuild, {
       dereference: true,
       recursive: true,
-      // filter: (file) => file !== paths.appHtml,
+      // filter: (file) => file !== paths.appHtml, // TODO: HTML parser plugin
     });
   }
 
@@ -104,14 +111,67 @@ const build: build = async (
   return await esbuild
     .build<ESBuild.BuildOptions>(getBuildOptions(proc, 'production'))
     .then(
-      (result) => {
-        const { warnings, errors, metafile, outputFiles, mangleCache } = result;
-        debug('mangleCache:', mangleCache);
-        error('errors:', errors);
-        warn('warnings:', warnings);
+      ({ warnings, errors, metafile, outputFiles, mangleCache }) => {
         info('outputFiles:', outputFiles);
-        log('metfile:', metafile);
-        return result;
+        return { warnings, errors, metafile, outputFiles, mangleCache };
+      },
+      (err) => {
+        throw err;
+      }
+    )
+    .then(
+      ({ errors, warnings, metafile, outputFiles, mangleCache }) => {
+        if (errors) {
+          const errorMessages = esbuild.formatMessagesSync(errors, {
+            color: proc.stdout.isTTY,
+            terminalWidth: 80,
+            kind: 'warning',
+          });
+          errorMessages.forEach((e) => error(e));
+        }
+        return { errors, warnings, metafile, outputFiles, mangleCache };
+      },
+      (err) => {
+        throw err;
+      }
+    )
+    .then(
+      ({ errors, warnings, metafile, outputFiles, mangleCache }) => {
+        if (warnings) {
+          const warningMessages = esbuild.formatMessagesSync(warnings, {
+            color: proc.stdout.isTTY,
+            terminalWidth: 80,
+            kind: 'warning',
+          });
+          warningMessages.forEach((w) => warn(w));
+        }
+        return { errors, warnings, metafile, outputFiles, mangleCache };
+      },
+      (err) => {
+        throw err;
+      }
+    )
+    .then(
+      ({ errors, warnings, metafile, outputFiles, mangleCache }) => {
+        if (mangleCache) {
+          debug(mangleCache);
+        }
+        return { errors, warnings, metafile, outputFiles, mangleCache };
+      },
+      (err) => {
+        throw err;
+      }
+    )
+    .then(
+      ({ errors, warnings, metafile, outputFiles, mangleCache }) => {
+        if (metafile) {
+          const analysis = esbuild.analyzeMetafileSync(metafile, {
+            color: proc.stdout.isTTY,
+            verbose: true,
+          });
+          log(analysis);
+        }
+        return { errors, warnings, metafile, outputFiles, mangleCache };
       },
       (err) => {
         throw err;
@@ -119,27 +179,10 @@ const build: build = async (
     )
     .catch((err) => {
       throw err;
+    })
+    .finally(() => {
+      timeEnd(logName);
     });
-  // return esbuild.buildSync<esbuild.BuildOptions>({
-  //   entryPoints: entryPoints,
-  //   outdir: outdir,
-  //   loader: loader,
-  // });
-  // .then((result) => {
-  //   const { warnings, errors, metafile, outputFiles, mangleCache } = result;
-  //   debug(mangleCache);
-  //   error(errors);
-  //   warn(warnings);
-  //   info(outputFiles);
-  //   log(metafile);
-  //   return result;
-  // })
-  // .catch((err) => {
-  //   throw err;
-  // })
-  // .finally(() => {
-  //   timeEnd(logName);
-  // });
 };
 
 // const buildAsync: (
