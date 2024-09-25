@@ -5,6 +5,10 @@
  */
 
 /** */
+import { createRequire } from 'node:module';
+
+const require: NodeRequire = createRequire(__filename);
+
 import path = require('node:path');
 import fs = require('node:fs');
 
@@ -308,9 +312,9 @@ const getClientPaths: getClientPaths = (
 
 export = getClientPaths;
 
-if (require.main === module) {
-  ((proc: NodeJS.Process, options?: GetClientPathsOptions) => {
-    const result = getClientPaths(proc, options);
-    global.console.assert(result);
-  })(global.process, { verbose: true });
-}
+// if (require.main === module) {
+//   ((proc: NodeJS.Process, options?: GetClientPathsOptions) => {
+//     const result = getClientPaths(proc, options);
+//     global.console.assert(result);
+//   })(global.process, { verbose: true });
+// }
