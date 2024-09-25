@@ -7,6 +7,9 @@
 /**
  *
  */
+import { createRequire } from 'node:module';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const require: NodeRequire = createRequire(__filename);
 
 import type Path = require('node:path');
 import path = require('node:path');
@@ -195,12 +198,12 @@ const getClientEnvironment: getClientEnvironment = (
 
 export = getClientEnvironment;
 
-if (require.main === module) {
-  ((proc: NodeJS.Process, options?: GetClientEnvironmentOptions) => {
-    const result = getClientEnvironment(proc, options);
-    global.console.assert(result);
-  })(global.process, {
-    verbose: true, // global.process.env['VERBOSE'] !== undefined ? true : false,
-    debug: global.process.env['DEBUG'] !== undefined ? true : false,
-  });
-}
+// if (require.main === module) {
+//   ((proc: NodeJS.Process, options?: GetClientEnvironmentOptions) => {
+//     const result = getClientEnvironment(proc, options);
+//     global.console.assert(result);
+//   })(global.process, {
+//     verbose: true, // global.process.env['VERBOSE'] !== undefined ? true : false,
+//     debug: global.process.env['DEBUG'] !== undefined ? true : false,
+//   });
+// }
