@@ -1,12 +1,15 @@
-import type Path = require('node:path');
-import type FS = require('node:fs');
+import { createRequire } from 'node:module';
+
+const require: NodeRequire = createRequire(__filename);
+
+// import type Path = require('node:path');
+// import type FS = require('node:fs');
 import type ESBuild = require('esbuild');
 
 import fs = require('node:fs');
 import path = require('node:path');
 import getClientPaths = require('../getClientPaths');
 import getCommonOptions = require('./getCommonOptions');
-import esbuild = require('esbuild');
 
 interface getBuildOptions {
   (
@@ -165,82 +168,82 @@ const getBuildOptions: getBuildOptions = (
 
 export = getBuildOptions;
 
-((
-  proc: NodeJS.Process,
-  env: 'development' | 'production' | 'test',
-  options?: ESBuild.BuildOptions
-): ESBuild.BuildOptions => {
-  //
+// ((
+//   proc: NodeJS.Process,
+//   env: 'development' | 'production' | 'test',
+//   options?: ESBuild.BuildOptions
+// ): ESBuild.BuildOptions => {
+//   //
 
-  //
-  const result = getBuildOptions(proc, env);
-  global.console.log(result);
-  return result;
-  //
-})(global.process, 'development');
+//   //
+//   const result = getBuildOptions(proc, env);
+//   global.console.log(result);
+//   return result;
+//   //
+// })(global.process, 'development');
 
-const sample: {
-  /** Documentation: https://esbuild.github.io/api/#bundle */
-  bundle?: boolean;
-  /** Documentation: https://esbuild.github.io/api/#splitting */
-  splitting?: boolean;
-  /** Documentation: https://esbuild.github.io/api/#preserve-symlinks */
-  preserveSymlinks?: boolean;
-  /** Documentation: https://esbuild.github.io/api/#outfile */
-  outfile?: string;
-  /** Documentation: https://esbuild.github.io/api/#metafile */
-  metafile?: boolean;
-  /** Documentation: https://esbuild.github.io/api/#outdir */
-  outdir?: string;
-  /** Documentation: https://esbuild.github.io/api/#outbase */
-  outbase?: string;
-  /** Documentation: https://esbuild.github.io/api/#external */
-  external?: string[];
-  /** Documentation: https://esbuild.github.io/api/#packages */
-  packages?: 'bundle' | 'external';
-  /** Documentation: https://esbuild.github.io/api/#alias */
-  alias?: Record<string, string>;
-  /** Documentation: https://esbuild.github.io/api/#loader */
-  loader?: { [ext: string]: ESBuild.Loader };
-  /** Documentation: https://esbuild.github.io/api/#resolve-extensions */
-  resolveExtensions?: string[];
-  /** Documentation: https://esbuild.github.io/api/#main-fields */
-  mainFields?: string[];
-  /** Documentation: https://esbuild.github.io/api/#conditions */
-  conditions?: string[];
-  /** Documentation: https://esbuild.github.io/api/#write */
-  write?: boolean;
-  /** Documentation: https://esbuild.github.io/api/#allow-overwrite */
-  allowOverwrite?: boolean;
-  /** Documentation: https://esbuild.github.io/api/#tsconfig */
-  tsconfig?: string;
-  /** Documentation: https://esbuild.github.io/api/#out-extension */
-  outExtension?: { [ext: string]: string };
-  /** Documentation: https://esbuild.github.io/api/#public-path */
-  publicPath?: string;
-  /** Documentation: https://esbuild.github.io/api/#entry-names */
-  entryNames?: string;
-  /** Documentation: https://esbuild.github.io/api/#chunk-names */
-  chunkNames?: string;
-  /** Documentation: https://esbuild.github.io/api/#asset-names */
-  assetNames?: string;
-  /** Documentation: https://esbuild.github.io/api/#inject */
-  inject?: string[];
-  /** Documentation: https://esbuild.github.io/api/#banner */
-  banner?: { [type: string]: string };
-  /** Documentation: https://esbuild.github.io/api/#footer */
-  footer?: { [type: string]: string };
-  /** Documentation: https://esbuild.github.io/api/#entry-points */
-  entryPoints?:
-    | string[]
-    | Record<string, string>
-    | { in: string; out: string }[];
-  /** Documentation: https://esbuild.github.io/api/#stdin */
-  stdin?: ESBuild.StdinOptions;
-  /** Documentation: https://esbuild.github.io/plugins/ */
-  plugins?: ESBuild.Plugin[];
-  /** Documentation: https://esbuild.github.io/api/#working-directory */
-  absWorkingDir?: string;
-  /** Documentation: https://esbuild.github.io/api/#node-paths */
-  nodePaths?: string[]; // The "NODE_PATH" variable from Node.js
-} = {} satisfies ESBuild.BuildOptions;
+// const sample: {
+//   /** Documentation: https://esbuild.github.io/api/#bundle */
+//   bundle?: boolean;
+//   /** Documentation: https://esbuild.github.io/api/#splitting */
+//   splitting?: boolean;
+//   /** Documentation: https://esbuild.github.io/api/#preserve-symlinks */
+//   preserveSymlinks?: boolean;
+//   /** Documentation: https://esbuild.github.io/api/#outfile */
+//   outfile?: string;
+//   /** Documentation: https://esbuild.github.io/api/#metafile */
+//   metafile?: boolean;
+//   /** Documentation: https://esbuild.github.io/api/#outdir */
+//   outdir?: string;
+//   /** Documentation: https://esbuild.github.io/api/#outbase */
+//   outbase?: string;
+//   /** Documentation: https://esbuild.github.io/api/#external */
+//   external?: string[];
+//   /** Documentation: https://esbuild.github.io/api/#packages */
+//   packages?: 'bundle' | 'external';
+//   /** Documentation: https://esbuild.github.io/api/#alias */
+//   alias?: Record<string, string>;
+//   /** Documentation: https://esbuild.github.io/api/#loader */
+//   loader?: { [ext: string]: ESBuild.Loader };
+//   /** Documentation: https://esbuild.github.io/api/#resolve-extensions */
+//   resolveExtensions?: string[];
+//   /** Documentation: https://esbuild.github.io/api/#main-fields */
+//   mainFields?: string[];
+//   /** Documentation: https://esbuild.github.io/api/#conditions */
+//   conditions?: string[];
+//   /** Documentation: https://esbuild.github.io/api/#write */
+//   write?: boolean;
+//   /** Documentation: https://esbuild.github.io/api/#allow-overwrite */
+//   allowOverwrite?: boolean;
+//   /** Documentation: https://esbuild.github.io/api/#tsconfig */
+//   tsconfig?: string;
+//   /** Documentation: https://esbuild.github.io/api/#out-extension */
+//   outExtension?: { [ext: string]: string };
+//   /** Documentation: https://esbuild.github.io/api/#public-path */
+//   publicPath?: string;
+//   /** Documentation: https://esbuild.github.io/api/#entry-names */
+//   entryNames?: string;
+//   /** Documentation: https://esbuild.github.io/api/#chunk-names */
+//   chunkNames?: string;
+//   /** Documentation: https://esbuild.github.io/api/#asset-names */
+//   assetNames?: string;
+//   /** Documentation: https://esbuild.github.io/api/#inject */
+//   inject?: string[];
+//   /** Documentation: https://esbuild.github.io/api/#banner */
+//   banner?: { [type: string]: string };
+//   /** Documentation: https://esbuild.github.io/api/#footer */
+//   footer?: { [type: string]: string };
+//   /** Documentation: https://esbuild.github.io/api/#entry-points */
+//   entryPoints?:
+//     | string[]
+//     | Record<string, string>
+//     | { in: string; out: string }[];
+//   /** Documentation: https://esbuild.github.io/api/#stdin */
+//   stdin?: ESBuild.StdinOptions;
+//   /** Documentation: https://esbuild.github.io/plugins/ */
+//   plugins?: ESBuild.Plugin[];
+//   /** Documentation: https://esbuild.github.io/api/#working-directory */
+//   absWorkingDir?: string;
+//   /** Documentation: https://esbuild.github.io/api/#node-paths */
+//   nodePaths?: string[]; // The "NODE_PATH" variable from Node.js
+// } = {} satisfies ESBuild.BuildOptions;
