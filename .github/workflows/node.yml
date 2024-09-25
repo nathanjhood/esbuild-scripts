@@ -91,17 +91,17 @@ jobs:
         env:
           NODE_ENV: production
         working-directory: ${{ github.workspace }}
-        run: yarn pack --filename ${{ env.PROJECT_NAME }}-${{ env.PROJECT_VERSION }}-${{ matrix.os }}-node-v${{ matrix.node-version }}
+        run: yarn pack --filename ${{ env.PROJECT_NAME }}-${{ env.PROJECT_VERSION }}-${{ matrix.os }}-node-${{ matrix.node-version }}
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.PROJECT_NAME }}-${{ env.PROJECT_VERSION }}-${{ matrix.os }}-node-v${{ matrix.node-version }}
+          name: ${{ env.PROJECT_NAME }}-${{ env.PROJECT_VERSION }}-${{ matrix.os }}-node-${{ matrix.node-version }}
           path: '${{ github.workspace }}/${{ env.PROJECT_NAME }}-${{ env.PROJECT_VERSION }}-${{ matrix.os }}-node-${{ matrix.node-version }}'
 
       - name: Download Artifact
         uses: actions/download-artifact@v4
         with:
-          name: ${{ env.PROJECT_NAME }}-${{ env.PROJECT_VERSION }}-${{ matrix.os }}-node-v${{ matrix.node-version }}
+          name: ${{ env.PROJECT_NAME }}-${{ env.PROJECT_VERSION }}-${{ matrix.os }}-node-${{ matrix.node-version }}
           path: '${{ github.workspace }}/${{ env.PROJECT_NAME }}-${{ env.PROJECT_VERSION }}-${{ matrix.os }}-node-${{ matrix.node-version }}'
           github-token: ${{ env.GITHUB_TOKEN }}
