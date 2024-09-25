@@ -103,5 +103,5 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ${{ env.PROJECT_NAME }}-${{ env.PROJECT_VERSION }}-${{ matrix.os }}-node-${{ matrix.node-version }}
-          path: '${{ github.workspace }}/${{ env.PROJECT_NAME }}-${{ env.PROJECT_VERSION }}-${{ matrix.os }}-node-${{ matrix.node-version }}'
+          path: '${{ github.workspace }}'
           github-token: ${{ env.GITHUB_TOKEN }}
