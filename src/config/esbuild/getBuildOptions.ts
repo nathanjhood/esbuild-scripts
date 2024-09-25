@@ -2,8 +2,6 @@ import { createRequire } from 'node:module';
 
 const require: NodeRequire = createRequire(__filename);
 
-// import type Path = require('node:path');
-// import type FS = require('node:fs');
 import type ESBuild = require('esbuild');
 
 import fs = require('node:fs');
