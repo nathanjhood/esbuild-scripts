@@ -563,7 +563,7 @@ if (require.main === module) {
     /** process -> */ global.process,
     /** options -> */ {
       sync: true,
-      verbose: true, // global.process.env['VERBOSE'] !== undefined ? true : false,
+      verbose: global.process.env['VERBOSE'] !== undefined ? true : false,
       debug: global.process.env['DEBUG'] !== undefined ? true : false,
       timeoutMs: MAX_SAFE_INTEGER,
       ignoreErrors: false,
