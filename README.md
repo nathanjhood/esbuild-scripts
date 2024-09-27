@@ -2,13 +2,58 @@
 
 esbuild-flavoured `react-scripts`.
 
+## Quickstart
+
+*note: this project is still under construction; the following documentation is a guiding principle, until stable release - use with caution*
+
+Create a new React project (Yarn version)
+
+```sh
+$ yarn init
+```
+```sh
+$ yarn add react react-dom
+```
+
+Add `@nathanjhood/esbuild-scripts` and [esbuild](https://esbuild.github.io/api/)
+
+```sh
+$ yarn add esbuild @nathanjhood/esbuild-scripts
+```
+
+Alias our scripts in your `package.json`:
+
+```jsonc
+{
+  "scripts": {
+    "build": "esbuild-scripts build", // experimental...
+    "start": "esbuild-scripts start", // tbd...
+    "test": "esbuild-scripts test",   // tbd...
+    // etc...
+  },
+  "dependencies": {
+    "@nathanjhood/esbuild-scripts": "0.0.1",
+    "esbuild": "0.24.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    // etc...
+  }
+}
+```
+
+Power your React (and React Native Web) projects with esbuild using zero config, including Typescript support:
+
+```sh
+$ yarn build
+```
+
+*note: some commands are still under construction: see below*
+
 ---
 
 ## Under Construction
 
-Once development is complete, the installed `esbuild-scripts` package will provide a simple command-line interface which exposes four primary commands available to consumers.
-
-React single-web-page application projects which consume `esbuild-scripts` shall be able to alias the below "script" commands via `npm`/`yarn`:
+React single-web-page application projects which consume `esbuild-scripts` shall (soon) be able to alias the below "script" commands via `npm`/`yarn`:
 
 - `build` for bundling React single-web-page applications
 - `test` for running unit test files for React single-web-page applications
@@ -20,38 +65,6 @@ React single-web-page application projects which consume `esbuild-scripts` shall
 React projects which consume `esbuild-scripts` shall be able to use the above commands via `npm`/`yarn`, providing React projects with the same functionality of the usual `react-scripts` package, but using - primarily - only ESBuild and NodeJS as dependencies.
 
 Additional features such as fast-refresh, developer error overlay, and support for both Typescript and React Native Web shall be implemented to present a similar experience to using `react-scripts` for end-consumers of `esbuild-scripts`.
-
----
-
-## Example intended usage (proposal - development pending)
-
-From the root directory of your React project, add `esbuild-scripts` to your NodeJS dependencies:
-
-```sh
-$ yarn add esbuild-scripts@latest
-```
-
-Alias the four scripts to make them available by `yarn run <name>`
-
-```jsonc
-// package.json
-{
-  "name": "yourReactWebPage",
-  "homepage": "https://yourDomain.com",
-  "main": "public/index.html",
-  "dependencies": {
-    "esbuild-scripts": "1.0.0",
-    "react": "18.2.0",
-    "react-dom": "18.2.0"
-  },
-  "scripts": {
-    "build": "esbuild-scripts build",
-    "start": "esbuild-scripts start",
-    "test": "esbuild-scripts test",
-    "eject": "esbuild-scripts eject"
-  }
-}
-```
 
 ---
 
@@ -281,7 +294,7 @@ For the time being while working towards a suitable `v0.0.1` baseline, a fully-w
 
 Several features from `react-dev-utils` shall also be ported into this project, as and when need arises; others may be replaced with counterparts which correspond more closely to ESBuild, rather than WebPack (including plugins, where necessary).
 
-The scripts and command-line interface shall be written Typescript-first (with UMD and Module Loader support) using only the NodeJS Javascript API (with Typescript support), developed with [tsx](https://tsx.dev), tested using NodeJS Test Runner, and transpiled then bundled with `pkgroll`; the package should *not* require any further dependencies, so that consumers should only have one additional package in their dependency lock files (`pkgroll` is a developer-only dependency, and thus not required for consumers).
+The scripts and command-line interface shall be written Typescript-first (with UMD and Module Loader support) using only the NodeJS Javascript API (with Typescript support), developed with [tsx](https://tsx.is), tested using NodeJS Test Runner, and transpiled then bundled with `pkgroll`; the package should *not* require any further dependencies, so that consumers should only have one additional package in their dependency lock files (`pkgroll` is a developer-only dependency, and thus not required for consumers).
 
 GitHub Actions shall be used to run multi-platform, multi-architecture tests, builds, and deployment, to maintain a reliable interface and baseline of functionality across future changes. The workflows shall support a specified array of NodeJS versions, with an intention to provide compatibility as far back as possible, while referencing latest changes and deprecation warnings.
 
@@ -290,8 +303,8 @@ GitHub Actions shall be used to run multi-platform, multi-architecture tests, bu
 ## Development Status
 
 - port `react-scripts` CLI to modern NodeJS Javascript API and Typescript using a 'test-and-declarations-first' approach - DONE
-- port `react-scripts build` command to the same - STARTED
-- port `react-scripts start` command to the same - PENDING
+- port `react-scripts build` command to the same - DONE
+- port `react-scripts start` command to the same - STARTED
 - port `react-scripts test` command to the same - PENDING
 - port `react-scripts init` command to the same, using [`ts-esbuild-react`](https://github.com/nathanjhood/ts-esbuild-react) and [`ts-esbuild-react-native-web`](https://github.com/nathanjhood/ts-esbuild-react-native-web) as the two project skeleton templates - PENDING
 
