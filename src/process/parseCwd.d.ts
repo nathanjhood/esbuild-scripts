@@ -26,6 +26,9 @@ declare interface parseCwd {
 
 declare const parseCwd: parseCwd;
 
-// declare namespace parseCwd {
-//   // export default parseCwd; // not supported yet
-// }
+declare interface parseCwdAsync {
+  (proc: NodeJS.Process): Promise<ParseCwdResult>;
+  (proc: NodeJS.Process, options?: ParseCwdOptions): Promise<ParseCwdResult>;
+}
+
+declare const parseCwdAsync: parseCwdAsync;
