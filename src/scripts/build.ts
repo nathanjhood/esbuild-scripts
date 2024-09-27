@@ -74,7 +74,7 @@ const build: build = async (
     }
   };
 
-  const MAX_SAFE_INTEGER: 2147483647 = 2147483647;
+  const MAX_SAFE_INTEGER: number = 2147483647;
 
   //
   const console = new node_console.Console({
@@ -120,18 +120,14 @@ const build: build = async (
   const paths = getClientPaths(proc);
 
   async function copyPublicFolder(): Promise<void> {
-    try {
-      return await new Promise<void>((resolvePublicDir) => {
-        return resolvePublicDir(
-          fs.cpSync(paths.appPublic, paths.appBuild, {
-            dereference: true,
-            recursive: true,
-          })
-        );
-      });
-    } catch (err) {
-      throw err;
-    }
+    return await new Promise<void>((resolvePublicDir) => {
+      return resolvePublicDir(
+        fs.cpSync(paths.appPublic, paths.appBuild, {
+          dereference: true,
+          recursive: true,
+        })
+      );
+    });
   }
 
   await copyPublicFolder();
@@ -341,7 +337,7 @@ const buildSync: buildSync = (
     }
   };
 
-  const MAX_SAFE_INTEGER: 2147483647 = 2147483647;
+  const MAX_SAFE_INTEGER: number = 2147483647;
 
   //
   const console = new node_console.Console({
