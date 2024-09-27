@@ -12,6 +12,7 @@
     "test": "tsx test/run.ts",
     "dev": "tsx src/cli.ts",
     "start": "node dist/cli.js",
+    "postinstall": "pkgroll --build",
     "build": "pkgroll --build",
     "watch": "pkgroll --watch",
     "minify": "pkgroll --minify",
