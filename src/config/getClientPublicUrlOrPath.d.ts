@@ -5,19 +5,18 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+export as namespace GetClientPublicUrlOrPath;
+
 export = getClientPublicUrlOrPath;
 
+declare type GetClientPublicUrlOrPathOptions = {
+  isEnvDevelopment: true | false;
+  homepage?: string;
+  envPublicUrl?: string | undefined;
+};
+
 declare interface getClientPublicUrlOrPath {
-  default?: (
-    isEnvDevelopment: boolean,
-    homepage: string | undefined,
-    envPublicUrl: string | undefined
-  ) => string;
-  (
-    isEnvDevelopment: boolean,
-    homepage: string | undefined,
-    envPublicUrl: string | undefined
-  ): string;
+  (proc: NodeJS.Process, options: GetClientPublicUrlOrPathOptions): string;
 }
 
 /**

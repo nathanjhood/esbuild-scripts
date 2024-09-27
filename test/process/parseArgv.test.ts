@@ -9,6 +9,8 @@ import type Test = require('node:test');
 import test = require('node:test');
 import util = require('node:util');
 
+import type ParseArgV = require('../../src/process/parseArgv');
+
 const timeout = 10000;
 
 test.suite(
@@ -164,7 +166,8 @@ test.suite(
 
             //
             const parseArgv: typeof import('../../src/process/parseArgv') = require('../../src/process/parseArgv');
-            const parseArgvSpy = ctx.mock.fn(parseArgv);
+            const parseArgvSpy: Test.Mock<ParseArgV<util.ParseArgsConfig>> =
+              ctx.mock.fn<ParseArgV<util.ParseArgsConfig>>(parseArgv);
 
             //
             (await ctx.test(

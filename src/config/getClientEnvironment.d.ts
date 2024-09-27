@@ -7,11 +7,15 @@
 /**
  *
  */
+
+export as namespace GetClientEnvironment;
+
 export = getClientEnvironment;
 
 declare type GetClientEnvironmentOptions = {
   verbose?: true | false;
   debug?: true | false;
+  color?: true | false;
 };
 
 declare type GetClientEnvironmentResult = {

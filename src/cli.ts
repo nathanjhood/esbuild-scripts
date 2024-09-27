@@ -14,7 +14,7 @@ import type ChildProcess = require('node:child_process');
 import path = require('node:path');
 import util = require('node:util');
 import fs = require('node:fs');
-import console = require('node:console');
+import node_console = require('node:console');
 import childProcess = require('node:child_process');
 
 import parseEnv = require('./process/parseEnv');
@@ -136,18 +136,7 @@ const cli: (proc: NodeJS.Process, options?: CliOptions) => void = (
   //     { once: true }
   //   );
 
-  const {
-    // assert,
-    info,
-    warn,
-    // error,
-    log,
-    // debug,
-    clear,
-    time,
-    // timeLog,
-    timeEnd,
-  }: Console = new console.Console({
+  const console: Console = new node_console.Console({
     groupIndentation: 2,
     ignoreErrors: ignoreErrors,
     stdout: proc.stdout,
@@ -172,18 +161,18 @@ const cli: (proc: NodeJS.Process, options?: CliOptions) => void = (
       '└─ ' + util.styleText('blue', script) + ' time taken',
   };
 
-  time(show.totalTime());
+  console.time(show.totalTime());
 
-  if (proc.stdout.isTTY) clear();
+  if (proc.stdout.isTTY) console.clear();
 
-  log(
+  console.log(
     util.styleText('white', 'Starting'),
     util.styleText('blue', packageJson.name),
     util.styleText('white', 'v' + packageJson.version),
     util.styleText('blue', '\n┊')
   );
 
-  log('├──' + '┐  ');
+  console.log('├──' + '┐  ');
 
   const cwd: ReturnType<typeof parseCwd> = parseCwd(proc, {
     debug: debug,
@@ -245,7 +234,7 @@ const cli: (proc: NodeJS.Process, options?: CliOptions) => void = (
 
   /** log the collected arg/value pairs from argv0 */
   if (verbose && !debug) {
-    info(childCommand);
+    console.info(childCommand);
   }
 
   const childArgs: string[] = [];
@@ -275,7 +264,7 @@ const cli: (proc: NodeJS.Process, options?: CliOptions) => void = (
 
   /** log the collected arg/value pairs from argv */
   if (verbose && !debug) {
-    info(childArgs);
+    console.info(childArgs);
   }
 
   /** local helper */
@@ -343,10 +332,13 @@ const cli: (proc: NodeJS.Process, options?: CliOptions) => void = (
         const timeTab: string = isLast ? '   ' : '│  ';
         const midTab: string = isLast ? '   ' : '│  ';
 
-        time('│  ' + timeTab + show.scriptTime(scriptToRun));
-        log('│  ' + '│  ');
-        log(tab + 'Recieved Script:', util.styleText('blue', scriptToRun));
-        log('│  ' + midTab + '│  ');
+        console.time('│  ' + timeTab + show.scriptTime(scriptToRun));
+        console.log('│  ' + '│  ');
+        console.log(
+          tab + 'Recieved Script:',
+          util.styleText('blue', scriptToRun)
+        );
+        console.log('│  ' + midTab + '│  ');
 
         const result: ChildProcess.SpawnSyncReturns<Buffer> =
           childProcess.spawnSync(
@@ -365,7 +357,7 @@ const cli: (proc: NodeJS.Process, options?: CliOptions) => void = (
         if (result.signal) {
           switch (result.signal) {
             case 'SIGKILL': {
-              log(
+              console.log(
                 'The build failed because the process exited too early. ' +
                   'This probably means the system ran out of memory or someone called ' +
                   '`kill -9` on the process.'
@@ -373,7 +365,7 @@ const cli: (proc: NodeJS.Process, options?: CliOptions) => void = (
               break;
             }
             case 'SIGTERM': {
-              log(
+              console.log(
                 'The build failed because the process exited too early. ' +
                   'Someone might have called `kill` or `killall`, or the system could ' +
                   'be shutting down.'
@@ -386,7 +378,7 @@ const cli: (proc: NodeJS.Process, options?: CliOptions) => void = (
           }
           proc.exit(1); // TODO - optional...
         }
-        timeEnd('│  ' + timeTab + show.scriptTime(scriptToRun));
+        console.timeEnd('│  ' + timeTab + show.scriptTime(scriptToRun));
         //
 
         //
@@ -409,10 +401,13 @@ const cli: (proc: NodeJS.Process, options?: CliOptions) => void = (
         const timeTab: string = isLast ? '   ' : '│  ';
         const midTab: string = isLast ? '   ' : '│  ';
 
-        time('│  ' + timeTab + show.scriptTime(scriptToRun));
-        log('│  ' + '│  ');
-        log(tab + 'Recieved Script:', util.styleText('blue', scriptToRun));
-        log('│  ' + midTab + '│  ');
+        console.time('│  ' + timeTab + show.scriptTime(scriptToRun));
+        console.log('│  ' + '│  ');
+        console.log(
+          tab + 'Recieved Script:',
+          util.styleText('blue', scriptToRun)
+        );
+        console.log('│  ' + midTab + '│  ');
 
         const result: ChildProcess.ChildProcess = childProcess.spawn(
           childCommand[0]!,
@@ -432,7 +427,7 @@ const cli: (proc: NodeJS.Process, options?: CliOptions) => void = (
 
           switch (result.signalCode) {
             case 'SIGKILL': {
-              log(
+              console.log(
                 'The build failed because the process exited too early. ' +
                   'This probably means the system ran out of memory or someone called ' +
                   '`kill -9` on the process.'
@@ -440,7 +435,7 @@ const cli: (proc: NodeJS.Process, options?: CliOptions) => void = (
               break;
             }
             case 'SIGTERM': {
-              log(
+              console.log(
                 'The build failed because the process exited too early. ' +
                   'Someone might have called `kill` or `killall`, or the system could ' +
                   'be shutting down.'
@@ -458,7 +453,7 @@ const cli: (proc: NodeJS.Process, options?: CliOptions) => void = (
         } // if (result.signalCode)
         //
 
-        timeEnd('│  ' + timeTab + show.scriptTime(scriptToRun));
+        console.timeEnd('│  ' + timeTab + show.scriptTime(scriptToRun));
 
         //
       }); // argv.tokens.forEach<PositionalArg>()
@@ -471,8 +466,8 @@ const cli: (proc: NodeJS.Process, options?: CliOptions) => void = (
   if (warnings.length != 0 && !ignoreWarnings) {
     //
 
-    warn('│  ');
-    warn('├─ ' + 'Finished with Warning:');
+    console.warn('│  ');
+    console.warn('├─ ' + 'Finished with Warning:');
 
     warnings.forEach((warning, id, array) => {
       //
@@ -480,7 +475,7 @@ const cli: (proc: NodeJS.Process, options?: CliOptions) => void = (
       const isLast: boolean = id === array.length;
       const tab: string = isLast ? '└─ ' : '├─ ';
 
-      warn(
+      console.warn(
         '│  ' + tab + warning.name,
         util.styleText('white', warning.message)
       );
@@ -489,17 +484,20 @@ const cli: (proc: NodeJS.Process, options?: CliOptions) => void = (
     }); // warnings.forEach()
     //
 
-    warn('│  ' + '├─ ' + 'Perhaps you need to update', packageJson.name + '?');
-    warn(
+    console.warn(
+      '│  ' + '├─ ' + 'Perhaps you need to update',
+      packageJson.name + '?'
+    );
+    console.warn(
       '│  ' + '└─ ' + 'See:',
       util.styleText('underline', packageJson.homepage)
     );
 
     //
     if (treatWarningsAsErrors) {
-      log('│  ');
-      timeEnd(show.totalTime());
-      log(util.styleText('red', '┊'));
+      console.log('│  ');
+      console.timeEnd(show.totalTime());
+      console.log(util.styleText('red', '┊'));
       // log(show.commands());
       proc.exitCode = warnings.length;
       const msg = util.styleText('yellow', 'Finished with warning');
@@ -513,9 +511,9 @@ const cli: (proc: NodeJS.Process, options?: CliOptions) => void = (
   } // if (warnings.length != 0 && ignoreWarnings)
   //
 
-  log('│  ');
-  timeEnd(show.totalTime());
-  log(util.styleText('green', '┊'));
+  console.log('│  ');
+  console.timeEnd(show.totalTime());
+  console.log(util.styleText('green', '┊'));
   return;
 };
 
@@ -562,7 +560,7 @@ if (require.main === module) {
   })(
     /** process -> */ global.process,
     /** options -> */ {
-      sync: true,
+      sync: false,
       verbose: global.process.env['VERBOSE'] !== undefined ? true : false,
       debug: global.process.env['DEBUG'] !== undefined ? true : false,
       timeoutMs: MAX_SAFE_INTEGER,

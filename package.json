@@ -1,6 +1,6 @@
 {
   "name": "@nathanjhood/esbuild-scripts",
-  "version": "0.1.0",
+  "version": "0.0.1-3a60d4837d96239d103bd4d7b0cfb9e33c7caefe",
   "license": "MIT",
   "homepage": "https://github.com/nathanjhood/esbuild-scripts",
   "repository": {
@@ -12,6 +12,7 @@
     "test": "tsx test/run.ts",
     "dev": "tsx src/cli.ts",
     "start": "node dist/cli.js",
+    "prepare": "pkgroll --build",
     "build": "pkgroll --build",
     "watch": "pkgroll --watch",
     "minify": "pkgroll --minify",
@@ -23,7 +24,8 @@
     "format:fix": "prettier --write ./**/*.{js,jsx,ts,tsx,css,md,json} --config ./prettier.config.mjs"
   },
   "files": [
-    "./dist"
+    "dist",
+    "src"
   ],
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -139,6 +141,18 @@
       },
       "types": "./dist/config/esbuild/getBuildOptions.d.ts",
       "default": "./dist/config/esbuild/getBuildOptions.js"
+    },
+    "src/scripts/buildSync.ts": {
+      "require": {
+        "types": "./dist/scripts/buildSync.d.cts",
+        "default": "./dist/scripts/buildSync.cjs"
+      },
+      "import": {
+        "types": "./dist/scripts/buildSync.d.mts",
+        "default": "./dist/scripts/buildSync.mjs"
+      },
+      "types": "./dist/scripts/buildSync.d.ts",
+      "default": "./dist/scripts/buildSync.js"
     },
     "src/scripts/build.ts": {
       "require": {

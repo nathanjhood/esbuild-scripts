@@ -159,7 +159,8 @@ test.suite('parseCwd()', { timeout: timeout }, (suiteContext_parseCwd) => {
 
           //
           const parseCwd: typeof import('../../src/process/parseCwd') = require('../../src/process/parseCwd');
-          const parseCwdSpy = ctx.mock.fn(parseCwd);
+          const parseCwdSpy: test.Mock<typeof parseCwd> =
+            ctx.mock.fn<typeof parseCwd>(parseCwd);
           //
 
           //

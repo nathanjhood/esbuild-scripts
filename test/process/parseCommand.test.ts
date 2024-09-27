@@ -7,6 +7,8 @@
 import test = require('node:test');
 import util = require('node:util');
 
+import type ParseCommand = require('../../src/process/parseCommand');
+
 const timeout = 10000;
 
 test.suite(
@@ -165,7 +167,9 @@ test.suite(
 
             //
             const parseCommand: typeof import('../../src/process/parseCommand') = require('../../src/process/parseCommand');
-            const parseCommandSpy = ctx.mock.fn(parseCommand);
+            const parseCommandSpy: test.Mock<
+              ParseCommand<util.ParseArgsConfig>
+            > = ctx.mock.fn<ParseCommand<util.ParseArgsConfig>>(parseCommand);
             //
 
             //

@@ -280,7 +280,7 @@ The convention mentioned exactly matches the React (and `dotenv`) documentation,
 
 ## See a Preview
 
-For the time being while working towards a suitable `v0.0.1` baseline, a fully-working draft of this entire project, including the four commands *and* react/react-native-web project templates, can be found at:
+For the time being while working towards a suitable `v0.0.1` baseline, a fully-working first draft of the porting of `react-scripts` to ESBuild, including the four commands *and* react/react-native-web project templates, can be found at:
 
 - [`ts-esbuild-react`](https://github.com/nathanjhood/ts-esbuild-react) - A react app template using esbuild and Typescript, with working version of all four scripts
 - [`ts-esbuild-react-native-web`](https://github.com/nathanjhood/ts-esbuild-react-native-web) - A react app template uing esbuild and Typescript *and* React Native Web, with working version of all four scripts

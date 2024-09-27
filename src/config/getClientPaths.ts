@@ -11,7 +11,7 @@ const require: NodeRequire = createRequire(__filename);
 
 import path = require('node:path');
 import fs = require('node:fs');
-
+import node_console = require('node:console');
 import ownPackageJson = require('../../package.json');
 import getClientPublicUrlOrPath = require('./getClientPublicUrlOrPath');
 
@@ -21,6 +21,7 @@ import getClientPublicUrlOrPath = require('./getClientPublicUrlOrPath');
 type GetClientPathsOptions = {
   verbose?: true | false;
   debug?: true | false;
+  color?: true | false;
   moduleFileExtensions?: string[];
   /**
    * - if `beforeEject: we're in `./node_modules/react-scripts/config/` (default)
@@ -75,12 +76,16 @@ const getClientPaths: getClientPaths = (
       : proc.env['VERBOSE'] === 'true'
         ? true
         : false;
+  //
   const debug: boolean =
     options && options.debug
       ? options.debug
       : proc.env['DEBUG'] === 'true'
         ? true
         : false;
+  //
+  const color: boolean = options && options.color ? options.color : false;
+  //
   const moduleFileExtensions: string[] =
     options && options.moduleFileExtensions
       ? options.moduleFileExtensions
@@ -98,6 +103,21 @@ const getClientPaths: getClientPaths = (
           'jsx',
         ];
   //
+  const MAX_SAFE_INTEGER: number = 2147483647;
+
+  //
+  const console: Console = new node_console.Console({
+    groupIndentation: 2,
+    // ignoreErrors: options && options.logLevel === 'error' ? true : false,
+    stdout: proc.stdout,
+    stderr: proc.stderr,
+    inspectOptions: {
+      depth: MAX_SAFE_INTEGER,
+      breakLength: 80,
+      colors: color,
+    },
+    // colorMode: 'auto', // cannot be used if using 'inspectOptions.colors'
+  });
 
   const isEjectedOrPublished: 'beforeEject' | 'afterEject' | 'beforePublish' =
     options && options.isEjectedOrPublished
@@ -119,11 +139,11 @@ const getClientPaths: getClientPaths = (
   // single-page apps that may serve index.html for nested URLs like /todos/42.
   // We can't use a relative path in HTML because we don't want to load something
   // like /todos/42/static/js/bundle.7289d.js. We have to know the root.
-  const publicUrlOrPath: string = getClientPublicUrlOrPath(
-    proc.env['NODE_ENV'] === 'development',
-    require(resolveApp('package.json')).homepage,
-    proc.env['PUBLIC_URL']
-  );
+  const publicUrlOrPath: string = getClientPublicUrlOrPath(proc, {
+    isEnvDevelopment: proc.env['NODE_ENV'] === 'development',
+    homepage: require(resolveApp('package.json')).homepage,
+    envPublicUrl: proc.env['PUBLIC_URL'],
+  });
   //
 
   //
@@ -176,7 +196,7 @@ const getClientPaths: getClientPaths = (
       //
 
       //
-      if (verbose && !debug) global.console.info(result);
+      if (verbose && !debug) console.info(result);
       //
 
       //
@@ -221,7 +241,7 @@ const getClientPaths: getClientPaths = (
       //
 
       //
-      if (verbose && !debug) global.console.info(result);
+      if (verbose && !debug) console.info(result);
       //
 
       //
@@ -290,7 +310,7 @@ const getClientPaths: getClientPaths = (
         //
 
         //
-        if (verbose && !debug) global.console.info(result);
+        if (verbose && !debug) console.info(result);
         //
 
         //

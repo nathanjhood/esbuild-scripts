@@ -8,6 +8,8 @@ import type Test = require('node:test');
 import test = require('node:test');
 import path = require('node:path');
 
+import type ParseEnv = require('../../src/process/parseEnv');
+
 const config = {
   timeout: 10000,
   file: path.parse(path.resolve(__dirname, '../../src/process/parseEnv')),
@@ -201,8 +203,8 @@ test.suite(
             // import the function
             const parseEnv: typeof import('../../src/process/parseEnv') = require('../../src/process/parseEnv');
             // create a spy
-            const parseEnvSpy: Test.Mock<typeof parseEnv> =
-              testContext_asAModule.mock.fn<typeof parseEnv>(parseEnv);
+            const parseEnvSpy: Test.Mock<ParseEnv> =
+              testContext_asAModule.mock.fn<ParseEnv>(parseEnv);
             //
 
             // minimum: client-side env, as found on esbuild's 'BuildOptions.defines'
@@ -218,11 +220,18 @@ test.suite(
             //
 
             //
-            const cwd = testContext_asAModule.mock.fn(global.process.cwd);
-            const loadEnvFile = testContext_asAModule.mock.fn(
-              global.process.loadEnvFile
+            const cwd = testContext_asAModule.mock.fn<() => string>(
+              global.process.cwd
             );
-            const exit = testContext_asAModule.mock.fn(global.process.exit);
+            //
+            const loadEnvFile = testContext_asAModule.mock.fn<
+              (path?: string | URL | Buffer) => void
+            >(global.process.loadEnvFile);
+            //
+            const exit = testContext_asAModule.mock.fn<
+              (code?: number | string | null | undefined) => never
+            >(global.process.exit);
+            //
             const on = testContext_asAModule.mock.fn(global.process.on);
             const off = testContext_asAModule.mock.fn(global.process.off);
             //
