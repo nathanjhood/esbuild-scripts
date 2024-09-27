@@ -15,10 +15,10 @@ $ yarn init
 $ yarn add react react-dom
 ```
 
-Add `esbuild-scripts` and [esbuild](https://esbuild.github.io/api/)
+Add `@nathanjhood/esbuild-scripts` and [esbuild](https://esbuild.github.io/api/)
 
 ```sh
-$ yarn add esbuild esbuild-scripts
+$ yarn add esbuild @nathanjhood/esbuild-scripts
 ```
 
 Alias our scripts in your `package.json`:
@@ -32,8 +32,8 @@ Alias our scripts in your `package.json`:
     // etc...
   },
   "dependencies": {
+    "@nathanjhood/esbuild-scripts": "0.0.1",
     "esbuild": "0.24.0",
-    "esbuild-scripts": "0.0.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     // etc...
