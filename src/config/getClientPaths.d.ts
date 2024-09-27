@@ -4,11 +4,15 @@
  * @copyright 2024 MIT License
  */
 
+/** */
+export as namespace GetClientPaths;
+
 export = getClientPaths;
 
 declare type GetClientPathsOptions = {
   verbose?: true | false;
   debug?: true | false;
+  color?: true | false;
   moduleFileExtensions?: string[];
   isEjectedOrPublished?: 'beforeEject' | 'afterEject' | 'beforePublish';
 };

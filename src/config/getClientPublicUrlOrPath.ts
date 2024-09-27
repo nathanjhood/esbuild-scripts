@@ -11,14 +11,16 @@ const require: NodeRequire = createRequire(__filename);
 
 import type Url = require('node:url');
 import url = require('node:url');
+import node_console = require('node:console');
+
+type GetClientPublicUrlOrPathOptions = {
+  isEnvDevelopment: true | false;
+  homepage?: string;
+  envPublicUrl?: string | undefined;
+};
 
 interface getClientPublicUrlOrPath {
-  default?: (
-    isEnvDevelopment: boolean,
-    homepage?: string,
-    envPublicUrl?: string
-  ) => string;
-  (isEnvDevelopment: boolean, homepage?: string, envPublicUrl?: string): string;
+  (proc: NodeJS.Process, options: GetClientPublicUrlOrPathOptions): string;
 }
 
 /**
@@ -37,19 +39,35 @@ interface getClientPublicUrlOrPath {
  * the LICENSE file in the root directory of this source tree.
  */
 const getClientPublicUrlOrPath: getClientPublicUrlOrPath = (
-  isEnvDevelopment: boolean,
-  homepage?: string,
-  envPublicUrl?: string
+  proc: NodeJS.Process,
+  options: GetClientPublicUrlOrPathOptions
 ): string => {
   //
 
   //
-  const verbose: boolean = global.process.env['VERBOSE'] ? true : false;
+  const verbose: boolean = process.env['VERBOSE'] ? true : false;
   //
+
+  const console: Console = new node_console.Console({
+    groupIndentation: 2,
+    // ignoreErrors: options && options.logLevel === 'error' ? true : false,
+    stdout: proc.stdout,
+    stderr: proc.stderr,
+    // inspectOptions: {
+    //   depth: MAX_SAFE_INTEGER,
+    //   breakLength: 80,
+    //   colors: options && options.color ? options.color : false,
+    // },
+    // colorMode: 'auto', // cannot be used if using 'inspectOptions.colors'
+  });
 
   //
   const stubDomain: string = 'https://nathanjhood.dev';
   //
+
+  const isEnvDevelopment: boolean = options.isEnvDevelopment;
+  let envPublicUrl: string | undefined = options.envPublicUrl;
+  let homepage: string | undefined = options.homepage;
 
   //
   if (envPublicUrl) {
@@ -92,7 +110,7 @@ const getClientPublicUrlOrPath: getClientPublicUrlOrPath = (
         ? homepage
         : validHomepagePathname;
 
-    if (verbose) global.console.log(result);
+    if (verbose) console.log(result);
 
     return result satisfies string;
   }

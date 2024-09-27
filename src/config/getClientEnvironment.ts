@@ -14,12 +14,14 @@ const require: NodeRequire = createRequire(__filename);
 import type Path = require('node:path');
 import path = require('node:path');
 import fs = require('node:fs');
+import node_console = require('node:console');
 
 import getClientPaths = require('./getClientPaths');
 
 type GetClientEnvironmentOptions = {
   verbose?: true | false;
   debug?: true | false;
+  color?: true | false;
 };
 
 type GetClientEnvironmentResult = {
@@ -55,6 +57,7 @@ const getClientEnvironment: getClientEnvironment = (
       : global.process.env['VERBOSE'] !== undefined
         ? true
         : false;
+  //
   const debug: boolean =
     options && options.debug
       ? options.debug
@@ -62,6 +65,24 @@ const getClientEnvironment: getClientEnvironment = (
         ? true
         : false;
   //
+  const color: boolean = options && options.color ? options.color : false;
+  //
+
+  const MAX_SAFE_INTEGER: number = 2147483647;
+
+  //
+  const console: Console = new node_console.Console({
+    groupIndentation: 2,
+    // ignoreErrors: options && options.logLevel === 'error' ? true : false,
+    stdout: proc.stdout,
+    stderr: proc.stderr,
+    inspectOptions: {
+      depth: MAX_SAFE_INTEGER,
+      breakLength: 80,
+      colors: color,
+    },
+    // colorMode: 'auto', // cannot be used if using 'inspectOptions.colors'
+  });
 
   //
   const paths = getClientPaths(proc, {
@@ -95,8 +116,7 @@ const getClientEnvironment: getClientEnvironment = (
       const parsedEnvPath: Path.ParsedPath = path.parse(dotenvFile.toString());
       // const formattedEnvPath = path.format(parsedEnvPath);
       //
-      if (verbose && !debug)
-        global.console.info(`parseEnv('${parsedEnvPath.base}')`);
+      if (verbose && !debug) console.info(`parseEnv('${parsedEnvPath.base}')`);
       //
       loadEnvFile(dotenvFile); // throws internally, or changes 'proc.env'
       //
