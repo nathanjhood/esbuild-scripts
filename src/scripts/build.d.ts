@@ -8,6 +8,8 @@ declare const require: NodeRequire;
 
 import type ESBuild = require('esbuild');
 
+export as namespace Build;
+
 export = build;
 
 declare interface build {
@@ -19,7 +21,3 @@ declare interface build {
 }
 
 declare const build: build;
-// declare const buildAsync: (
-//   proc: NodeJS.Process,
-//   options?: ESBuild.BuildOptions
-// ) => Promise<ESBuild.BuildResult<ESBuild.BuildOptions>>;
