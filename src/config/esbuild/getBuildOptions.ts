@@ -21,6 +21,13 @@ interface getBuildOptions {
   ): ESBuild.BuildOptions;
 }
 
+/**
+ *
+ * @param {NodeJS.Process} proc
+ * @param {'development'|'production'|'test'} env
+ * @param {ESBuild.BuildOptions} options
+ * @returns {Promise<ESBuild.BuildResult<ESBuild.BuildOptions>>}
+ */
 const getBuildOptions: getBuildOptions = (
   proc: NodeJS.Process,
   env: 'development' | 'production' | 'test',
