@@ -69,8 +69,20 @@ const buildSync: buildSync = (
 
   const MAX_SAFE_INTEGER: number = 2147483647;
 
+  const defaultBuildOptions: ESBuild.BuildOptions = getBuildOptions(
+    proc,
+    'production'
+  );
+
+  const buildOptions: ESBuild.BuildOptions = {
+    // defaults
+    ...defaultBuildOptions,
+    // args
+    ...options,
+  };
+
   //
-  const console = new node_console.Console({
+  const console: Console = new node_console.Console({
     groupIndentation: 2,
     ignoreErrors: options && options.logLevel === 'error' ? true : false,
     stdout: proc.stdout,
@@ -87,18 +99,6 @@ const buildSync: buildSync = (
   const logName: string = 'esbuild-scripts build';
   console.time(logName);
   //
-
-  const defaultBuildOptions: ESBuild.BuildOptions = getBuildOptions(
-    proc,
-    'production'
-  );
-
-  const buildOptions: ESBuild.BuildOptions = {
-    // defaults
-    ...defaultBuildOptions,
-    // args
-    ...options,
-  };
 
   const paths = getClientPaths(proc);
 

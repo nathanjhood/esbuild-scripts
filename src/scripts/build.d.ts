@@ -4,8 +4,6 @@
  * @copyright 2024 MIT License
  */
 
-declare const require: NodeRequire;
-
 import type ESBuild = require('esbuild');
 
 export as namespace Build;
@@ -20,4 +18,7 @@ declare interface build {
   ): Promise<ESBuild.BuildResult<ESBuild.BuildOptions>>;
 }
 
+/**
+ * build
+ */
 declare const build: build;

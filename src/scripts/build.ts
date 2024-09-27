@@ -76,8 +76,20 @@ const build: build = async (
 
   const MAX_SAFE_INTEGER: number = 2147483647;
 
+  const defaultBuildOptions: ESBuild.BuildOptions = getBuildOptions(
+    proc,
+    'production'
+  );
+
+  const buildOptions: ESBuild.BuildOptions = {
+    // defaults
+    ...defaultBuildOptions,
+    // args
+    ...options,
+  };
+
   //
-  const console = new node_console.Console({
+  const console: Console = new node_console.Console({
     groupIndentation: 2,
     ignoreErrors: options && options.logLevel === 'error' ? true : false,
     stdout: proc.stdout,
@@ -104,18 +116,6 @@ const build: build = async (
   //   new util.MIMEType('text/ecmascript'),
   // ];
   // //
-
-  const defaultBuildOptions: ESBuild.BuildOptions = getBuildOptions(
-    proc,
-    'production'
-  );
-
-  const buildOptions: ESBuild.BuildOptions = {
-    // defaults
-    ...defaultBuildOptions,
-    // args
-    ...options,
-  };
 
   const paths = getClientPaths(proc);
 
