@@ -4,7 +4,7 @@
  * @copyright 2024 MIT License
  */
 
-/** */
+//
 import { createRequire } from 'node:module';
 const require: NodeRequire = createRequire(__filename);
 
@@ -25,6 +25,13 @@ interface build {
   ): Promise<ESBuild.BuildResult<ESBuild.BuildOptions>>;
 }
 
+/**
+ *
+ * @param {NodeJS.Process} proc
+ * @param {(ESBuild.BuildOptions|undefined)} options
+ * @returns {Promise<ESBuild.BuildResult<ESBuild.BuildOptions>>}
+ * @async
+ */
 const build: build = async (
   proc: NodeJS.Process,
   options?: ESBuild.BuildOptions
@@ -38,12 +45,12 @@ const build: build = async (
       fs.writeSync(proc.stderr.fd, util.format(err, origin), null, 'utf8');
       throw err;
     }
-  );
+  ) satisfies NodeJS.Process;
   //
   proc.on('unhandledRejection', (err: unknown, origin: Promise<unknown>) => {
     fs.writeSync(proc.stderr.fd, util.format(err, origin), null, 'utf8');
     throw err;
-  });
+  }) satisfies NodeJS.Process;
   //
 
   const logLevelValue: (logLevel: ESBuild.LogLevel) => number = (
@@ -107,20 +114,17 @@ const build: build = async (
   console.time(logName);
   //
 
-  // //
-  // const MIMETypes: Util.MIMEType[] = [
-  //   new util.MIMEType('image/png'),
-  //   new util.MIMEType('image/gif'),
-  //   new util.MIMEType('text/javascript'),
-  //   new util.MIMEType('text/typescript'),
-  //   new util.MIMEType('text/ecmascript'),
-  // ];
-  // //
-
   const paths = getClientPaths(proc);
 
+  /**
+   *
+   * @returns {Promise<void>}
+   * @async
+   */
   async function copyPublicFolder(): Promise<void> {
-    return await new Promise<void>((resolvePublicDir) => {
+    //
+    return new Promise<void>((resolvePublicDir) => {
+      //
       return resolvePublicDir(
         fs.cpSync(paths.appPublic, paths.appBuild, {
           dereference: true,
@@ -130,162 +134,175 @@ const build: build = async (
     });
   }
 
-  await copyPublicFolder();
+  /**
+   *
+   * @param {ESBuild.BuildResult<ESBuild.BuildOptions>} result
+   * @returns {Promise<ESBuild.BuildResult<ESBuild.BuildOptions>>}
+   * @async
+   */
+  const formatErrors = async (
+    result: ESBuild.BuildResult<ESBuild.BuildOptions>
+  ): Promise<ESBuild.BuildResult<ESBuild.BuildOptions>> => {
+    //
+    const { errors } = result;
+    //
+    if (errors) {
+      //
+      const errorMessages: string[] = await esbuild.formatMessages(errors, {
+        color: proc.stdout.isTTY,
+        terminalWidth: 80,
+        kind: 'error',
+      });
+      //
+      if (buildOptions.logLevel && logLevelValue(buildOptions.logLevel) <= 1)
+        errorMessages.forEach((e) => console.error(e));
+      //
+    }
+    //
+    return result satisfies ESBuild.BuildResult<ESBuild.BuildOptions>;
+  };
 
-  //
-  return await esbuild
-    .build<ESBuild.BuildOptions>(buildOptions)
-    .then<ESBuild.BuildResult<ESBuild.BuildOptions>>(
-      async ({
-        errors,
-        warnings,
-        metafile,
-        outputFiles,
-        mangleCache,
-      }: ESBuild.BuildResult<ESBuild.BuildOptions>) => {
-        if (errors) {
-          const errorMessages = await esbuild.formatMessages(errors, {
-            color: proc.stdout.isTTY,
-            terminalWidth: 80,
-            kind: 'error',
-          });
-          if (
-            buildOptions.logLevel &&
-            logLevelValue(buildOptions.logLevel) <= 1
-          )
-            errorMessages.forEach((e) => console.error(e));
-        }
-        return {
-          errors,
-          warnings,
-          metafile,
-          outputFiles,
-          mangleCache,
-        } satisfies ESBuild.BuildResult<ESBuild.BuildOptions>;
-      },
-      (err) => {
-        throw err;
-      }
-    )
-    .then<ESBuild.BuildResult<ESBuild.BuildOptions>>(
-      async ({
-        errors,
-        warnings,
-        metafile,
-        outputFiles,
-        mangleCache,
-      }: ESBuild.BuildResult<ESBuild.BuildOptions>) => {
-        if (warnings) {
-          const warningMessages = await esbuild.formatMessages(warnings, {
-            color: proc.stdout.isTTY,
-            terminalWidth: 80,
-            kind: 'warning',
-          });
-          if (
-            buildOptions.logLevel &&
-            logLevelValue(buildOptions.logLevel) <= 2
-          )
-            warningMessages.forEach((w) => console.warn(w));
-        }
-        return {
-          errors,
-          warnings,
-          metafile,
-          outputFiles,
-          mangleCache,
-        } satisfies ESBuild.BuildResult<ESBuild.BuildOptions>;
-      },
-      (err) => {
-        throw err;
-      }
-    )
-    .then<ESBuild.BuildResult<ESBuild.BuildOptions>>(
-      async ({
-        errors,
-        warnings,
-        metafile,
-        outputFiles,
-        mangleCache,
-      }: ESBuild.BuildResult<ESBuild.BuildOptions>) => {
-        if (metafile) {
-          const analysis = await esbuild.analyzeMetafile(metafile, {
-            color: proc.stdout.isTTY,
-            verbose: true,
-          });
-          if (
-            buildOptions.logLevel &&
-            logLevelValue(buildOptions.logLevel) <= 3
-          )
-            console.log(analysis);
-        }
-        return {
-          errors,
-          warnings,
-          metafile,
-          outputFiles,
-          mangleCache,
-        } satisfies ESBuild.BuildResult<ESBuild.BuildOptions>;
-      },
-      (err) => {
-        throw err;
-      }
-    )
-    .then<ESBuild.BuildResult<ESBuild.BuildOptions>>(
-      ({
-        warnings,
-        errors,
-        metafile,
-        outputFiles,
-        mangleCache,
-      }: ESBuild.BuildResult<ESBuild.BuildOptions>) => {
+  /**
+   *
+   * @param {ESBuild.BuildResult<ESBuild.BuildOptions>} result
+   * @returns {Promise<ESBuild.BuildResult<ESBuild.BuildOptions>>}
+   * @async
+   */
+  const formatWarnings = async (
+    result: ESBuild.BuildResult<ESBuild.BuildOptions>
+  ): Promise<ESBuild.BuildResult<ESBuild.BuildOptions>> => {
+    //
+    const { warnings } = result;
+    //
+    if (warnings) {
+      //
+      const warningMessages: string[] = await esbuild.formatMessages(warnings, {
+        color: proc.stdout.isTTY,
+        terminalWidth: 80,
+        kind: 'warning',
+      });
+      //
+      if (buildOptions.logLevel && logLevelValue(buildOptions.logLevel) <= 2)
+        warningMessages.forEach((w) => console.warn(w));
+      //
+    }
+    //
+    return result satisfies ESBuild.BuildResult<ESBuild.BuildOptions>;
+  };
+
+  /**
+   *
+   * @param {ESBuild.BuildResult<ESBuild.BuildOptions>} result
+   * @returns {Promise<ESBuild.BuildResult<ESBuild.BuildOptions>>}
+   * @async
+   */
+  const analyzeMetaFile = async (
+    result: ESBuild.BuildResult<ESBuild.BuildOptions>
+  ): Promise<ESBuild.BuildResult<ESBuild.BuildOptions>> => {
+    //
+    const { metafile } = result;
+    //
+    if (metafile) {
+      //
+      const analysis: string = await esbuild.analyzeMetafile(metafile, {
+        color: proc.stdout.isTTY,
+        verbose: true,
+      });
+      //
+      if (buildOptions.logLevel && logLevelValue(buildOptions.logLevel) <= 3)
+        console.log(analysis);
+      //
+    }
+    //
+    return result satisfies ESBuild.BuildResult<ESBuild.BuildOptions>;
+  };
+
+  /**
+   *
+   * @param {ESBuild.BuildResult<ESBuild.BuildOptions>} result
+   * @returns {Promise<ESBuild.BuildResult<ESBuild.BuildOptions>>}
+   * @async
+   */
+  const logOutputFiles = async (
+    result: ESBuild.BuildResult<ESBuild.BuildOptions>
+  ): Promise<ESBuild.BuildResult<ESBuild.BuildOptions>> => {
+    //
+    return new Promise<ESBuild.BuildResult<ESBuild.BuildOptions>>(
+      (onResolve, onReject) => {
+        //
+        const { outputFiles } = result;
+        //
+        if (!outputFiles) return onReject();
+        //
         if (buildOptions.logLevel && logLevelValue(buildOptions.logLevel) <= 4)
-          console.info('outputFiles:', outputFiles);
-        return {
-          warnings,
-          errors,
-          metafile,
-          outputFiles,
-          mangleCache,
-        } satisfies ESBuild.BuildResult<ESBuild.BuildOptions>;
-      },
-      (err) => {
-        throw err;
+          outputFiles.forEach((outputFile) => console.info(outputFile));
+        //
+        return onResolve(result);
       }
-    )
-    .then<ESBuild.BuildResult<ESBuild.BuildOptions>>(
-      async ({
-        errors,
-        warnings,
-        metafile,
-        outputFiles,
-        mangleCache,
-      }: ESBuild.BuildResult<ESBuild.BuildOptions>) => {
+    );
+  };
+
+  /**
+   *
+   * @param {ESBuild.BuildResult<ESBuild.BuildOptions>} result
+   * @returns {Promise<ESBuild.BuildResult<ESBuild.BuildOptions>>}
+   * @async
+   */
+  const logMangleCache = async (
+    result: ESBuild.BuildResult<ESBuild.BuildOptions>
+  ): Promise<ESBuild.BuildResult<ESBuild.BuildOptions>> => {
+    //
+    return new Promise<ESBuild.BuildResult<ESBuild.BuildOptions>>(
+      (onResolve /**, onReject */) => {
+        //
+        const { mangleCache } = result;
+        // //
         if (mangleCache) {
+          //
           if (
             buildOptions.logLevel &&
             logLevelValue(buildOptions.logLevel) <= 5
           )
             console.debug(mangleCache);
         }
-        return {
-          errors,
-          warnings,
-          metafile,
-          outputFiles,
-          mangleCache,
-        } satisfies ESBuild.BuildResult<ESBuild.BuildOptions>;
-      },
-      (err) => {
-        throw err;
+
+        //
+        return onResolve(result);
       }
-    )
-    .catch((err) => {
+    );
+  };
+
+  await copyPublicFolder().catch((err) => {
+    throw err;
+  });
+
+  //
+  return esbuild
+    .build<ESBuild.BuildOptions>(buildOptions)
+    .then<ESBuild.BuildResult<ESBuild.BuildOptions>>(logMangleCache, (err) => {
+      throw err;
+    })
+    .then<ESBuild.BuildResult<ESBuild.BuildOptions>>(formatErrors, (err) => {
+      throw err;
+    })
+    .then<ESBuild.BuildResult<ESBuild.BuildOptions>>(formatWarnings, (err) => {
+      throw err;
+    })
+    .then<ESBuild.BuildResult<ESBuild.BuildOptions>>(logOutputFiles, (err) => {
+      throw err;
+    })
+    .then<ESBuild.BuildResult<ESBuild.BuildOptions>>(analyzeMetaFile, (err) => {
+      throw err;
+    })
+    .catch<never>((err) => {
       throw err;
     })
     .finally(() => {
       console.timeEnd(logName);
     });
 };
+
+export = build;
 
 if (require.main === module) {
   (async (
@@ -305,7 +322,7 @@ if (require.main === module) {
 
     //
   })(global.process, {
-    logLevel: 'warning',
+    logLevel: 'silent',
     metafile: true,
     write: false,
     color: true,
@@ -313,5 +330,3 @@ if (require.main === module) {
     // color: global.process.stdout.hasColors(),
   });
 }
-
-export = build;
