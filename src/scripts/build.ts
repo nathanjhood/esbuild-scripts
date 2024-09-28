@@ -123,10 +123,15 @@ const build: build = async (
    */
   async function copyPublicFolder(): Promise<void> {
     //
+    const publicPath =
+      options && options.publicPath ? options.publicPath : paths.appPublic;
+    //
+    const outdir = options && options.outdir ? options.outdir : paths.appBuild;
+    //
     return new Promise<void>((resolvePublicDir) => {
       //
       return resolvePublicDir(
-        fs.cpSync(paths.appPublic, paths.appBuild, {
+        fs.cpSync(publicPath, outdir, {
           dereference: true,
           recursive: true,
         })
