@@ -1,5 +1,11 @@
+import { createRequire } from 'node:module';
+const require: NodeRequire = createRequire(__dirname);
+
+import type ESBuild = require('esbuild');
 // import type Util = require('node:util');
-// import util = require('node:util');
+import util = require('node:util');
+import fs = require('node:fs');
+import node_console = require('node:console');
 import esbuild = require('esbuild');
 
 const start: (
@@ -15,23 +21,49 @@ const start: (
   proc.on(
     'uncaughtException',
     (err: Error, origin: NodeJS.UncaughtExceptionOrigin) => {
-      error(origin, err);
+      fs.writeSync(proc.stderr.fd, util.format(err, origin), null, 'utf8');
       throw err;
     }
   );
   //
+  proc.on('unhandledRejection', (err: unknown, origin: Promise<unknown>) => {
+    fs.writeSync(proc.stderr.fd, util.format(err, origin), null, 'utf8');
+    throw err;
+  });
+  //
+
+  const logLevelValue: (logLevel: ESBuild.LogLevel) => number = (
+    logLevel: ESBuild.LogLevel
+  ): number => {
+    switch (logLevel) {
+      case 'silent': {
+        return 0;
+      }
+      case 'error': {
+        return 1;
+      }
+      case 'warning': {
+        return 2;
+      }
+      case 'info': {
+        return 3;
+      }
+      case 'debug': {
+        return 4;
+      }
+      case 'verbose': {
+        return 5;
+      }
+      default: {
+        throw new Error('No matching case in switch statement');
+      }
+    }
+  };
+
+  const MAX_SAFE_INTEGER: number = 2147483647;
 
   //
-  const {
-    assert: assert,
-    info: info,
-    warn: warn,
-    error: error,
-    debug: debug,
-    time: time,
-    timeLog: timeLog,
-    timeEnd: timeEnd,
-  } = new console.Console({
+  const console = new node_console.Console({
     stdout: proc.stdout,
     stderr: proc.stdout,
     ignoreErrors: false,
@@ -41,7 +73,7 @@ const start: (
 
   //
   const logName: string = 'esbuild-scripts start';
-  time(logName);
+  console.time(logName);
   //
 
   // //
@@ -54,20 +86,20 @@ const start: (
   // ];
   // //
 
-  //
-  info('info message');
-  warn('warn message');
-  error('error message');
-  debug('debug message');
-  assert(false, 'assert message');
-  timeLog(logName);
-  //
+  // //
+  // console.info('info message');
+  // console.warn('warn message');
+  // console.error('error message');
+  // console.debug('debug message');
+  // console.assert(false, 'assert message');
+  // console.timeLog(logName);
+  // //
 
   //
   return esbuild
     .context(options ? options : {})
     .then(async (result) => {
-      info(result);
+      console.info(result);
       return await result.serve(options).then((ctx) => {
         return ctx;
       });
@@ -76,7 +108,7 @@ const start: (
       throw err;
     })
     .finally(() => {
-      timeEnd(logName);
+      console.timeEnd(logName);
     });
 };
 
