@@ -79,8 +79,8 @@ const cli: (proc: NodeJS.Process, options?: CliOptions) => void = (
   }) satisfies NodeJS.Process;
 
   proc.on('SIGTERM', (signal) => {
-    fs.writeSync(proc.stderr.fd, util.format(signal), null, 'utf8');
     ac.abort(signal);
+    fs.writeSync(proc.stderr.fd, util.format(signal), null, 'utf8');
     proc.exit();
   }) satisfies NodeJS.Process;
 
@@ -322,7 +322,7 @@ const cli: (proc: NodeJS.Process, options?: CliOptions) => void = (
   if (sync) {
     /** run the validated tokens as scripts with spawnSync */
     argv.tokens
-      .filter((token) => token.kind === 'positional')
+      .filter<PositionalArg>((token) => token.kind === 'positional')
       .forEach((token, id, array) => {
         //
 
@@ -391,7 +391,7 @@ const cli: (proc: NodeJS.Process, options?: CliOptions) => void = (
 
     /** run the validated tokens as scripts with spawn */
     argv.tokens
-      .filter((token) => token.kind === 'positional')
+      .filter<PositionalArg>((token) => token.kind === 'positional')
       .forEach(async (token, id, array) => {
         //
 
