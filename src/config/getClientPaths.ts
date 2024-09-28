@@ -332,9 +332,9 @@ const getClientPaths: getClientPaths = (
 
 export = getClientPaths;
 
-// if (require.main === module) {
-//   ((proc: NodeJS.Process, options?: GetClientPathsOptions) => {
-//     const result = getClientPaths(proc, options);
-//     global.console.assert(result);
-//   })(global.process, { verbose: true });
-// }
+if (require.main === module) {
+  ((proc: NodeJS.Process, options?: GetClientPathsOptions) => {
+    const result = getClientPaths(proc, options);
+    global.console.assert(result);
+  })(global.process, { verbose: true });
+}

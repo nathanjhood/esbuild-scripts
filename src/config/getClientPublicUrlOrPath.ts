@@ -6,7 +6,7 @@
  */
 
 import { createRequire } from 'node:module';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 const require: NodeRequire = createRequire(__filename);
 
 import type Url = require('node:url');
@@ -120,11 +120,11 @@ const getClientPublicUrlOrPath: getClientPublicUrlOrPath = (
 
 export = getClientPublicUrlOrPath;
 
-// if (require.main === module) {
-//   ((proc: NodeJS.Process) => {
-//     const result = getClientPublicUrlOrPath(
-//       proc.env['NODE_ENV'] === 'development' ? true : false
-//     );
-//     global.console.assert(result);
-//   })(global.process);
-// }
+if (require.main === module) {
+  ((proc: NodeJS.Process) => {
+    const result = getClientPublicUrlOrPath(proc, {
+      isEnvDevelopment: proc.env['NODE_ENV'] === 'development' ? true : false,
+    });
+    global.console.assert(result);
+  })(global.process);
+}

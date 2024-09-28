@@ -56,11 +56,4 @@ const options: Readonly<NodeTestRunnerOptions> =
     // ],
   });
 
-// before(() => {
-//   console.log("NodeJS test runner starting with", path.resolve(__filename))
-// }, { signal: abortController.signal });
-// after(() => {
-//   console.log("NodeJS test runner completed with", path.resolve(__filename))
-// }, { signal: abortController.signal });
-
 export = options;
