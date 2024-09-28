@@ -118,6 +118,7 @@ const getBuildOptions: getBuildOptions = (
     // It requires a trailing slash, or the file assets will get an incorrect path.
     // We inferred the "public path" (such as / or /my-project) from homepage.
     publicPath: paths.publicUrlOrPath,
+    tsconfig: paths.appTsConfig,
     loader: {
       '.jsx': 'jsx',
       '.js': 'js',
@@ -173,82 +174,16 @@ const getBuildOptions: getBuildOptions = (
 
 export = getBuildOptions;
 
-// ((
-//   proc: NodeJS.Process,
-//   env: 'development' | 'production' | 'test',
-//   options?: ESBuild.BuildOptions
-// ): ESBuild.BuildOptions => {
-//   //
+((
+  proc: NodeJS.Process,
+  env: 'development' | 'production' | 'test',
+  options?: ESBuild.BuildOptions
+): ESBuild.BuildOptions => {
+  //
 
-//   //
-//   const result = getBuildOptions(proc, env);
-//   global.console.log(result);
-//   return result;
-//   //
-// })(global.process, 'development');
-
-// const sample: {
-//   /** Documentation: https://esbuild.github.io/api/#bundle */
-//   bundle?: boolean;
-//   /** Documentation: https://esbuild.github.io/api/#splitting */
-//   splitting?: boolean;
-//   /** Documentation: https://esbuild.github.io/api/#preserve-symlinks */
-//   preserveSymlinks?: boolean;
-//   /** Documentation: https://esbuild.github.io/api/#outfile */
-//   outfile?: string;
-//   /** Documentation: https://esbuild.github.io/api/#metafile */
-//   metafile?: boolean;
-//   /** Documentation: https://esbuild.github.io/api/#outdir */
-//   outdir?: string;
-//   /** Documentation: https://esbuild.github.io/api/#outbase */
-//   outbase?: string;
-//   /** Documentation: https://esbuild.github.io/api/#external */
-//   external?: string[];
-//   /** Documentation: https://esbuild.github.io/api/#packages */
-//   packages?: 'bundle' | 'external';
-//   /** Documentation: https://esbuild.github.io/api/#alias */
-//   alias?: Record<string, string>;
-//   /** Documentation: https://esbuild.github.io/api/#loader */
-//   loader?: { [ext: string]: ESBuild.Loader };
-//   /** Documentation: https://esbuild.github.io/api/#resolve-extensions */
-//   resolveExtensions?: string[];
-//   /** Documentation: https://esbuild.github.io/api/#main-fields */
-//   mainFields?: string[];
-//   /** Documentation: https://esbuild.github.io/api/#conditions */
-//   conditions?: string[];
-//   /** Documentation: https://esbuild.github.io/api/#write */
-//   write?: boolean;
-//   /** Documentation: https://esbuild.github.io/api/#allow-overwrite */
-//   allowOverwrite?: boolean;
-//   /** Documentation: https://esbuild.github.io/api/#tsconfig */
-//   tsconfig?: string;
-//   /** Documentation: https://esbuild.github.io/api/#out-extension */
-//   outExtension?: { [ext: string]: string };
-//   /** Documentation: https://esbuild.github.io/api/#public-path */
-//   publicPath?: string;
-//   /** Documentation: https://esbuild.github.io/api/#entry-names */
-//   entryNames?: string;
-//   /** Documentation: https://esbuild.github.io/api/#chunk-names */
-//   chunkNames?: string;
-//   /** Documentation: https://esbuild.github.io/api/#asset-names */
-//   assetNames?: string;
-//   /** Documentation: https://esbuild.github.io/api/#inject */
-//   inject?: string[];
-//   /** Documentation: https://esbuild.github.io/api/#banner */
-//   banner?: { [type: string]: string };
-//   /** Documentation: https://esbuild.github.io/api/#footer */
-//   footer?: { [type: string]: string };
-//   /** Documentation: https://esbuild.github.io/api/#entry-points */
-//   entryPoints?:
-//     | string[]
-//     | Record<string, string>
-//     | { in: string; out: string }[];
-//   /** Documentation: https://esbuild.github.io/api/#stdin */
-//   stdin?: ESBuild.StdinOptions;
-//   /** Documentation: https://esbuild.github.io/plugins/ */
-//   plugins?: ESBuild.Plugin[];
-//   /** Documentation: https://esbuild.github.io/api/#working-directory */
-//   absWorkingDir?: string;
-//   /** Documentation: https://esbuild.github.io/api/#node-paths */
-//   nodePaths?: string[]; // The "NODE_PATH" variable from Node.js
-// } = {} satisfies ESBuild.BuildOptions;
+  //
+  const result = getBuildOptions(proc, env);
+  global.console.log(result);
+  return result;
+  //
+})(global.process, 'development');
