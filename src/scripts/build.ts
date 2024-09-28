@@ -326,7 +326,6 @@ if (require.main === module) {
     metafile: true,
     write: false,
     color: true,
-    platform: 'node',
     // color: global.process.stdout.hasColors(),
   });
 }
