@@ -24,6 +24,7 @@
     "format:fix": "prettier --write ./**/*.{js,jsx,ts,tsx,css,md,json} --config ./prettier.config.mjs"
   },
   "files": [
+    "tsconfig.json",
     "dist",
     "src"
   ],
