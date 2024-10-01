@@ -203,7 +203,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.10.0",
-    "@types/node": "22.5.5",
+    "@types/node": "22.7.4",
     "cli-testing-library": "^2.0.2",
     "debug": "^4.3.7",
     "eslint": "^9.10.0",
