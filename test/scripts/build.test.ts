@@ -36,7 +36,7 @@ test.suite(
           entryPoints: [path.resolve(__dirname, '../', 'setupTests.ts')],
           logLevel: 'silent',
           write: false,
-          publicPath: path.resolve(__dirname, '../', 'mocks', 'public')
+          publicPath: path.resolve(__dirname, '../', 'mocks', 'public'),
         });
         //
         (await ctx.test(

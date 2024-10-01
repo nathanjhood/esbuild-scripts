@@ -32,11 +32,16 @@
     "isolatedModules": true,
     // recommended
     "verbatimModuleSyntax": true,
+    // library code needs special considerations...
+    "skipLibCheck": false,
+    "strictFunctionTypes": true,
+    "strictNullChecks": true,
+    "strictPropertyInitialization": true,
+    "strictBindCallApply": true,
     // custom
     "composite": true,
     "declaration": true,
     "emitDeclarationOnly": true,
-    "skipLibCheck": false,
     "tsBuildInfoFile": ".cache/.tsbuildinfo"
   },
   "include": [
