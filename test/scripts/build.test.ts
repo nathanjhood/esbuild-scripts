@@ -30,13 +30,15 @@ test.suite(
       async (ctx) => {
         //
         const mockBuild: Test.Mock<Build> = ctx.mock.fn<Build>(build);
-        const result = await mockBuild(global.process, {
+        const mockEnv: NodeJS.ProcessEnv['NODE_ENV'] = 'production';
+        const mockProcess: NodeJS.Process = { ...global.process, env: { NODE_ENV: mockEnv } };
+        const result = await mockBuild(mockProcess, {
           platform: 'node',
           outdir: path.resolve(__dirname, 'dist'),
           entryPoints: [path.resolve(__dirname, '../', 'setupTests.ts')],
           logLevel: 'silent',
           write: false,
-          publicPath: path.resolve(__dirname, '../', 'mocks', 'public')
+          publicPath: path.resolve(__dirname, '../', 'mocks', 'public'),
         });
         //
         (await ctx.test(
