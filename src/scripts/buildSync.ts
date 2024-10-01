@@ -102,14 +102,21 @@ const buildSync: buildSync = (
 
   const paths = getClientPaths(proc);
 
-  function copyPublicFolder(): void {
+  const copyPublicFolder: (paths: {
+    appPublic: string;
+    appBuild: string;
+  }) => void = (paths: { appPublic: string; appBuild: string }) => {
     return fs.cpSync(paths.appPublic, paths.appBuild, {
       dereference: true,
       recursive: true,
     });
-  }
+  };
 
-  copyPublicFolder();
+  copyPublicFolder({
+    appBuild: options && options.outdir ? options.outdir : paths.appBuild,
+    appPublic:
+      options && options.publicPath ? options.publicPath : paths.appPublic,
+  });
 
   const {
     errors,

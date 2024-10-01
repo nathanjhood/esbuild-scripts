@@ -13,7 +13,8 @@ import util = require('node:util');
 import fs = require('node:fs');
 import node_console = require('node:console');
 import esbuild = require('esbuild');
-
+import parseEnv = require('../process/parseEnv');
+// import parseArgv = require('../process/parseArgv');
 import getClientPaths = require('../config/getClientPaths');
 import getBuildOptions = require('../config/esbuild/getBuildOptions');
 
@@ -37,20 +38,44 @@ const build: build = async (
   options?: ESBuild.BuildOptions
 ): Promise<ESBuild.BuildResult<ESBuild.BuildOptions>> => {
   //
+  const ac: AbortController = new AbortController();
+  //
+  const MAX_SAFE_INTEGER: number = 2147483647;
+  //
+  const unhandledRejectionListener: NodeJS.UnhandledRejectionListener = (
+    err: unknown,
+    origin: Promise<unknown>
+  ): void => {
+    const error: Error =
+      err instanceof Error
+        ? err
+        : new Error(util.styleText('red', 'Recieved unhandled rejection'), {
+            cause: origin,
+          });
+    ac.abort(error.message);
+    fs.writeSync(proc.stderr.fd, util.format(error), null, 'utf8');
+    throw error;
+  };
+  //
+  const uncaughtExceptionListener: NodeJS.UncaughtExceptionListener = (
+    error: Error,
+    origin: NodeJS.UncaughtExceptionOrigin
+  ): void => {
+    ac.abort(error);
+    fs.writeSync(proc.stderr.fd, util.format(error, origin), null, 'utf8');
+    throw error;
+  };
 
   //
   proc.on(
     'uncaughtException',
-    (err: Error, origin: NodeJS.UncaughtExceptionOrigin) => {
-      fs.writeSync(proc.stderr.fd, util.format(err, origin), null, 'utf8');
-      throw err;
-    }
+    uncaughtExceptionListener
   ) satisfies NodeJS.Process;
   //
-  proc.on('unhandledRejection', (err: unknown, origin: Promise<unknown>) => {
-    fs.writeSync(proc.stderr.fd, util.format(err, origin), null, 'utf8');
-    throw err;
-  }) satisfies NodeJS.Process;
+  proc.on(
+    'unhandledRejection',
+    unhandledRejectionListener
+  ) satisfies NodeJS.Process;
   //
 
   const logLevelValue: (logLevel: ESBuild.LogLevel) => number = (
@@ -81,20 +106,6 @@ const build: build = async (
     }
   };
 
-  const MAX_SAFE_INTEGER: number = 2147483647;
-
-  const defaultBuildOptions: ESBuild.BuildOptions = getBuildOptions(
-    proc,
-    'production'
-  );
-
-  const buildOptions: ESBuild.BuildOptions = {
-    // defaults
-    ...defaultBuildOptions,
-    // args
-    ...options,
-  };
-
   //
   const console: Console = new node_console.Console({
     groupIndentation: 2,
@@ -114,30 +125,48 @@ const build: build = async (
   console.time(logName);
   //
 
+  const env = parseEnv(proc);
+
+  if (proc.env['NODE_ENV'] !== 'production')
+    throw new Error(
+      util.styleText(
+        'red',
+        "'NODE_ENV' should be 'production', but it was " + proc.env['NODE_ENV']
+      )
+    );
+
+  // const argv = parseArgv(proc);
+
+  const defaultBuildOptions: ESBuild.BuildOptions = getBuildOptions(
+    proc,
+    'production'
+  );
+
+  const buildOptions: ESBuild.BuildOptions = {
+    // defaults
+    ...defaultBuildOptions,
+    // args
+    ...options,
+  };
+
   const paths = getClientPaths(proc);
+
+  const logLevel = buildOptions.logLevel;
 
   /**
    *
-   * @returns {Promise<void>}
-   * @async
+   * @param paths
+   * @returns {void}
    */
-  async function copyPublicFolder(): Promise<void> {
-    //
-    const publicPath =
-      options && options.publicPath ? options.publicPath : paths.appPublic;
-    //
-    const outdir = options && options.outdir ? options.outdir : paths.appBuild;
-    //
-    return new Promise<void>((resolvePublicDir) => {
-      //
-      return resolvePublicDir(
-        fs.cpSync(publicPath, outdir, {
-          dereference: true,
-          recursive: true,
-        })
-      );
+  const copyPublicFolder: (paths: {
+    appPublic: string;
+    appBuild: string;
+  }) => void = (paths: { appPublic: string; appBuild: string }): void => {
+    return fs.cpSync(paths.appPublic, paths.appBuild, {
+      dereference: true,
+      recursive: true,
     });
-  }
+  };
 
   /**
    *
@@ -159,7 +188,7 @@ const build: build = async (
         kind: 'error',
       });
       //
-      if (buildOptions.logLevel && logLevelValue(buildOptions.logLevel) <= 1)
+      if (logLevel && logLevelValue(logLevel) >= 1)
         errorMessages.forEach((e) => console.error(e));
       //
     }
@@ -187,7 +216,7 @@ const build: build = async (
         kind: 'warning',
       });
       //
-      if (buildOptions.logLevel && logLevelValue(buildOptions.logLevel) <= 2)
+      if (logLevel && logLevelValue(logLevel) >= 2)
         warningMessages.forEach((w) => console.warn(w));
       //
     }
@@ -214,8 +243,7 @@ const build: build = async (
         verbose: true,
       });
       //
-      if (buildOptions.logLevel && logLevelValue(buildOptions.logLevel) <= 3)
-        console.log(analysis);
+      if (logLevel && logLevelValue(logLevel) >= 3) console.log(analysis);
       //
     }
     //
@@ -239,7 +267,7 @@ const build: build = async (
         //
         if (!outputFiles) return onReject();
         //
-        if (buildOptions.logLevel && logLevelValue(buildOptions.logLevel) <= 4)
+        if (logLevel && logLevelValue(logLevel) >= 4)
           outputFiles.forEach((outputFile) => console.info(outputFile));
         //
         return onResolve(result);
@@ -264,10 +292,7 @@ const build: build = async (
         // //
         if (mangleCache) {
           //
-          if (
-            buildOptions.logLevel &&
-            logLevelValue(buildOptions.logLevel) <= 5
-          )
+          if (logLevel && logLevelValue(logLevel) >= 5)
             console.debug(mangleCache);
         }
 
@@ -277,8 +302,10 @@ const build: build = async (
     );
   };
 
-  await copyPublicFolder().catch((err) => {
-    throw err;
+  copyPublicFolder({
+    appBuild: options && options.outdir ? options.outdir : paths.appBuild,
+    appPublic:
+      options && options.publicPath ? options.publicPath : paths.appPublic,
   });
 
   //
@@ -329,8 +356,9 @@ if (require.main === module) {
   })(global.process, {
     logLevel: 'silent',
     metafile: true,
-    write: false,
+    write: true,
     color: true,
+
     // color: global.process.stdout.hasColors(),
   });
 }
