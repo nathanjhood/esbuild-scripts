@@ -125,15 +125,16 @@ const build: build = async (
   console.time(logName);
   //
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const env = parseEnv(proc);
 
-  if (proc.env['NODE_ENV'] !== 'production')
-    throw new Error(
-      util.styleText(
-        'red',
-        "'NODE_ENV' should be 'production', but it was " + proc.env['NODE_ENV']
-      )
-    );
+  // if (proc.env['NODE_ENV'] !== 'production')
+  //   throw new Error(
+  //     util.styleText(
+  //       'red',
+  //       "'NODE_ENV' should be 'production', but it was " + proc.env['NODE_ENV']
+  //     )
+  //   );
 
   // const argv = parseArgv(proc);
 
