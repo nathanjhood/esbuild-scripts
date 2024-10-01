@@ -272,12 +272,12 @@ const build: build = async (
         //
         const { outputFiles } = result;
         //
-        if (!outputFiles)
-          return onReject('logOutputFiles failed... did you set write=true?');
-        //
-        if (logLevel && logLevelValue(logLevel) >= 4)
+        if (logLevel && logLevelValue(logLevel) >= 4) {
+          if (!outputFiles)
+            return onReject('logOutputFiles failed... did you set write=true?');
+
           outputFiles.forEach((outputFile) => console.info(outputFile));
-        //
+        }
         return onResolve(result);
       }
     ).catch((err) => err);
