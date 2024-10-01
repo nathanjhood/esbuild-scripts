@@ -183,11 +183,13 @@ const build: build = async (
     //
     if (errors) {
       //
-      const errorMessages: string[] = await esbuild.formatMessages(errors, {
-        color: proc.stdout.isTTY,
-        terminalWidth: 80,
-        kind: 'error',
-      });
+      const errorMessages: string[] = await esbuild
+        .formatMessages(errors, {
+          color: proc.stdout.isTTY,
+          terminalWidth: 80,
+          kind: 'error',
+        })
+        .catch((err) => err);
       //
       if (logLevel && logLevelValue(logLevel) >= 1)
         errorMessages.forEach((e) => console.error(e));
@@ -211,11 +213,13 @@ const build: build = async (
     //
     if (warnings) {
       //
-      const warningMessages: string[] = await esbuild.formatMessages(warnings, {
-        color: proc.stdout.isTTY,
-        terminalWidth: 80,
-        kind: 'warning',
-      });
+      const warningMessages: string[] = await esbuild
+        .formatMessages(warnings, {
+          color: proc.stdout.isTTY,
+          terminalWidth: 80,
+          kind: 'warning',
+        })
+        .catch((err) => err);
       //
       if (logLevel && logLevelValue(logLevel) >= 2)
         warningMessages.forEach((w) => console.warn(w));
@@ -239,10 +243,12 @@ const build: build = async (
     //
     if (metafile) {
       //
-      const analysis: string = await esbuild.analyzeMetafile(metafile, {
-        color: proc.stdout.isTTY,
-        verbose: true,
-      });
+      const analysis: string = await esbuild
+        .analyzeMetafile(metafile, {
+          color: proc.stdout.isTTY,
+          verbose: true,
+        })
+        .catch((err) => err);
       //
       if (logLevel && logLevelValue(logLevel) >= 3) console.log(analysis);
       //
@@ -266,14 +272,15 @@ const build: build = async (
         //
         const { outputFiles } = result;
         //
-        if (!outputFiles) return onReject();
+        if (!outputFiles)
+          return onReject('logOutputFiles failed... did you set write=true?');
         //
         if (logLevel && logLevelValue(logLevel) >= 4)
           outputFiles.forEach((outputFile) => console.info(outputFile));
         //
         return onResolve(result);
       }
-    );
+    ).catch((err) => err);
   };
 
   /**
@@ -300,7 +307,7 @@ const build: build = async (
         //
         return onResolve(result);
       }
-    );
+    ).catch((err) => err);
   };
 
   copyPublicFolder({
@@ -355,11 +362,9 @@ if (require.main === module) {
 
     //
   })(global.process, {
-    logLevel: 'silent',
+    logLevel: 'info',
     metafile: true,
     write: true,
     color: true,
-
-    // color: global.process.stdout.hasColors(),
   });
 }
