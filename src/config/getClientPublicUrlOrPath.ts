@@ -11,7 +11,6 @@ const require: NodeRequire = createRequire(__filename);
 
 import type Url = require('node:url');
 import url = require('node:url');
-import node_console = require('node:console');
 
 type GetClientPublicUrlOrPathOptions = {
   isEnvDevelopment: true | false;
@@ -43,24 +42,9 @@ const getClientPublicUrlOrPath: getClientPublicUrlOrPath = (
   options: GetClientPublicUrlOrPathOptions
 ): string => {
   //
-
-  //
-  const verbose: boolean = process.env['VERBOSE'] ? true : false;
-  //
-
-  const console: Console = new node_console.Console({
-    groupIndentation: 2,
-    // ignoreErrors: options && options.logLevel === 'error' ? true : false,
-    stdout: proc.stdout,
-    stderr: proc.stderr,
-    // inspectOptions: {
-    //   depth: MAX_SAFE_INTEGER,
-    //   breakLength: 80,
-    //   colors: options && options.color ? options.color : false,
-    // },
-    // colorMode: 'auto', // cannot be used if using 'inspectOptions.colors'
+  proc.on('unhandledRejection', (err) => {
+    throw err;
   });
-
   //
   const stubDomain: string = 'https://nathanjhood.dev';
   //
@@ -109,8 +93,6 @@ const getClientPublicUrlOrPath: getClientPublicUrlOrPath = (
         homepage.startsWith('.')
         ? homepage
         : validHomepagePathname;
-
-    if (verbose) console.log(result);
 
     return result satisfies string;
   }

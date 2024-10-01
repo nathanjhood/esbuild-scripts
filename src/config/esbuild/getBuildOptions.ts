@@ -175,17 +175,17 @@ const getBuildOptions: getBuildOptions = (
 export = getBuildOptions;
 
 if (require.main === module) {
-((
-  proc: NodeJS.Process,
-  env: 'development' | 'production' | 'test',
-  options?: ESBuild.BuildOptions
-): ESBuild.BuildOptions => {
-  //
+  ((
+    proc: NodeJS.Process,
+    env: 'development' | 'production' | 'test',
+    options?: ESBuild.BuildOptions
+  ): ESBuild.BuildOptions => {
+    //
 
-  //
-  const result = getBuildOptions(proc, env);
+    //
+    const result = getBuildOptions(proc, env);
     // global.console.log(result);
-  return result;
-  //
-})(global.process, 'development');
+    return result;
+    //
+  })(global.process, 'development');
 }

@@ -5,6 +5,7 @@
  */
 
 /** */
+import type ESBuild = require('esbuild');
 import type Util = require('node:util');
 import util = require('node:util');
 
@@ -21,10 +22,7 @@ declare type ParseArgvResult<T extends ParseArgsConfig> = ReturnType<
 >;
 
 declare type ParseArgvOptions = {
-  sync?: true | false;
-  verbose?: true | false;
-  debug?: true | false;
-  throws?: true | false;
+  logLevel?: ESBuild.LogLevel;
   env?: NodeJS.ProcessEnv;
   parseArgsConfig?: ParseArgsConfig;
 };

@@ -11,7 +11,7 @@ const require: NodeRequire = createRequire(__filename);
 
 import type Util = require('node:util');
 import util = require('node:util');
-import console = require('node:console');
+import node_console = require('node:console');
 
 type ParseCommandConfig = Util.ParseArgsConfig;
 
@@ -20,9 +20,6 @@ type ParseCommandResult<T extends ParseCommandConfig> = ReturnType<
 >;
 
 type ParseCommandOptions = {
-  sync?: true | false;
-  verbose?: true | false;
-  debug?: true | false;
   throws?: true | false;
   env?: NodeJS.ProcessEnv;
   parseCommandConfig?: ParseCommandConfig;
@@ -57,26 +54,6 @@ const parseCommand: parseCommand<ParseCommandConfig> = (
   const errors: Error[] = [];
   proc.exitCode = errors.length;
   //
-
-  const {
-    // assert,
-    info,
-    // warn,
-    // error,
-    // log,
-    debug,
-    // clear,
-    // time,
-    // timeLog,
-    // timeEnd,
-  } = new console.Console({
-    stdout: proc.stdout,
-    stderr: proc.stderr,
-    groupIndentation: 2,
-    inspectOptions: {
-      breakLength: 80,
-    },
-  });
 
   //
   const {
@@ -125,34 +102,34 @@ const parseCommand: parseCommand<ParseCommandConfig> = (
   // (this should never happen in theory... but it removes the 'undefined' case)
   if (!tokens) throw new Error('parseCommand returned no tokens');
 
-  // 6) log the collected arg/value pairs from argv0
-  if (options && options.verbose && !options.debug) {
-    const msg: string[] = [];
-    tokens.forEach((token) => {
-      switch (token.kind) {
-        case 'option': {
-          msg.push(token.rawName);
-          if (token.value) msg.push(token.value);
-          break;
-        }
-        case 'positional': {
-          msg.push(token.value);
-          break;
-        }
-        case 'option-terminator': {
-          msg.push('--');
-          break;
-        }
-        default: {
-          break;
-        }
-      }
-    });
-    info(msg);
-  }
+  // // 6) log the collected arg/value pairs from argv0
+  // if (options && options.verbose && !options.debug) {
+  //   const msg: string[] = [];
+  //   tokens.forEach((token) => {
+  //     switch (token.kind) {
+  //       case 'option': {
+  //         msg.push(token.rawName);
+  //         if (token.value) msg.push(token.value);
+  //         break;
+  //       }
+  //       case 'positional': {
+  //         msg.push(token.value);
+  //         break;
+  //       }
+  //       case 'option-terminator': {
+  //         msg.push('--');
+  //         break;
+  //       }
+  //       default: {
+  //         break;
+  //       }
+  //     }
+  //   });
+  //   console.info(msg);
+  // }
 
-  // 7) log the parsed argv0
-  if (options && options.debug) debug({ values, positionals, tokens });
+  // // 7) log the parsed argv0
+  // if (options && options.debug) cosole.debug({ values, positionals, tokens });
 
   // 8) return the parsed argv0
   return {

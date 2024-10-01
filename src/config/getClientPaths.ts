@@ -11,7 +11,6 @@ const require: NodeRequire = createRequire(__filename);
 
 import path = require('node:path');
 import fs = require('node:fs');
-import node_console = require('node:console');
 import ownPackageJson = require('../../package.json');
 import getClientPublicUrlOrPath = require('./getClientPublicUrlOrPath');
 
@@ -19,8 +18,6 @@ import getClientPublicUrlOrPath = require('./getClientPublicUrlOrPath');
  *
  */
 type GetClientPathsOptions = {
-  verbose?: true | false;
-  debug?: true | false;
   color?: true | false;
   moduleFileExtensions?: string[];
   /**
@@ -68,24 +65,11 @@ const getClientPaths: getClientPaths = (
   options?: GetClientPathsOptions
 ): GetClientPathsResult => {
   //
+  proc.on('unhandledRejection', (err) => {
+    throw err;
+  });
 
   // defaults
-  const verbose: boolean =
-    options && options.verbose
-      ? options.verbose
-      : proc.env['VERBOSE'] === 'true'
-        ? true
-        : false;
-  //
-  const debug: boolean =
-    options && options.debug
-      ? options.debug
-      : proc.env['DEBUG'] === 'true'
-        ? true
-        : false;
-  //
-  const color: boolean = options && options.color ? options.color : false;
-  //
   const moduleFileExtensions: string[] =
     options && options.moduleFileExtensions
       ? options.moduleFileExtensions
@@ -103,21 +87,6 @@ const getClientPaths: getClientPaths = (
           'jsx',
         ];
   //
-  const MAX_SAFE_INTEGER: number = 2147483647;
-
-  //
-  const console: Console = new node_console.Console({
-    groupIndentation: 2,
-    // ignoreErrors: options && options.logLevel === 'error' ? true : false,
-    stdout: proc.stdout,
-    stderr: proc.stderr,
-    inspectOptions: {
-      depth: MAX_SAFE_INTEGER,
-      breakLength: 80,
-      colors: color,
-    },
-    // colorMode: 'auto', // cannot be used if using 'inspectOptions.colors'
-  });
 
   const isEjectedOrPublished: 'beforeEject' | 'afterEject' | 'beforePublish' =
     options && options.isEjectedOrPublished
@@ -193,15 +162,8 @@ const getClientPaths: getClientPaths = (
         publicUrlOrPath,
         moduleFileExtensions,
       } as const satisfies Readonly<GetClientPathsResult>);
-      //
 
-      //
-      if (verbose && !debug) console.info(result);
-      //
-
-      //
       return result;
-      //
     }
     case 'beforeEject': {
       //
@@ -238,18 +200,10 @@ const getClientPaths: getClientPaths = (
         ownTypeDeclarations: resolveOwn('lib/react-app.d.ts'),
         moduleFileExtensions,
       } as const satisfies Readonly<GetClientPathsResult>);
-      //
 
-      //
-      if (verbose && !debug) console.info(result);
-      //
-
-      //
       return result;
-      //
     }
     case 'beforePublish': {
-      //
       const resolveOwn: (relativePath: string) => string = (
         relativePath: string
       ) => path.resolve(__dirname, '..', relativePath);
@@ -267,13 +221,8 @@ const getClientPaths: getClientPaths = (
           path.join('packages', 'esbuild-scripts', 'config')
         ) !== -1
       ) {
-        //
-
-        //
         const templatePath = '../ts-esbuild-react/template'; // TODO: figure out where to put this...
-        //
 
-        //
         const result = Object.freeze<GetClientPathsResult>({
           dotenv: resolveOwn(`${templatePath}/.env`),
           appPath: resolveApp('.'),
@@ -307,15 +256,8 @@ const getClientPaths: getClientPaths = (
           ownTypeDeclarations: resolveOwn('lib/react-app.d.ts'),
           moduleFileExtensions,
         } as const satisfies Readonly<GetClientPathsResult>);
-        //
 
-        //
-        if (verbose && !debug) console.info(result);
-        //
-
-        //
         return result;
-        //
       } else {
         throw new Error(
           'Unknown option passed to getClientPaths:' + isEjectedOrPublished
@@ -336,5 +278,5 @@ if (require.main === module) {
   ((proc: NodeJS.Process, options?: GetClientPathsOptions) => {
     const result = getClientPaths(proc, options);
     global.console.assert(result);
-  })(global.process, { verbose: true });
+  })(global.process);
 }

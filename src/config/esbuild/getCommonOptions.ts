@@ -67,7 +67,7 @@ const getCommonOptions: getCommonOptions = (
     //
     define: {
       'process.env': JSON.stringify(
-        getClientEnvironment(proc, { verbose: true }).stringified['process.env']
+        getClientEnvironment(proc).stringified['process.env']
       ),
     },
     //
@@ -87,7 +87,7 @@ if (require.main === module) {
       env,
       options ? options : undefined
     );
-    global.console.log(commonOptions);
+    // global.console.log(commonOptions);
     return commonOptions;
   })(global.process, 'development');
 }
