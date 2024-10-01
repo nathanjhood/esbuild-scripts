@@ -174,6 +174,7 @@ const getBuildOptions: getBuildOptions = (
 
 export = getBuildOptions;
 
+if (require.main === module) {
 ((
   proc: NodeJS.Process,
   env: 'development' | 'production' | 'test',
@@ -183,7 +184,8 @@ export = getBuildOptions;
 
   //
   const result = getBuildOptions(proc, env);
-  global.console.log(result);
+    // global.console.log(result);
   return result;
   //
 })(global.process, 'development');
+}
