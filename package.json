@@ -26,6 +26,8 @@
     "README.md",
     "LICENSE",
     "VERSION",
+    "package-lock.json",
+    "yarn.lock",
     "package.json",
     "tsconfig.json",
     "dist",
@@ -202,7 +204,7 @@
     "tsx": "4.19.1"
   },
   "peerDependencies": {
-    "esbuild": "0.24.0"
+    "esbuild": "^0.24.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.10.0",
