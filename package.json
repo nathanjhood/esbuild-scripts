@@ -5,8 +5,7 @@
   "homepage": "https://github.com/nathanjhood/esbuild-scripts",
   "repository": {
     "type": "git",
-    "url": "git@github.com/nathanjhood/nathanjhood.github.io.git",
-    "directory": "packages/@nathanjhood/esbuild-scripts"
+    "url": "git@github.com/nathanjhood/esbuild-scripts.git"
   },
   "scripts": {
     "test": "tsx test/run.ts",
