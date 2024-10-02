@@ -357,7 +357,7 @@ if (require.main === module) {
     //
   })(global.process, {
     logLevel: 'info',
-    metafile: true,
+    metafile: false,
     write: true,
     color: true,
   });
