@@ -11,18 +11,9 @@ import { createRequire } from 'node:module';
 
 const require: NodeRequire = createRequire(__filename);
 
-import type Path = require('node:path');
 import path = require('node:path');
 import fs = require('node:fs');
-import node_console = require('node:console');
-
 import getClientPaths = require('./getClientPaths');
-
-type GetClientEnvironmentOptions = {
-  verbose?: true | false;
-  debug?: true | false;
-  color?: true | false;
-};
 
 type GetClientEnvironmentResult = {
   raw: NodeJS.ProcessEnv;
@@ -31,18 +22,11 @@ type GetClientEnvironmentResult = {
 
 interface getClientEnvironment {
   (proc: NodeJS.Process): GetClientEnvironmentResult;
-  (
-    proc: NodeJS.Process,
-    options?: GetClientEnvironmentOptions
-  ): GetClientEnvironmentResult;
 }
 
 const getClientEnvironment: getClientEnvironment = (
-  proc: NodeJS.Process,
-  options?: GetClientEnvironmentOptions
+  proc: NodeJS.Process
 ): GetClientEnvironmentResult => {
-  //
-
   //
   const errors: Error[] = [];
   proc.exitCode = errors.length;
@@ -50,51 +34,11 @@ const getClientEnvironment: getClientEnvironment = (
 
   // rename 'cwd()' but not 'loadEnvFile()'
   const { loadEnvFile }: NodeJS.Process = proc;
-  //
-  const verbose: boolean =
-    options && options.verbose
-      ? options.verbose
-      : global.process.env['VERBOSE'] !== undefined
-        ? true
-        : false;
-  //
-  const debug: boolean =
-    options && options.debug
-      ? options.debug
-      : global.process.env['DEBUG'] !== undefined
-        ? true
-        : false;
-  //
-  const color: boolean = options && options.color ? options.color : false;
-  //
 
-  const MAX_SAFE_INTEGER: number = 2147483647;
+  const paths = getClientPaths(proc);
 
-  //
-  const console: Console = new node_console.Console({
-    groupIndentation: 2,
-    // ignoreErrors: options && options.logLevel === 'error' ? true : false,
-    stdout: proc.stdout,
-    stderr: proc.stderr,
-    inspectOptions: {
-      depth: MAX_SAFE_INTEGER,
-      breakLength: 80,
-      colors: color,
-    },
-    // colorMode: 'auto', // cannot be used if using 'inspectOptions.colors'
-  });
-
-  //
-  const paths = getClientPaths(proc, {
-    verbose: verbose,
-    debug: debug,
-  });
-  //
-
-  //
   const isNotLocalTestEnv =
     proc.env['NODE_ENV'] !== 'test' && `${paths.dotenv}.local`;
-  //
 
   // https://github.com/bkeepers/dotenv#what-other-env-files-can-i-use
   const dotenvFiles: string[] = [];
@@ -113,10 +57,9 @@ const getClientEnvironment: getClientEnvironment = (
   dotenvFiles.forEach((dotenvFile) => {
     if (fs.existsSync(dotenvFile.toString())) {
       //
-      const parsedEnvPath: Path.ParsedPath = path.parse(dotenvFile.toString());
-      // const formattedEnvPath = path.format(parsedEnvPath);
-      //
-      if (verbose && !debug) console.info(`parseEnv('${parsedEnvPath.base}')`);
+      // const parsedEnvPath: Path.ParsedPath = path.parse(dotenvFile.toString());
+
+      // if (verbose) info(`parseEnv('${parsedEnvPath.base}')`);
       //
       loadEnvFile(dotenvFile); // throws internally, or changes 'proc.env'
       //
@@ -141,6 +84,11 @@ const getClientEnvironment: getClientEnvironment = (
     .filter((folder) => folder && !path.isAbsolute(folder))
     .map((folder) => path.resolve(appDirectory, folder))
     .join(path.delimiter);
+
+  if (errors.length < 0)
+    throw new Error('parseEnv() failed', { cause: errors });
+
+  // const env = parseEnv(proc);
 
   const REACT_APP: RegExp = /^REACT_APP_/i;
   const NODE: RegExp = /^NODE_/i;
@@ -174,7 +122,7 @@ const getClientEnvironment: getClientEnvironment = (
     // It is defined here so it is available in the webpackHotDevClient.
     FAST_REFRESH: proc.env.FAST_REFRESH || 'false', // !== 'false',
     // custom
-    // FORCE_COLOR: proc.env.FORCE_COLOR || 'true',
+    // FORCE_COLOR: env.FORCE_COLOR || 'true',
     // HTTPS: HTTPS !== "false",
     // HOST: HOST ? HOST : "0.0.0.0",
     // PORT: PORT ? parseInt(PORT) : 3000
@@ -192,8 +140,6 @@ const getClientEnvironment: getClientEnvironment = (
       return env;
     }, envDefaults);
 
-  if (verbose && !debug) console.log('raw:', raw);
-
   // Stringify all values (except 'NODE_*') so we can feed into esbuild defines
   const stringified: {
     'process.env': NodeJS.ProcessEnv;
@@ -206,24 +152,17 @@ const getClientEnvironment: getClientEnvironment = (
       }, raw),
   };
 
-  if (verbose && !debug) console.log('stringified:', stringified);
-
-  //
   return Object.freeze<GetClientEnvironmentResult>({
     raw,
     stringified,
   } as const satisfies Readonly<GetClientEnvironmentResult>);
-  //
 };
 
 export = getClientEnvironment;
 
 if (require.main === module) {
-  ((proc: NodeJS.Process, options?: GetClientEnvironmentOptions) => {
-    const result = getClientEnvironment(proc, options);
-    global.console.assert(result);
-  })(global.process, {
-    verbose: true, // global.process.env['VERBOSE'] !== undefined ? true : false,
-    debug: global.process.env['DEBUG'] !== undefined ? true : false,
-  });
+  ((proc: NodeJS.Process) => {
+    getClientEnvironment(proc);
+    // global.console.assert(result);
+  })(global.process);
 }

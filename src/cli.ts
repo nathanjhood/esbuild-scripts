@@ -217,15 +217,7 @@ const cli: cli = (proc: NodeJS.Process, options?: CliOptions) => {
 
   const cwd: ReturnType<typeof parseCwd> = parseCwd(proc);
 
-  const env: ReturnType<typeof parseEnv> = parseEnv(proc, {
-    cwd: path.format({
-      base: cwd.base,
-      dir: cwd.dir,
-      ext: cwd.ext,
-      name: cwd.name,
-      root: cwd.root,
-    }),
-  });
+  const env: ReturnType<typeof parseEnv> = parseEnv(proc);
 
   const command: ReturnType<typeof parseCommand> = parseCommand(proc);
 
@@ -354,10 +346,10 @@ const cli: cli = (proc: NodeJS.Process, options?: CliOptions) => {
             .slice(1)
             .concat([path.resolve(__dirname, 'scripts', scriptToRun)]),
           {
-            env: proc.env,
+            env: env,
             argv0: childCommand[0],
             signal: ac.signal,
-            cwd: proc.cwd(),
+            cwd: path.format(cwd),
             stdio: 'inherit',
           }
         );

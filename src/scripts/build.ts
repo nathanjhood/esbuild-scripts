@@ -266,11 +266,12 @@ const build: build = async (
         //
         const { outputFiles } = result;
         //
-        if (!outputFiles) return onReject();
-        //
-        if (logLevel && logLevelValue(logLevel) >= 4)
+        if (logLevel && logLevelValue(logLevel) >= 4) {
+          if (!outputFiles)
+            return onReject('logOutputFiles failed... did you set write=true?');
+
           outputFiles.forEach((outputFile) => console.info(outputFile));
-        //
+        }
         return onResolve(result);
       }
     );
@@ -355,11 +356,9 @@ if (require.main === module) {
 
     //
   })(global.process, {
-    logLevel: 'silent',
+    logLevel: 'info',
     metafile: true,
     write: true,
     color: true,
-
-    // color: global.process.stdout.hasColors(),
   });
 }

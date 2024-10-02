@@ -178,10 +178,7 @@ test.suite(
               },
               (ctx_ok: Test.TestContext, done) => {
                 //
-                const argv = parseArgvSpy(process, {
-                  verbose:
-                    global.process.env['VERBOSE'] === 'true' ? true : false,
-                });
+                const argv = parseArgvSpy(process);
                 ctx_ok.assert.ok(argv);
                 parseArgvSpy.mock.resetCalls();
                 //
@@ -201,10 +198,7 @@ test.suite(
               (ctx_callcount: Test.TestContext, done) => {
                 // call parseEnv 5 times consecutively
                 for (let i = 0; i < 5; i++) {
-                  parseArgvSpy(process, {
-                    verbose:
-                      global.process.env['VERBOSE'] === 'true' ? true : false,
-                  });
+                  parseArgvSpy(process);
                   ctx_callcount.assert.deepStrictEqual(
                     parseArgvSpy.mock.callCount(),
                     i + 1 // assert the callcount each time

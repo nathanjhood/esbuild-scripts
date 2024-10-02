@@ -6,8 +6,10 @@
 
 /** */
 import { createRequire } from 'node:module';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 const require: NodeRequire = createRequire(__filename);
+
+import type ESBuild = require('esbuild');
 
 import type Util = require('node:util');
 import util = require('node:util');
@@ -19,10 +21,7 @@ type ParseArgs<T extends ParseArgsConfig> = typeof util.parseArgs<T>;
 type ParseArgvResult<T extends ParseArgsConfig> = ReturnType<ParseArgs<T>>;
 
 type ParseArgvOptions = {
-  sync?: true | false;
-  verbose?: true | false;
-  debug?: true | false;
-  throws?: true | false;
+  logLevel?: ESBuild.LogLevel;
   env?: NodeJS.ProcessEnv;
   parseArgsConfig?: ParseArgsConfig;
 };
@@ -43,38 +42,9 @@ const parseArgv: parseArgv<ParseArgsConfig> = (
   options?: ParseArgvOptions
 ): ParseArgvResult<ParseArgsConfig> => {
   //
-
-  //
-  const errors: Error[] = [];
-  proc.exitCode = errors.length;
-  //
-
-  const {
-    // assert,
-    info,
-    // warn,
-    // error,
-    // log,
-    debug,
-    // clear,
-    // time,
-    // timeLog,
-    // timeEnd,
-  } = new console.Console({
-    stdout: proc.stdout,
-    stderr: proc.stderr,
-    groupIndentation: 2,
-    inspectOptions: {
-      breakLength: 80,
-    },
-  });
-
-  //
   const { argv: argv } = proc;
   //
   const args: string[] = argv.slice(2);
-  //
-
   //
   const parsedArgs = util.parseArgs<ParseArgsConfig>({
     args: args,
@@ -83,18 +53,38 @@ const parseArgv: parseArgv<ParseArgsConfig> = (
     tokens: true,
     allowPositionals: true,
     options: {
-      // acceptable args go here
-      verbose: { type: 'boolean' },
-      'no-verbose': { type: 'boolean' },
-      debug: { type: 'boolean' },
-      'no-debug': { type: 'boolean' },
-      color: { type: 'boolean' },
-      'no-color': { type: 'boolean' },
-      logfile: { type: 'string' },
-      'no-logfile': { type: 'boolean' },
+      // // TODO: acceptable args go here
+      // verbose: { type: 'boolean' },
+      // 'no-verbose': { type: 'boolean' },
+      // debug: { type: 'boolean' },
+      // 'no-debug': { type: 'boolean' },
+      // color: { type: 'boolean' },
+      // 'no-color': { type: 'boolean' },
+      // logfile: { type: 'string' },
+      // 'no-logfile': { type: 'boolean' },
+
+      // build args
+
+      bundle: { type: 'boolean', default: false, multiple: false },
+      watch: { type: 'boolean', default: false, multiple: false },
+      tsconfig: { type: 'string', multiple: false },
+      splitting: { type: 'boolean', default: false, multiple: false },
+
+      // shared args
+      platform: { type: 'string', default: 'browser', multiple: false },
+      'tsconfig-raw': { type: 'string', multiple: false },
+      loader: { type: 'string', multiple: true },
+      banner: { type: 'string', multiple: true },
+      footer: { type: 'string', multiple: true },
+      format: { type: 'string', multiple: false },
+      'global-name': { type: 'string', multiple: false },
+      'legal-comments': { type: 'string', multiple: false },
+      'line-limit': { type: 'string', multiple: false },
+
+      // serve args
+      servedir: { type: 'string', multiple: false },
     },
   });
-  //
 
   const {
     values: values,
@@ -119,41 +109,11 @@ const parseArgv: parseArgv<ParseArgsConfig> = (
         values[token.name] = token.value ?? true;
       }
     });
-  //
 
-  // (this should never happen in theory... but it removes the 'undefined' case)
+  // (this should never happen; it just removes the 'undefined' case)
   if (!tokens) throw new Error('util.parseArgs returned no tokens');
 
-  // 6) log the collected arg/value pairs from argv0
-  if (options && options.verbose && !options.debug) {
-    const msg: string[] = [];
-    tokens.forEach((token) => {
-      switch (token.kind) {
-        case 'option': {
-          msg.push(token.rawName);
-          if (token.value) msg.push(token.value);
-          break;
-        }
-        case 'positional': {
-          msg.push(token.value);
-          break;
-        }
-        case 'option-terminator': {
-          msg.push('--');
-          break;
-        }
-        default: {
-          break;
-        }
-      }
-    });
-    info(msg);
-  }
-
-  // 7) log the parsed argv0
-  if (options && options.debug) debug({ values, positionals, tokens });
-
-  // 8) return the parsed argv0
+  // return the parsed argv0
   return {
     values: values,
     positionals: positionals,
@@ -163,11 +123,8 @@ const parseArgv: parseArgv<ParseArgsConfig> = (
 
 export = parseArgv;
 
-// if (require.main === module) {
-//   ((proc: NodeJS.Process, options?: ParseArgvOptions) => {
-//     parseArgv(proc, options);
-//   })(global.process, {
-//     verbose: global.process.env['VERBOSE'] !== undefined ? true : false,
-//     debug: global.process.env['DEBUG'] !== undefined ? true : false,
-//   });
-// }
+if (require.main === module) {
+  (async (proc: NodeJS.Process, options?: ParseArgvOptions) => {
+    return parseArgv(proc, options);
+  })(global.process);
+}

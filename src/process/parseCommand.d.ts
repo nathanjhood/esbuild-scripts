@@ -19,9 +19,6 @@ declare type ParseCommandResult<T extends ParseCommandConfig> = ReturnType<
 >;
 
 declare type ParseCommandOptions = {
-  sync?: true | false;
-  verbose?: true | false;
-  debug?: true | false;
   throws?: true | false;
   env?: NodeJS.ProcessEnv;
   parseArgsConfig?: ParseCommandConfig;
