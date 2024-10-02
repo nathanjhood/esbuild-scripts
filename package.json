@@ -5,7 +5,7 @@
   "homepage": "https://github.com/nathanjhood/esbuild-scripts",
   "repository": {
     "type": "git",
-    "url": "git@github.com/nathanjhood/esbuild-scripts.git"
+    "url": "git+ssh://git@github.com/nathanjhood/esbuild-scripts.git"
   },
   "scripts": {
     "test": "tsx test/run.ts",
@@ -36,7 +36,7 @@
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.cts",
   "bin": {
-    "esbuild-scripts": "./dist/cli.js"
+    "esbuild-scripts": "dist/cli.js"
   },
   "exports": {
     "src/process/parseCwd.ts": {
