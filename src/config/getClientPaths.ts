@@ -65,9 +65,6 @@ const getClientPaths: getClientPaths = (
   options?: GetClientPathsOptions
 ): GetClientPathsResult => {
   //
-  proc.on('unhandledRejection', (err) => {
-    throw err;
-  });
 
   // defaults
   const moduleFileExtensions: string[] =

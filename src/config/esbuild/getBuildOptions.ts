@@ -35,16 +35,6 @@ const getBuildOptions: getBuildOptions = (
 ): ESBuild.BuildOptions => {
   //
 
-  //
-  proc.on('unhandledRejection', (error) => {
-    throw error;
-  }) satisfies NodeJS.Process;
-  //
-  proc.on('uncaughtException', (error) => {
-    throw error;
-  }) satisfies NodeJS.Process;
-  //
-
   const paths = getClientPaths(proc);
   const commonOptions = getCommonOptions(proc, env);
 
@@ -180,12 +170,7 @@ if (require.main === module) {
     env: 'development' | 'production' | 'test',
     options?: ESBuild.BuildOptions
   ): ESBuild.BuildOptions => {
-    //
-
-    //
     const result = getBuildOptions(proc, env);
-    // global.console.log(result);
     return result;
-    //
   })(global.process, 'development');
 }

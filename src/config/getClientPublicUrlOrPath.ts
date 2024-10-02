@@ -42,10 +42,6 @@ const getClientPublicUrlOrPath: getClientPublicUrlOrPath = (
   options: GetClientPublicUrlOrPathOptions
 ): string => {
   //
-  proc.on('unhandledRejection', (err) => {
-    throw err;
-  });
-  //
   const stubDomain: string = 'https://nathanjhood.dev';
   //
 

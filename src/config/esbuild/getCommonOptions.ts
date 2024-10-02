@@ -2,12 +2,7 @@ import { createRequire } from 'node:module';
 const require: NodeRequire = createRequire(__filename);
 
 import type ESBuild = require('esbuild');
-import fs = require('node:fs');
-import path = require('node:path');
 import getClientEnvironment = require('../getClientEnvironment');
-import getClientPaths = require('../getClientPaths');
-
-// //
 // import browsersList = require('browserslist');
 
 interface getCommonOptions {
@@ -27,16 +22,6 @@ const getCommonOptions: getCommonOptions = (
   env: 'development' | 'production' | 'test',
   options?: ESBuild.CommonOptions
 ) => {
-  //
-
-  //
-  proc.on('unhandledRejection', (error) => {
-    throw error;
-  }) satisfies NodeJS.Process;
-  //
-  proc.on('uncaughtException', (error) => {
-    throw error;
-  }) satisfies NodeJS.Process;
   //
 
   //
