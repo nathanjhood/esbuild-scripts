@@ -172,10 +172,7 @@ test.suite('parseCwd()', { timeout: timeout }, (suiteContext_parseCwd) => {
             },
             (ctx_ok: test.TestContext, done) => {
               //
-              const argv = parseCwdSpy(process, {
-                verbose:
-                  global.process.env['VERBOSE'] === 'true' ? true : false,
-              });
+              const argv = parseCwdSpy(process);
               ctx_ok.assert.ok(argv);
               parseCwdSpy.mock.resetCalls();
               //
@@ -195,10 +192,7 @@ test.suite('parseCwd()', { timeout: timeout }, (suiteContext_parseCwd) => {
             (ctx_callcount: test.TestContext, done) => {
               // call parseEnv 5 times consecutively
               for (let i = 0; i < 5; i++) {
-                parseCwdSpy(process, {
-                  verbose:
-                    global.process.env['VERBOSE'] === 'true' ? true : false,
-                });
+                parseCwdSpy(process);
                 ctx_callcount.assert.deepStrictEqual(
                   parseCwdSpy.mock.callCount(),
                   i + 1 // assert the callcount each time

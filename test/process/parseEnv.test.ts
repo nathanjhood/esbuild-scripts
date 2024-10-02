@@ -9,6 +9,22 @@ import test = require('node:test');
 import path = require('node:path');
 
 import type ParseEnv = require('../../src/process/parseEnv');
+import parseEnv = require('../../src/process/parseEnv');
+
+// test.suite('parseEnv()', { timeout: 10000 }, (suiteContext) => {
+//   test.test(
+//     'loadEnvFile',
+//     { signal: suiteContext.signal },
+//     (testContext: Test.TestContext) => {
+//       const before = process.env;
+//       console.log(before);
+//       process.loadEnvFile(path.resolve(process.cwd(), '.env.example'));
+//       console.log(before);
+//       const after = process.env;
+//       testContext.assert.deepStrictEqual(before, after);
+//     }
+//   );
+// });
 
 const config = {
   timeout: 10000,
@@ -23,7 +39,11 @@ test.suite(
     //
 
     //
-    const { describe, it, before, after, beforeEach, afterEach } = test;
+    const { describe, it, before, after, beforeEach, afterEach, mock } = test;
+
+    // create a spy
+    const parseEnvSpy: Test.Mock<ParseEnv> = mock.fn<ParseEnv>(parseEnv);
+    //
 
     //
     before(
@@ -130,10 +150,7 @@ test.suite(
             ctx.assert
               .doesNotReject(
                 (): Promise<{
-                  default: (proc: NodeJS.Process) => {
-                    raw: NodeJS.ProcessEnv;
-                    stringified: { 'process.env': NodeJS.ProcessEnv };
-                  };
+                  default: (proc: NodeJS.Process) => NodeJS.ProcessEnv;
                 }> => import('../../src/process/parseEnv')
               )
               .then(done)
@@ -150,10 +167,7 @@ test.suite(
             //
             const t: void = ctx.assert.doesNotThrow(
               async (): Promise<{
-                default: (proc: NodeJS.Process) => {
-                  raw: NodeJS.ProcessEnv;
-                  stringified: { 'process.env': NodeJS.ProcessEnv };
-                };
+                default: (proc: NodeJS.Process) => NodeJS.ProcessEnv;
               }> => await import('../../src/process/parseEnv')
             );
             //
@@ -178,10 +192,10 @@ test.suite(
         it(
           'parses .env files from cwd()',
           { signal: suiteContext_runs.signal },
-          async (testContext_asAModule: Test.TestContext): Promise<void> => {
+          async (testContext_asAModule: Test.TestContext) => {
             //
 
-            afterEach(
+            testContext_asAModule.afterEach(
               (ctx: Test.SuiteContext | Test.TestContext, done): void => {
                 //
                 if (ctx.signal.aborted) {
@@ -200,27 +214,22 @@ test.suite(
             ) satisfies void;
             //
 
-            // import the function
-            const parseEnv: typeof import('../../src/process/parseEnv') = require('../../src/process/parseEnv');
-            // create a spy
-            const parseEnvSpy: Test.Mock<ParseEnv> =
-              testContext_asAModule.mock.fn<ParseEnv>(parseEnv);
-            //
-
             // minimum: client-side env, as found on esbuild's 'BuildOptions.defines'
-            const env: NodeJS.ProcessEnv = {
-              NODE_ENV: 'test',
-              PUBLIC_URL: '/',
-              WDS_SOCKET_HOST: undefined,
-              WDS_SOCKET_PORT: undefined,
-              WDS_SOCKET_PATH: undefined,
-              FAST_REFRESH: 'false',
+            // eslint-disable-next-line prefer-const
+            let env: NodeJS.ProcessEnv = {
+              NODE_ENV: 'production',
+              BUILD_DIR: undefined,
+              // PUBLIC_URL: '/',
+              // WDS_SOCKET_HOST: undefined,
+              // WDS_SOCKET_PORT: undefined,
+              // WDS_SOCKET_PATH: undefined,
+              // FAST_REFRESH: 'false',
               __TEST_VARIABLE__: 'false',
             } satisfies NodeJS.ProcessEnv;
             //
 
-            //
-            const cwd = testContext_asAModule.mock.fn<() => string>(
+            // eslint-disable-next-line prefer-const
+            let cwd = testContext_asAModule.mock.fn<() => string>(
               global.process.cwd
             );
             //
@@ -235,7 +244,8 @@ test.suite(
             const on = testContext_asAModule.mock.fn(global.process.on);
             const off = testContext_asAModule.mock.fn(global.process.off);
             //
-            const mockProcess: NodeJS.Process = {
+            // eslint-disable-next-line prefer-const
+            let mockProcess: NodeJS.Process = {
               ...global.process,
               env: env,
               loadEnvFile: loadEnvFile,
@@ -247,22 +257,6 @@ test.suite(
             };
             //
 
-            const logCallCounts = (
-              ctx: Test.TestContext | Test.SuiteContext
-            ) => {
-              const checks = [on, off, cwd, exit, loadEnvFile];
-              checks.forEach((check) => {
-                global.console.info(
-                  name,
-                  ctx.name,
-                  `called`,
-                  check.name,
-                  check.mock.callCount(),
-                  'times'
-                );
-              });
-            };
-
             const resetCalls = () => {
               const checks = [on, off, cwd, exit, loadEnvFile];
               checks.forEach((check) => {
@@ -270,17 +264,6 @@ test.suite(
               });
             };
 
-            testContext_asAModule.afterEach(
-              (ctx, done) => {
-                ctx.mock.reset();
-                return done();
-              },
-              {
-                signal: testContext_asAModule.signal,
-              }
-            );
-
-            //
             (await testContext_asAModule.test(
               'loads .env from cwd()',
               { signal: testContext_asAModule.signal },
@@ -288,69 +271,22 @@ test.suite(
                 //
 
                 // use the function, sample the result
-                const result = parseEnvSpy(mockProcess, {
-                  verbose: false, //config.verbose,
-                });
+                const result = parseEnvSpy(mockProcess);
                 // result type-checks
                 ctx.assert.ok(result);
                 ctx.assert.ok(typeof result === 'object');
                 ctx.assert.ok(result instanceof Object);
-                ctx.assert.ok(result.raw satisfies NodeJS.ProcessEnv);
-                ctx.assert.ok(
-                  result.stringified['process.env'] satisfies NodeJS.ProcessEnv
-                );
+                ctx.assert.ok(result satisfies NodeJS.ProcessEnv);
                 // impl. should only call 'proc.cwd()' once
                 ctx.assert.deepStrictEqual(cwd.mock.callCount(), 1);
-                //
-                if (config.verbose) logCallCounts(ctx);
                 resetCalls();
+                ctx.mock.reset();
                 return done();
               }
             )) satisfies void; // 'loads .env from cwd()'
-            //
-
-            //
-            (await testContext_asAModule.test(
-              'loads .env from cwd()',
-              { signal: testContext_asAModule.signal },
-              (ctx: Test.TestContext, done): void => {
-                //
-
-                // 'before' value
-                const before = mockProcess.env;
-                // 'result' value
-                const result = parseEnvSpy(mockProcess, {
-                  verbose: config.verbose,
-                }).raw;
-                // 'after' value
-                const after = mockProcess.env;
-                // should only call 'proc.cwd()' once
-                ctx.assert.deepStrictEqual(cwd.mock.callCount(), 1);
-                // compare 'before' to 'after'
-                ctx.assert.deepStrictEqual(after, before);
-                // compare 'result' to 'after'
-                ctx.assert.notDeepStrictEqual(after, result);
-                // compare 'result' to 'before'
-                ctx.assert.notDeepStrictEqual(before, result);
-                // if 'process.env' has changed, test has passed.
-                if (config.verbose) logCallCounts(ctx);
-                resetCalls();
-                return done();
-              }
-            )) satisfies void; // 'mutates process.env correctly'
-            //
-
-            //
           }
-        ) satisfies Promise<void>; // 'parses '.env' files from cwd()';
-
-        //
+        ) satisfies Promise<void>; // suiteContext_runs
       }
-    ) satisfies Promise<void>; // suiteContext_runs
-    //
-
-    if (config.verbose) global.console.timeEnd(name);
-
-    //
+    ) satisfies Promise<void>; // suiteContext_parseEnv
   }
-) satisfies Promise<void>; // suiteContext_parseEnv
+);
