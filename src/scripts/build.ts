@@ -183,13 +183,11 @@ const build: build = async (
     //
     if (errors) {
       //
-      const errorMessages: string[] = await esbuild
-        .formatMessages(errors, {
-          color: proc.stdout.isTTY,
-          terminalWidth: 80,
-          kind: 'error',
-        })
-        .catch((err) => err);
+      const errorMessages: string[] = await esbuild.formatMessages(errors, {
+        color: proc.stdout.isTTY,
+        terminalWidth: 80,
+        kind: 'error',
+      });
       //
       if (logLevel && logLevelValue(logLevel) >= 1)
         errorMessages.forEach((e) => console.error(e));
@@ -213,13 +211,11 @@ const build: build = async (
     //
     if (warnings) {
       //
-      const warningMessages: string[] = await esbuild
-        .formatMessages(warnings, {
-          color: proc.stdout.isTTY,
-          terminalWidth: 80,
-          kind: 'warning',
-        })
-        .catch((err) => err);
+      const warningMessages: string[] = await esbuild.formatMessages(warnings, {
+        color: proc.stdout.isTTY,
+        terminalWidth: 80,
+        kind: 'warning',
+      });
       //
       if (logLevel && logLevelValue(logLevel) >= 2)
         warningMessages.forEach((w) => console.warn(w));
@@ -243,12 +239,10 @@ const build: build = async (
     //
     if (metafile) {
       //
-      const analysis: string = await esbuild
-        .analyzeMetafile(metafile, {
-          color: proc.stdout.isTTY,
-          verbose: true,
-        })
-        .catch((err) => err);
+      const analysis: string = await esbuild.analyzeMetafile(metafile, {
+        color: proc.stdout.isTTY,
+        verbose: true,
+      });
       //
       if (logLevel && logLevelValue(logLevel) >= 3) console.log(analysis);
       //
@@ -280,7 +274,7 @@ const build: build = async (
         }
         return onResolve(result);
       }
-    ).catch((err) => err);
+    );
   };
 
   /**
@@ -307,7 +301,7 @@ const build: build = async (
         //
         return onResolve(result);
       }
-    ).catch((err) => err);
+    );
   };
 
   copyPublicFolder({
