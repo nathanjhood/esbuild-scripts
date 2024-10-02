@@ -1,12 +1,11 @@
 {
   "name": "@nathanjhood/esbuild-scripts",
-  "version": "0.0.1-ab87ca3f38e991d179d6cef3e10412234539bbbf",
+  "version": "0.0.1",
   "license": "MIT",
   "homepage": "https://github.com/nathanjhood/esbuild-scripts",
   "repository": {
     "type": "git",
-    "url": "git@github.com/nathanjhood/nathanjhood.github.io.git",
-    "directory": "packages/@nathanjhood/esbuild-scripts"
+    "url": "git@github.com/nathanjhood/esbuild-scripts.git"
   },
   "scripts": {
     "test": "tsx test/run.ts",
