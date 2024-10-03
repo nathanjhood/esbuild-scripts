@@ -47,7 +47,10 @@ Power your React (and React Native Web) projects with esbuild using zero config,
 $ yarn start
 ```
 
-*note: some commands are still under construction: see below*
+If you need a React project template to get you started, have a look at:
+
+- [ts-esbuild-react](https://github.com/nathanjhood/ts-esbuild-react)
+- [ts-esbuild-react-native-web](https://github.com/nathanjhood/ts-esbuild-react-native-web)
 
 ---
 
@@ -65,6 +68,18 @@ React single-web-page application projects which consume `esbuild-scripts` shall
 React projects which consume `esbuild-scripts` shall be able to use the above commands via `npm`/`yarn`, providing React projects with the same functionality of the usual `react-scripts` package, but using - primarily - only ESBuild and NodeJS as dependencies.
 
 Additional features such as fast-refresh, developer error overlay, and support for both Typescript and React Native Web shall be implemented to present a similar experience to using `react-scripts` for end-consumers of `esbuild-scripts`.
+
+---
+
+## Development Status
+
+- port `react-scripts` CLI to modern NodeJS Javascript API and Typescript using a 'test-and-declarations-first' approach - DONE
+- port `react-scripts build` command to the same - DONE
+- port `react-scripts start` command to the same - STARTED
+- port `react-scripts test` command to the same - PENDING
+- port `react-scripts init` command to the same, using [`ts-esbuild-react`](https://github.com/nathanjhood/ts-esbuild-react) and [`ts-esbuild-react-native-web`](https://github.com/nathanjhood/ts-esbuild-react-native-web) as the two project skeleton templates - PENDING
+
+Initial ports of all of the above are easily found in the other "preview" projects mentioned in the "[See a Preview](#see-a-preview)" section. Those are very much ad-verbatim copies of the original `react-scripts`, with WebPack swapped out for the nearest ESBuild-equivalent functionality\*, and shall be replaced with the `esbuild-scripts` package once complete.
 
 ---
 
@@ -297,20 +312,6 @@ Several features from `react-dev-utils` shall also be ported into this project, 
 The scripts and command-line interface shall be written Typescript-first (with UMD and Module Loader support) using only the NodeJS Javascript API (with Typescript support), developed with [tsx](https://tsx.is), tested using NodeJS Test Runner, and transpiled then bundled with `pkgroll`; the package should *not* require any further dependencies, so that consumers should only have one additional package in their dependency lock files (`pkgroll` is a developer-only dependency, and thus not required for consumers).
 
 GitHub Actions shall be used to run multi-platform, multi-architecture tests, builds, and deployment, to maintain a reliable interface and baseline of functionality across future changes. The workflows shall support a specified array of NodeJS versions, with an intention to provide compatibility as far back as possible, while referencing latest changes and deprecation warnings.
-
----
-
-## Development Status
-
-- port `react-scripts` CLI to modern NodeJS Javascript API and Typescript using a 'test-and-declarations-first' approach - DONE
-- port `react-scripts build` command to the same - DONE
-- port `react-scripts start` command to the same - STARTED
-- port `react-scripts test` command to the same - PENDING
-- port `react-scripts init` command to the same, using [`ts-esbuild-react`](https://github.com/nathanjhood/ts-esbuild-react) and [`ts-esbuild-react-native-web`](https://github.com/nathanjhood/ts-esbuild-react-native-web) as the two project skeleton templates - PENDING
-
-Initial ports of all of the above are easily found in the other "preview" projects mentioned in the "[See a Preview](#see-a-preview)" section. Those are very much ad-verbatim copies of the original `react-scripts`, with WebPack swapped out for the nearest ESBuild-equivalent functionality\*.
-
-\* *Thankfully, much of which actually translates 1-1 from one configuration to the other - it seems that WebPack provided inspiration for lots of aspects of ESBuild's interface, and the latter was clearly designed to be familiar and "easy" by building on conventions to users of the former.*
 
 ---
 
