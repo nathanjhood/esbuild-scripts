@@ -20,24 +20,24 @@ import getBuildOptions = require('../config/esbuild/getBuildOptions');
 import getServeOptions = require('../config/esbuild/getServeOptions');
 
 interface start {
-  (proc: NodeJS.Process): Promise<esbuild.ServeResult>;
+  (proc: NodeJS.Process): Promise<void>;
   (
     proc: NodeJS.Process,
     options?: ESBuild.ServeOptions & ESBuild.BuildOptions
-  ): Promise<ESBuild.ServeResult>;
+  ): Promise<void>;
 }
 
 /**
  *
  * @param {NodeJS.Process} proc
  * @param {ESBuild.ServeOptions & ESBuild.BuildOptions} options
- * @returns {Promise<ESBuild.ServeResult>}
+ * @returns {Promise<void>}
  * @async
  */
 const start: start = async (
   proc: NodeJS.Process,
   options?: ESBuild.ServeOptions & ESBuild.BuildOptions
-): Promise<esbuild.ServeResult> => {
+): Promise<void> => {
   //
   const ac: AbortController = new AbortController();
   //
@@ -126,7 +126,6 @@ const start: start = async (
   console.time(logName);
   //
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const env = parseEnv(proc);
 
   if (proc.env['NODE_ENV'] !== 'development')
@@ -187,9 +186,22 @@ const start: start = async (
 
   const serveContext = async (
     ctx: ESBuild.BuildContext<ESBuild.BuildOptions>
-  ): Promise<ESBuild.ServeResult> => {
+  ): Promise<{ result: ESBuild.ServeResult; ctx: ESBuild.BuildContext }> => {
     return ctx
       .serve(serveOptions)
+      .then((result) => {
+        return { result, ctx };
+      })
+      .catch((err) => {
+        throw err;
+      });
+  };
+
+  const cancelContext = async (
+    ctx: ESBuild.BuildContext<ESBuild.BuildOptions>
+  ): Promise<void> => {
+    return ctx
+      .cancel()
       .then((result) => {
         return result;
       })
@@ -218,6 +230,76 @@ const start: start = async (
     })
     .then(serveContext, (err) => {
       throw err;
+    })
+    .then(({ result, ctx }) => {
+      // if (isInteractive) {
+      //   clearConsole();
+      // }
+
+      // if (env.raw.FAST_REFRESH && semver.lt(react.version, '16.10.0')) {
+      //   console.log(
+      //     chalk.yellow(
+      //       `Fast Refresh requires React 16.10 or higher. You are using React ${react.version}.`
+      //     )
+      //   );
+      // }
+
+      // console.log(chalk.cyan('Starting the development server...\n'));
+      // console.log(
+      //   'Serving app at',
+      //   chalk.yellow(urls.localUrlForBrowser),
+      //   '\n'
+      // );
+      // openBrowser(urls.localUrlForBrowser);
+      // console.log('Press', chalk.yellow('Enter'), 'to reload.');
+      // console.log('Press', chalk.yellow('Ctrl + c'), 'to quit.');
+      // console.log();
+
+      ['SIGINT', 'SIGTERM'].forEach(function (sig) {
+        proc.on(sig, function () {
+          console.log();
+          console.log(
+            util.styleText('cyan', sig),
+            'recieved: shutting down gracefully...'
+          );
+          ctx.cancel().then(() => {
+            ctx.dispose().then(() => {
+              process.exit();
+            });
+          });
+        });
+      });
+
+      if (process.env.CI !== 'true') {
+        // Whenever we get some data over stdin
+        ['data'].forEach(function (ev) {
+          console.log();
+          process.stdin.on(ev, () => {
+            try {
+              console.log('stdin recieved event:', util.styleText('cyan', ev));
+              // Cancel the already-running build
+              ctx.cancel().then(() => {
+                // Then start a new build
+                ctx.rebuild().then((result) => {
+                  return console.log('build:', result);
+                });
+              });
+            } catch (err) {
+              console.error(err);
+            }
+          });
+        });
+        // Gracefully exit when stdin ends
+        process.stdin.on('end', function () {
+          console.log();
+          console.log(`shutting down gracefully...`);
+          ctx.cancel().then(() => {
+            ctx.dispose().then(() => {
+              process.exit();
+            });
+          });
+        });
+      }
     })
     .catch((err) => {
       throw err;
