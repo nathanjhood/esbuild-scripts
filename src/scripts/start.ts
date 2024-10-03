@@ -5,7 +5,7 @@
  */
 
 import { createRequire } from 'node:module';
-const require: NodeRequire = createRequire(__dirname);
+const require: NodeRequire = createRequire(__filename);
 
 import type ESBuild = require('esbuild');
 // import type Util = require('node:util');
