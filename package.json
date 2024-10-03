@@ -1,6 +1,6 @@
 {
   "name": "@nathanjhood/esbuild-scripts",
-  "version": "0.0.2-3bc4d63c3f3dea54adc14ccf2b77d1d8cce8189a",
+  "version": "0.0.2.a7892b3861fe4ef540b5831bf21633e0690c6413",
   "license": "MIT",
   "homepage": "https://github.com/nathanjhood/esbuild-scripts",
   "private": false,
@@ -136,6 +136,18 @@
       "types": "./dist/config/esbuild/getCommonOptions.d.ts",
       "default": "./dist/config/esbuild/getCommonOptions.js"
     },
+    "src/config/esbuild/getServeOptions.ts": {
+      "require": {
+        "types": "./dist/config/esbuild/getServeOptions.d.cts",
+        "default": "./dist/config/esbuild/getServeOptions.cjs"
+      },
+      "import": {
+        "types": "./dist/config/esbuild/getServeOptions.d.mts",
+        "default": "./dist/config/esbuild/getServeOptions.mjs"
+      },
+      "types": "./dist/config/esbuild/getServeOptions.d.ts",
+      "default": "./dist/config/esbuild/getServeOptions.js"
+    },
     "src/config/esbuild/getBuildOptions.ts": {
       "require": {
         "types": "./dist/config/esbuild/getBuildOptions.d.cts",
@@ -171,6 +183,18 @@
       },
       "types": "./dist/scripts/build.d.ts",
       "default": "./dist/scripts/build.js"
+    },
+    "src/scripts/start.ts": {
+      "require": {
+        "types": "./dist/scripts/start.d.cts",
+        "default": "./dist/scripts/start.cjs"
+      },
+      "import": {
+        "types": "./dist/scripts/start.d.mts",
+        "default": "./dist/scripts/start.mjs"
+      },
+      "types": "./dist/scripts/start.d.ts",
+      "default": "./dist/scripts/start.js"
     },
     "require": {
       "types": "./dist/index.d.cts",
