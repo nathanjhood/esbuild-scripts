@@ -18,7 +18,7 @@ $ yarn add react react-dom
 Add `@nathanjhood/esbuild-scripts` and [esbuild](https://esbuild.github.io/api/)
 
 ```sh
-$ yarn add esbuild @nathanjhood/esbuild-scripts
+$ yarn add @nathanjhood/esbuild-scripts esbuild
 ```
 
 Alias our scripts in your `package.json`:
@@ -27,7 +27,7 @@ Alias our scripts in your `package.json`:
 {
   "scripts": {
     "build": "esbuild-scripts build", // experimental...
-    "start": "esbuild-scripts start", // tbd...
+    "start": "esbuild-scripts start", // experimental...
     "test": "esbuild-scripts test",   // tbd...
     // etc...
   },
@@ -44,7 +44,7 @@ Alias our scripts in your `package.json`:
 Power your React (and React Native Web) projects with esbuild using zero config, including Typescript support:
 
 ```sh
-$ yarn build
+$ yarn start
 ```
 
 *note: some commands are still under construction: see below*
