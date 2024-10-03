@@ -1,6 +1,6 @@
 {
   "name": "@nathanjhood/esbuild-scripts",
-  "version": "0.0.2.a7892b3861fe4ef540b5831bf21633e0690c6413",
+  "version": "0.0.2",
   "license": "MIT",
   "homepage": "https://github.com/nathanjhood/esbuild-scripts",
   "private": false,
