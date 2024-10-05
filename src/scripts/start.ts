@@ -12,6 +12,7 @@ import fs = require('node:fs');
 import node_console = require('node:console');
 import esbuild = require('esbuild');
 import parseEnv = require('../process/parseEnv');
+import getClientPaths = require('../config/getClientPaths');
 import getBuildOptions = require('../config/esbuild/getBuildOptions');
 import getServeOptions = require('../config/esbuild/getServeOptions');
 
@@ -161,6 +162,23 @@ const start: start = async (
   };
 
   const logLevel = buildOptions.logLevel;
+
+  const paths = getClientPaths(proc);
+
+  /**
+   *
+   * @param paths
+   * @returns {void}
+   */
+  const copyPublicFolder: (paths: {
+    appPublic: string;
+    appBuild: string;
+  }) => void = (paths: { appPublic: string; appBuild: string }): void => {
+    return fs.cpSync(paths.appPublic, paths.appBuild, {
+      dereference: true,
+      recursive: true,
+    });
+  };
 
   const watchContext = async (
     ctx: ESBuild.BuildContext<ESBuild.BuildOptions>
@@ -348,6 +366,12 @@ const start: start = async (
       }
     );
   };
+
+  copyPublicFolder({
+    appBuild: options && options.outdir ? options.outdir : paths.appBuild,
+    appPublic:
+      options && options.publicPath ? options.publicPath : paths.appPublic,
+  });
 
   return esbuild
     .context(buildOptions)
