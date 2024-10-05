@@ -4,7 +4,7 @@
  * @copyright 2024 MIT License
  */
 
-/** */
+//
 import type Path = require('node:path');
 
 export as namespace ParseCwd;

@@ -4,13 +4,9 @@
  * @copyright 2024 MIT License
  */
 
-/**
- *
- */
+//
 import { createRequire } from 'node:module';
-
 const require: NodeRequire = createRequire(__filename);
-
 import path = require('node:path');
 import fs = require('node:fs');
 import getClientPaths = require('./getClientPaths');
@@ -163,6 +159,5 @@ export = getClientEnvironment;
 if (require.main === module) {
   ((proc: NodeJS.Process) => {
     getClientEnvironment(proc);
-    // global.console.assert(result);
   })(global.process);
 }

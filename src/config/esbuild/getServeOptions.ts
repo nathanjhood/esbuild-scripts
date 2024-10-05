@@ -3,27 +3,14 @@ import path = require('node:path');
 import getClientPaths = require('../getClientPaths');
 
 interface getServeOptions {
-  (
-    proc: NodeJS.Process,
-    env: 'development' | 'production' | 'test'
-  ): ESBuild.ServeOptions;
-  (
-    proc: NodeJS.Process,
-    env: 'development' | 'production' | 'test',
-    options?: ESBuild.ServeOptions
-  ): ESBuild.ServeOptions;
+  (proc: NodeJS.Process): ESBuild.ServeOptions;
 }
 
 const getServeOptions: getServeOptions = (
-  proc: NodeJS.Process,
-  env: 'development' | 'production' | 'test',
-  options?: ESBuild.ServeOptions
+  proc: NodeJS.Process
 ): ESBuild.ServeOptions => {
   //
   if (!proc.env.PORT) throw new Error('PORT was not defined');
-
-  const isEnvDevelopment: boolean = env === 'development';
-  const isEnvProduction: boolean = env === 'production';
 
   const paths = getClientPaths(proc);
 

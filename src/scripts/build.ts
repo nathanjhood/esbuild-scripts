@@ -7,14 +7,12 @@
 //
 import { createRequire } from 'node:module';
 const require: NodeRequire = createRequire(__filename);
-
 import type ESBuild = require('esbuild');
 import util = require('node:util');
 import fs = require('node:fs');
 import node_console = require('node:console');
 import esbuild = require('esbuild');
 import parseEnv = require('../process/parseEnv');
-// import parseArgv = require('../process/parseArgv');
 import getClientPaths = require('../config/getClientPaths');
 import getBuildOptions = require('../config/esbuild/getBuildOptions');
 
@@ -125,18 +123,15 @@ const build: build = async (
   console.time(logName);
   //
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const env = parseEnv(proc);
 
-  // if (proc.env['NODE_ENV'] !== 'production')
-  //   throw new Error(
-  //     util.styleText(
-  //       'red',
-  //       "'NODE_ENV' should be 'production', but it was " + proc.env['NODE_ENV']
-  //     )
-  //   );
-
-  // const argv = parseArgv(proc);
+  if (env['NODE_ENV'] !== 'production')
+    throw new Error(
+      util.styleText(
+        'red',
+        "'NODE_ENV' should be 'production', but it was " + env['NODE_ENV']
+      )
+    );
 
   const defaultBuildOptions: ESBuild.BuildOptions = getBuildOptions(
     proc,

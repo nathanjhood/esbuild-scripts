@@ -1,6 +1,5 @@
 import { createRequire } from 'node:module';
 const require: NodeRequire = createRequire(__filename);
-
 import type ESBuild = require('esbuild');
 import getClientEnvironment = require('../getClientEnvironment');
 // import browsersList = require('browserslist');
@@ -10,32 +9,26 @@ interface getCommonOptions {
     proc: NodeJS.Process,
     env: 'development' | 'production' | 'test'
   ): ESBuild.CommonOptions;
-  (
-    proc: NodeJS.Process,
-    env: 'development' | 'production' | 'test',
-    options?: ESBuild.CommonOptions
-  ): ESBuild.CommonOptions;
 }
 
 const getCommonOptions: getCommonOptions = (
   proc: NodeJS.Process,
-  env: 'development' | 'production' | 'test',
-  options?: ESBuild.CommonOptions
+  env: 'development' | 'production' | 'test'
 ) => {
-  //
-
   //
   const isEnvDevelopment: boolean = env === 'development';
   const isEnvProduction: boolean = env === 'production';
 
-  //
+  // Source maps are resource heavy and can cause out of memory issue for large
+  // source files.
+  const shouldUseSourceMap = process.env.GENERATE_SOURCEMAP !== 'false';
+
   return {
-    //
     treeShaking: isEnvProduction,
     minify: isEnvProduction,
-    sourcemap: isEnvDevelopment,
+    sourcemap: isEnvProduction ? shouldUseSourceMap : isEnvDevelopment,
     //
-    color: proc.stderr.isTTY,
+    color: proc.stdout.hasColors(),
     logLimit: 10,
     lineLimit: 80,
     //
@@ -64,15 +57,9 @@ export = getCommonOptions;
 if (require.main === module) {
   ((
     proc: NodeJS.Process,
-    env: 'development' | 'production' | 'test',
-    options?: ESBuild.CommonOptions
+    env: 'development' | 'production' | 'test'
   ): ESBuild.CommonOptions => {
-    const commonOptions = getCommonOptions(
-      proc,
-      env,
-      options ? options : undefined
-    );
-    // global.console.log(commonOptions);
+    const commonOptions = getCommonOptions(proc, env);
     return commonOptions;
   })(global.process, 'development');
 }

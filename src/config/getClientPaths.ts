@@ -4,11 +4,9 @@
  * @copyright 2024 MIT License
  */
 
-/** */
+//
 import { createRequire } from 'node:module';
-
 const require: NodeRequire = createRequire(__filename);
-
 import path = require('node:path');
 import fs = require('node:fs');
 import ownPackageJson = require('../../package.json');

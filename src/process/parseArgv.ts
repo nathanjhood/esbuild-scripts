@@ -4,13 +4,9 @@
  * @copyright 2024 MIT License
  */
 
-/** */
+//
 import { createRequire } from 'node:module';
-
 const require: NodeRequire = createRequire(__filename);
-
-import type ESBuild = require('esbuild');
-
 import type Util = require('node:util');
 import util = require('node:util');
 
@@ -20,26 +16,12 @@ type ParseArgs<T extends ParseArgsConfig> = typeof util.parseArgs<T>;
 
 type ParseArgvResult<T extends ParseArgsConfig> = ReturnType<ParseArgs<T>>;
 
-type ParseArgvOptions = {
-  logLevel?: ESBuild.LogLevel;
-  env?: NodeJS.ProcessEnv;
-  parseArgsConfig?: ParseArgsConfig;
-};
-
 interface parseArgv<T extends ParseArgsConfig> {
   (proc: NodeJS.Process): ParseArgvResult<T>;
-  (proc: NodeJS.Process, options?: ParseArgvOptions): ParseArgvResult<T>;
 }
 
-/**
- *
- * @param {NodeJS.Process} proc
- * @param {ParseArgvOptions} options
- * @returns {ParseArgvResult<ParseArgsConfig>}
- */
 const parseArgv: parseArgv<ParseArgsConfig> = (
-  proc: NodeJS.Process,
-  options?: ParseArgvOptions
+  proc: NodeJS.Process
 ): ParseArgvResult<ParseArgsConfig> => {
   //
   const { argv: argv } = proc;
@@ -53,15 +35,7 @@ const parseArgv: parseArgv<ParseArgsConfig> = (
     tokens: true,
     allowPositionals: true,
     options: {
-      // // TODO: acceptable args go here
-      // verbose: { type: 'boolean' },
-      // 'no-verbose': { type: 'boolean' },
-      // debug: { type: 'boolean' },
-      // 'no-debug': { type: 'boolean' },
-      // color: { type: 'boolean' },
-      // 'no-color': { type: 'boolean' },
-      // logfile: { type: 'string' },
-      // 'no-logfile': { type: 'boolean' },
+      // TODO: acceptable args go here
 
       // build args
 
@@ -124,7 +98,7 @@ const parseArgv: parseArgv<ParseArgsConfig> = (
 export = parseArgv;
 
 if (require.main === module) {
-  (async (proc: NodeJS.Process, options?: ParseArgvOptions) => {
-    return parseArgv(proc, options);
+  (async (proc: NodeJS.Process) => {
+    return parseArgv(proc);
   })(global.process);
 }
