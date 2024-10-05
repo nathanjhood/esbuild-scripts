@@ -232,6 +232,8 @@ const start: start = async (
       throw err;
     })
     .then(({ result, ctx }) => {
+      const { host, port } = result;
+
       // if (isInteractive) {
       //   clearConsole();
       // }
@@ -244,16 +246,18 @@ const start: start = async (
       //   );
       // }
 
-      // console.log(chalk.cyan('Starting the development server...\n'));
-      // console.log(
-      //   'Serving app at',
-      //   chalk.yellow(urls.localUrlForBrowser),
-      //   '\n'
-      // );
+      console.log(
+        util.styleText('cyan', 'Starting the development server...\n')
+      );
+      console.log(
+        'Serving app at',
+        util.styleText('yellow', host + ':' + port),
+        '\n'
+      );
       // openBrowser(urls.localUrlForBrowser);
-      // console.log('Press', chalk.yellow('Enter'), 'to reload.');
-      // console.log('Press', chalk.yellow('Ctrl + c'), 'to quit.');
-      // console.log();
+      console.log('Press', util.styleText('yellow', 'Enter'), 'to reload.');
+      console.log('Press', util.styleText('yellow', 'Ctrl + c'), 'to quit.');
+      console.log();
 
       ['SIGINT', 'SIGTERM'].forEach(function (sig) {
         proc.on(sig, function () {
