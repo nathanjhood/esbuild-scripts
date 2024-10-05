@@ -151,8 +151,8 @@ const start: start = async (
   const buildOptions: ESBuild.BuildOptions = {
     // defaults
     ...defaultBuildOptions,
-    // args
-    ...options,
+    // // args
+    // ...options,
     // required
     banner: {
       js: `new EventSource('/esbuild').addEventListener('change', () => location.reload());`,
@@ -163,8 +163,8 @@ const start: start = async (
   const serveOptions: ESBuild.ServeOptions = {
     // defaults
     ...defaultServeOptions,
-    // args
-    ...options,
+    // // args
+    // ...options,
   };
 
   const paths = getClientPaths(proc);
