@@ -27,8 +27,7 @@ const getCommonOptions: getCommonOptions = (
     treeShaking: isEnvProduction,
     minify: isEnvProduction,
     sourcemap: isEnvProduction ? shouldUseSourceMap : isEnvDevelopment,
-    //
-    color: proc.stdout.hasColors(),
+    color: proc.stdout.isTTY,
     logLimit: 10,
     lineLimit: 80,
     //
