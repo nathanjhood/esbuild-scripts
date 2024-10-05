@@ -1,6 +1,6 @@
 import type ESBuild = require('esbuild');
 
-const getTypescriptConfig = () => {
+const getTypescriptConfig = (): ESBuild.TsconfigRaw => {
   const result: {
     compilerOptions?: {
       alwaysStrict?: boolean;
@@ -24,4 +24,7 @@ const getTypescriptConfig = () => {
       verbatimModuleSyntax?: boolean;
     };
   } = {} satisfies ESBuild.TsconfigRaw;
+  return result;
 };
+
+export = getTypescriptConfig;

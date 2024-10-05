@@ -4,8 +4,8 @@
  * @copyright 2024 MIT License
  */
 
+//
 import type ESBuild = require('esbuild');
-// import type Util = require('node:util');
 
 export as namespace Start;
 

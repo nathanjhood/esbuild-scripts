@@ -22,12 +22,52 @@ test.suite(
     //
     const mock = test.mock;
 
+    // minimum: client-side env, as found on esbuild's 'BuildOptions.defines'
+    // eslint-disable-next-line prefer-const
+    let env: NodeJS.ProcessEnv = {
+      NODE_ENV: 'production',
+      BUILD_DIR: undefined,
+      // PUBLIC_URL: '/',
+      // WDS_SOCKET_HOST: undefined,
+      // WDS_SOCKET_PORT: undefined,
+      // WDS_SOCKET_PATH: undefined,
+      // FAST_REFRESH: 'false',
+      __TEST_VARIABLE__: 'false',
+    } satisfies NodeJS.ProcessEnv;
+    //
+
+    // eslint-disable-next-line prefer-const
+    let cwd = mock.fn<() => string>(global.process.cwd);
+    //
+    const loadEnvFile = mock.fn<(path?: string | URL | Buffer) => void>(
+      global.process.loadEnvFile
+    );
+    //
+    const exit = mock.fn<(code?: number | string | null | undefined) => never>(
+      global.process.exit
+    );
+    //
+    const on = mock.fn(global.process.on);
+    const off = mock.fn(global.process.off);
+    //
+    // eslint-disable-next-line prefer-const
+    let mockProcess: NodeJS.Process = {
+      ...global.process,
+      env: env,
+      loadEnvFile: loadEnvFile,
+      cwd: cwd,
+      on: on,
+      off: off,
+      exit: exit,
+      exitCode: 0,
+    };
+
     const { it } = test;
 
     it('runs', { signal: suiteContext_build.signal }, async (ctx) => {
       //
       const mockBuild: Test.Mock<Build> = ctx.mock.fn<Build>(build);
-      const result = await mockBuild(global.process, {
+      const result = await mockBuild(mockProcess, {
         platform: 'node',
         outdir: path.resolve(__dirname, 'dist'),
         entryPoints: [path.resolve(__dirname, '../', 'setupTests.ts')],

@@ -5,17 +5,7 @@ export as namespace GetCommonOptions;
 export = getCommonOptions;
 
 declare interface getCommonOptions {
-  (
-    proc: NodeJS.Process,
-    env: 'development' | 'production' | 'test'
-  ): ESBuild.CommonOptions;
-  (
-    proc: NodeJS.Process,
-    env: 'development' | 'production' | 'test'
-  ): ESBuild.CommonOptions;
+  (proc: NodeJS.Process): ESBuild.CommonOptions;
 }
 
-declare const getCommonOptions: (
-  proc: NodeJS.Process,
-  env: 'development' | 'production' | 'test'
-) => ESBuild.CommonOptions;
+declare const getCommonOptions: getCommonOptions;

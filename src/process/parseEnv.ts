@@ -4,11 +4,9 @@
  * @copyright 2024 MIT License
  */
 
-/** */
+//
 import { createRequire } from 'node:module';
-
 const require: NodeRequire = createRequire(__filename);
-
 import fs = require('node:fs');
 import getClientPaths = require('../config/getClientPaths');
 
@@ -22,7 +20,6 @@ const parseEnv: parseEnv = (proc: NodeJS.Process): ParseEnvResult => {
   //
   const errors: Error[] = [];
   proc.exitCode = errors.length;
-  //
 
   const paths = getClientPaths(proc);
 

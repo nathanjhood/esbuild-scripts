@@ -6,16 +6,12 @@
 
 import { createRequire } from 'node:module';
 const require: NodeRequire = createRequire(__filename);
-
 import type ESBuild = require('esbuild');
-// import type Util = require('node:util');
 import util = require('node:util');
 import fs = require('node:fs');
 import node_console = require('node:console');
 import esbuild = require('esbuild');
-
 import parseEnv = require('../process/parseEnv');
-import getClientPaths = require('../config/getClientPaths');
 import getBuildOptions = require('../config/esbuild/getBuildOptions');
 import getServeOptions = require('../config/esbuild/getServeOptions');
 
@@ -128,11 +124,11 @@ const start: start = async (
 
   const env = parseEnv(proc);
 
-  if (proc.env['NODE_ENV'] !== 'development')
+  if (env['NODE_ENV'] !== 'development')
     throw new Error(
       util.styleText(
         'red',
-        "'NODE_ENV' should be 'development', but it was " + proc.env['NODE_ENV']
+        "'NODE_ENV' should be 'development', but it was " + env['NODE_ENV']
       )
     );
 
@@ -143,10 +139,7 @@ const start: start = async (
     'production'
   );
 
-  const defaultServeOptions: ESBuild.ServeOptions = getServeOptions(
-    proc,
-    'production'
-  );
+  const defaultServeOptions: ESBuild.ServeOptions = getServeOptions(proc);
 
   const buildOptions: ESBuild.BuildOptions = {
     // defaults
@@ -166,8 +159,6 @@ const start: start = async (
     // // args
     // ...options,
   };
-
-  const paths = getClientPaths(proc);
 
   const logLevel = buildOptions.logLevel;
 
@@ -223,6 +214,141 @@ const start: start = async (
       });
   };
 
+  /**
+   *
+   * @param {ESBuild.BuildResult<ESBuild.BuildOptions>} result
+   * @returns {Promise<ESBuild.BuildResult<ESBuild.BuildOptions>>}
+   * @async
+   */
+  const formatErrors = async (
+    result: ESBuild.BuildResult<ESBuild.BuildOptions>
+  ): Promise<ESBuild.BuildResult<ESBuild.BuildOptions>> => {
+    //
+    const { errors } = result;
+    //
+    if (errors) {
+      //
+      const errorMessages: string[] = await esbuild.formatMessages(errors, {
+        color: proc.stdout.isTTY,
+        terminalWidth: 80,
+        kind: 'error',
+      });
+      //
+      if (logLevel && logLevelValue(logLevel) >= 1)
+        errorMessages.forEach((e) => console.error(e));
+      //
+    }
+    //
+    return result satisfies ESBuild.BuildResult<ESBuild.BuildOptions>;
+  };
+
+  /**
+   *
+   * @param {ESBuild.BuildResult<ESBuild.BuildOptions>} result
+   * @returns {Promise<ESBuild.BuildResult<ESBuild.BuildOptions>>}
+   * @async
+   */
+  const formatWarnings = async (
+    result: ESBuild.BuildResult<ESBuild.BuildOptions>
+  ): Promise<ESBuild.BuildResult<ESBuild.BuildOptions>> => {
+    //
+    const { warnings } = result;
+    //
+    if (warnings) {
+      //
+      const warningMessages: string[] = await esbuild.formatMessages(warnings, {
+        color: proc.stdout.isTTY,
+        terminalWidth: 80,
+        kind: 'warning',
+      });
+      //
+      if (logLevel && logLevelValue(logLevel) >= 2)
+        warningMessages.forEach((w) => console.warn(w));
+      //
+    }
+    //
+    return result satisfies ESBuild.BuildResult<ESBuild.BuildOptions>;
+  };
+
+  /**
+   *
+   * @param {ESBuild.BuildResult<ESBuild.BuildOptions>} result
+   * @returns {Promise<ESBuild.BuildResult<ESBuild.BuildOptions>>}
+   * @async
+   */
+  const analyzeMetaFile = async (
+    result: ESBuild.BuildResult<ESBuild.BuildOptions>
+  ): Promise<ESBuild.BuildResult<ESBuild.BuildOptions>> => {
+    //
+    const { metafile } = result;
+    //
+    if (metafile) {
+      //
+      const analysis: string = await esbuild.analyzeMetafile(metafile, {
+        color: proc.stdout.isTTY,
+        verbose: true,
+      });
+      //
+      if (logLevel && logLevelValue(logLevel) >= 3) console.log(analysis);
+      //
+    }
+    //
+    return result satisfies ESBuild.BuildResult<ESBuild.BuildOptions>;
+  };
+
+  /**
+   *
+   * @param {ESBuild.BuildResult<ESBuild.BuildOptions>} result
+   * @returns {Promise<ESBuild.BuildResult<ESBuild.BuildOptions>>}
+   * @async
+   */
+  const logOutputFiles = async (
+    result: ESBuild.BuildResult<ESBuild.BuildOptions>
+  ): Promise<ESBuild.BuildResult<ESBuild.BuildOptions>> => {
+    //
+    return new Promise<ESBuild.BuildResult<ESBuild.BuildOptions>>(
+      (onResolve, onReject) => {
+        //
+        const { outputFiles } = result;
+        //
+        if (logLevel && logLevelValue(logLevel) >= 4) {
+          if (!outputFiles)
+            return onReject('logOutputFiles failed... did you set write=true?');
+
+          outputFiles.forEach((outputFile) => console.info(outputFile));
+        }
+        return onResolve(result);
+      }
+    );
+  };
+
+  /**
+   *
+   * @param {ESBuild.BuildResult<ESBuild.BuildOptions>} result
+   * @returns {Promise<ESBuild.BuildResult<ESBuild.BuildOptions>>}
+   * @async
+   */
+  const logMangleCache = async (
+    result: ESBuild.BuildResult<ESBuild.BuildOptions>
+  ): Promise<ESBuild.BuildResult<ESBuild.BuildOptions>> => {
+    //
+    return new Promise<ESBuild.BuildResult<ESBuild.BuildOptions>>(
+      (onResolve /**, onReject */) => {
+        //
+        const { mangleCache } = result;
+        // //
+        if (mangleCache) {
+          //
+          if (logLevel && logLevelValue(logLevel) >= 5)
+            console.debug(mangleCache);
+        }
+
+        //
+        return onResolve(result);
+      }
+    );
+  };
+
   return esbuild
     .context(buildOptions)
     .then(watchContext, (err) => {
@@ -246,15 +372,25 @@ const start: start = async (
       //   );
       // }
 
+      const isHttps: true | false = proc.env['HTTPS'] === 'true' ? true : false;
+
+      let protocol: string = 'http';
+      if (isHttps) protocol += 's';
+
       console.log(
         util.styleText('cyan', 'Starting the development server...\n')
       );
       console.log(
         'Serving app at',
-        util.styleText('yellow', host + ':' + port),
+        util.styleText('yellow', protocol + '://' + host + ':' + port),
         '\n'
       );
       // openBrowser(urls.localUrlForBrowser);
+      console.log(
+        'Edit any',
+        util.styleText('yellow', "'.ts/tsx'"),
+        'file and save to fast-refresh.'
+      );
       console.log('Press', util.styleText('yellow', 'Enter'), 'to reload.');
       console.log('Press', util.styleText('yellow', 'Ctrl + c'), 'to quit.');
       console.log();
@@ -266,8 +402,8 @@ const start: start = async (
             util.styleText('cyan', sig),
             'recieved: shutting down gracefully...'
           );
-          ctx.cancel().then(() => {
-            ctx.dispose().then(() => {
+          cancelContext(ctx).then(() => {
+            disposeContext(ctx).then(() => {
               process.exit();
             });
           });
@@ -279,18 +415,67 @@ const start: start = async (
         ['data'].forEach(function (ev) {
           console.log();
           process.stdin.on(ev, () => {
-            try {
-              console.log('stdin recieved event:', util.styleText('cyan', ev));
-              // Cancel the already-running build
-              ctx.cancel().then(() => {
+            console.log('stdin recieved event:', util.styleText('cyan', ev));
+            // Cancel the already-running build
+            ctx
+              .cancel()
+              .then(() => {
                 // Then start a new build
-                ctx.rebuild().then((result) => {
-                  return console.log('build:', result);
-                });
+                ctx
+                  .rebuild()
+                  .then<ESBuild.BuildResult<ESBuild.BuildOptions>>(
+                    logMangleCache,
+                    (err) => {
+                      throw err;
+                    }
+                  )
+                  .then<ESBuild.BuildResult<ESBuild.BuildOptions>>(
+                    formatErrors,
+                    (err) => {
+                      throw err;
+                    }
+                  )
+                  .then<ESBuild.BuildResult<ESBuild.BuildOptions>>(
+                    formatWarnings,
+                    (err) => {
+                      throw err;
+                    }
+                  )
+                  .then<ESBuild.BuildResult<ESBuild.BuildOptions>>(
+                    logOutputFiles,
+                    (err) => {
+                      throw err;
+                    }
+                  )
+                  .then<ESBuild.BuildResult<ESBuild.BuildOptions>>(
+                    analyzeMetaFile,
+                    (err) => {
+                      throw err;
+                    }
+                  )
+                  .then<ESBuild.BuildResult<ESBuild.BuildOptions>>((result) => {
+                    console.log(
+                      'Edit any',
+                      util.styleText('yellow', "'.ts/tsx'"),
+                      'file and save to fast-refresh.'
+                    );
+                    console.log(
+                      'Press',
+                      util.styleText('yellow', 'Enter'),
+                      'to reload.'
+                    );
+                    console.log(
+                      'Press',
+                      util.styleText('yellow', 'Ctrl + c'),
+                      'to quit.'
+                    );
+                    console.log();
+                    return result;
+                  });
+              })
+              .catch((err) => {
+                throw err;
               });
-            } catch (err) {
-              console.error(err);
-            }
           });
         });
         // Gracefully exit when stdin ends
@@ -320,7 +505,7 @@ if (require.main === module) {
     host: global.process.env['HOST'] ? global.process.env['HOST'] : '127.0.0.1',
     port: global.process.env['PORT']
       ? parseInt(global.process.env['PORT'])
-      : 5173,
+      : 3000,
   });
 }
 

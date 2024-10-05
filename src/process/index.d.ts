@@ -4,22 +4,22 @@
  * @copyright 2024 MIT License
  */
 
-/** */
-
-export as namespace Process;
-
-export = process;
-
+//
+import type Util = require('node:util');
 import type parseArgv = require('./parseArgv.d');
 import type parseCommand = require('./parseCommand.d');
 import type parseCwd = require('./parseCwd.d');
 import type parseEnv = require('./parseEnv.d');
 
+export as namespace Process;
+
+export = process;
+
 declare type process = {
-  parseCommand: typeof parseCommand;
-  parseArgv: typeof parseArgv;
-  parseCwd: typeof parseCwd;
-  parseEnv: typeof parseEnv;
+  parseCommand: parseCommand<Util.ParseArgsConfig>;
+  parseArgv: parseArgv<Util.ParseArgsConfig>;
+  parseCwd: parseCwd;
+  parseEnv: parseEnv;
 };
 
 declare const process: process;

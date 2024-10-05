@@ -4,14 +4,11 @@
  * @copyright 2024 MIT License
  */
 
-/** */
+//
 import { createRequire } from 'node:module';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const require: NodeRequire = createRequire(__filename);
-
 import type Util = require('node:util');
 import util = require('node:util');
-import node_console = require('node:console');
 
 type ParseCommandConfig = Util.ParseArgsConfig;
 
@@ -19,26 +16,17 @@ type ParseCommandResult<T extends ParseCommandConfig> = ReturnType<
   typeof util.parseArgs<T>
 >;
 
-type ParseCommandOptions = {
-  throws?: true | false;
-  env?: NodeJS.ProcessEnv;
-  parseCommandConfig?: ParseCommandConfig;
-};
-
 interface parseCommand<T extends ParseCommandConfig> {
   (proc: NodeJS.Process): ParseCommandResult<T>;
-  (proc: NodeJS.Process, options?: ParseCommandOptions): ParseCommandResult<T>;
 }
 
 /**
  *
  * @param {NodeJS.Process} proc
- * @param {ParseCommandOptions} options
  * @returns {ParseCommandResult<ParseCommandConfig>}
  */
 const parseCommand: parseCommand<ParseCommandConfig> = (
-  proc: NodeJS.Process,
-  options?: ParseCommandOptions
+  proc: NodeJS.Process
 ): ParseCommandResult<ParseCommandConfig> => {
   //
 
@@ -102,36 +90,6 @@ const parseCommand: parseCommand<ParseCommandConfig> = (
   // (this should never happen in theory... but it removes the 'undefined' case)
   if (!tokens) throw new Error('parseCommand returned no tokens');
 
-  // // 6) log the collected arg/value pairs from argv0
-  // if (options && options.verbose && !options.debug) {
-  //   const msg: string[] = [];
-  //   tokens.forEach((token) => {
-  //     switch (token.kind) {
-  //       case 'option': {
-  //         msg.push(token.rawName);
-  //         if (token.value) msg.push(token.value);
-  //         break;
-  //       }
-  //       case 'positional': {
-  //         msg.push(token.value);
-  //         break;
-  //       }
-  //       case 'option-terminator': {
-  //         msg.push('--');
-  //         break;
-  //       }
-  //       default: {
-  //         break;
-  //       }
-  //     }
-  //   });
-  //   console.info(msg);
-  // }
-
-  // // 7) log the parsed argv0
-  // if (options && options.debug) cosole.debug({ values, positionals, tokens });
-
-  // 8) return the parsed argv0
   return {
     values: values,
     positionals: positionals,
@@ -141,11 +99,8 @@ const parseCommand: parseCommand<ParseCommandConfig> = (
 
 export = parseCommand;
 
-// if (require.main === module) {
-//   ((proc: NodeJS.Process, options?: ParseCommandOptions) => {
-//     parseCommand(proc, options);
-//   })(global.process, {
-//     verbose: global.process.env['VERBOSE'] !== undefined ? true : false,
-//     debug: global.process.env['DEBUG'] !== undefined ? true : false,
-//   });
-// }
+if (require.main === module) {
+  ((proc: NodeJS.Process) => {
+    parseCommand(proc);
+  })(global.process);
+}

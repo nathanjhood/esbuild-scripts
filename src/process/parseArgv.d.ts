@@ -4,8 +4,7 @@
  * @copyright 2024 MIT License
  */
 
-/** */
-import type ESBuild = require('esbuild');
+//
 import type Util = require('node:util');
 import util = require('node:util');
 
@@ -21,15 +20,8 @@ declare type ParseArgvResult<T extends ParseArgsConfig> = ReturnType<
   ParseArgs<T>
 >;
 
-declare type ParseArgvOptions = {
-  logLevel?: ESBuild.LogLevel;
-  env?: NodeJS.ProcessEnv;
-  parseArgsConfig?: ParseArgsConfig;
-};
-
 declare interface parseArgv<T extends ParseArgsConfig> {
   (proc: NodeJS.Process): ParseArgvResult<T>;
-  (proc: NodeJS.Process, options?: ParseArgvOptions): ParseArgvResult<T>;
 }
 
 declare const parseArgv: parseArgv<ParseArgsConfig>;
