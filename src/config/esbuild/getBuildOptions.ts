@@ -27,14 +27,14 @@ const getBuildOptions: getBuildOptions = (
   const paths = getClientPaths(proc);
   const commonOptions = getCommonOptions(proc, env);
 
-  // //
-  // const {
-  //   INLINE_RUNTIME_CHUNK,
-  //   ESLINT_NO_DEV_ERRORS,
-  //   DISABLE_ESLINT_PLUGIN,
-  //   IMAGE_INLINE_SIZE_LIMIT,
-  //   DISABLE_NEW_JSX_TRANSFORM,
-  // }: NodeJS.ProcessEnv = proc.env;
+  //
+  const {
+    // INLINE_RUNTIME_CHUNK,
+    // ESLINT_NO_DEV_ERRORS,
+    // DISABLE_ESLINT_PLUGIN,
+    // IMAGE_INLINE_SIZE_LIMIT,
+    DISABLE_NEW_JSX_TRANSFORM,
+  }: NodeJS.ProcessEnv = proc.env;
   // //
   // // Some apps do not need the benefits of saving a web request, so not inlining
   // // the chunk makes for a smoother build process.
@@ -52,20 +52,18 @@ const getBuildOptions: getBuildOptions = (
   //   path.join(paths.appPath, 'tailwind.config.js') // TODO: use Typescript
   // );
 
-  //
-  // const hasJsxRuntime: boolean = (() => {
-  //   if (DISABLE_NEW_JSX_TRANSFORM === 'true') {
-  //     return false;
-  //   }
-  //   //
-  //   try {
-  //     require.resolve('react/jsx-runtime');
-  //     return true;
-  //   } catch (e) {
-  //     return false;
-  //   }
-  // })();
-  //
+  const hasJsxRuntime: boolean = (() => {
+    if (DISABLE_NEW_JSX_TRANSFORM === 'true') {
+      return false;
+    }
+    //
+    try {
+      require.resolve('react/jsx-runtime');
+      return true;
+    } catch (e) {
+      return false;
+    }
+  })();
 
   const useTypeScript: boolean = fs.existsSync(paths.appTsConfig);
 
@@ -138,6 +136,30 @@ const getBuildOptions: getBuildOptions = (
       .map((ext) => `.${ext}`)
       .filter((ext) => useTypeScript || !ext.includes('ts')),
     //
+    jsx: 'automatic',
+    plugins: [
+      (() => {
+        return {
+          name: 'env',
+          setup(build) {
+            // Intercept import paths called "env" so esbuild doesn't attempt
+            // to map them to a file system location. Tag them with the "env-ns"
+            // namespace to reserve them for this plugin.
+            build.onResolve({ filter: /^env$/ }, (args) => ({
+              path: args.path,
+              namespace: 'env-ns',
+            }));
+
+            // Load paths tagged with the "env-ns" namespace and behave as if
+            // they point to a JSON file containing the environment variables.
+            build.onLoad({ filter: /.*/, namespace: 'env-ns' }, () => ({
+              contents: JSON.stringify(proc.env),
+              loader: 'json',
+            }));
+          },
+        };
+      })(),
+    ],
     ...commonOptions,
     //
   } satisfies ESBuild.BuildOptions;

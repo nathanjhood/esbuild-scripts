@@ -29,7 +29,7 @@ const getCommonOptions: getCommonOptions = (
     sourcemap: isEnvProduction ? shouldUseSourceMap : isEnvDevelopment,
     color: proc.stdout.isTTY,
     logLimit: 10,
-    lineLimit: 80,
+    // lineLimit: 80,
     //
     // target: browsersList(
     //   isEnvProduction

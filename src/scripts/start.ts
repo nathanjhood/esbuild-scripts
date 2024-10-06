@@ -9,6 +9,7 @@ const require: NodeRequire = createRequire(__filename);
 import type ESBuild = require('esbuild');
 import util = require('node:util');
 import fs = require('node:fs');
+import path = require('node:path');
 import node_console = require('node:console');
 import esbuild = require('esbuild');
 import parseEnv = require('../process/parseEnv');
@@ -164,6 +165,16 @@ const start: start = async (
   const logLevel = buildOptions.logLevel;
 
   const paths = getClientPaths(proc);
+
+  const buildServiceWorker = () => {
+    return esbuild.buildSync({
+      entryPoints: [paths.swSrc],
+      bundle: true,
+      minify: false,
+      // outdir: paths.appBuild,
+      outfile: path.resolve(paths.appBuild, 'service-worker.js'),
+    });
+  };
 
   /**
    *
@@ -372,6 +383,8 @@ const start: start = async (
     appPublic:
       options && options.publicPath ? options.publicPath : paths.appPublic,
   });
+
+  if (fs.existsSync(paths.swSrc)) buildServiceWorker();
 
   return esbuild
     .context(buildOptions)
