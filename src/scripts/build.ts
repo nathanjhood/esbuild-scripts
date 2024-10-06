@@ -149,6 +149,16 @@ const build: build = async (
 
   const logLevel = buildOptions.logLevel;
 
+  const buildServiceWorker = () => {
+    return esbuild.buildSync({
+      entryPoints: [paths.swSrc],
+      bundle: false,
+      minify: false,
+      outdir: paths.appBuild,
+      outfile: 'service-worker.js',
+    });
+  };
+
   /**
    *
    * @param paths
@@ -304,6 +314,8 @@ const build: build = async (
     appPublic:
       options && options.publicPath ? options.publicPath : paths.appPublic,
   });
+
+  buildServiceWorker();
 
   //
   return esbuild

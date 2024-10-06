@@ -165,6 +165,16 @@ const start: start = async (
 
   const paths = getClientPaths(proc);
 
+  const buildServiceWorker = () => {
+    return esbuild.buildSync({
+      entryPoints: [paths.swSrc],
+      bundle: false,
+      minify: false,
+      outdir: paths.appBuild,
+      outfile: 'service-worker.js',
+    });
+  };
+
   /**
    *
    * @param paths
@@ -372,6 +382,8 @@ const start: start = async (
     appPublic:
       options && options.publicPath ? options.publicPath : paths.appPublic,
   });
+
+  buildServiceWorker();
 
   return esbuild
     .context(buildOptions)
