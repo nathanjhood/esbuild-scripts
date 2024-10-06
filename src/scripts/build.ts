@@ -153,7 +153,7 @@ const build: build = async (
   const buildServiceWorker = () => {
     return esbuild.buildSync({
       entryPoints: [paths.swSrc],
-      bundle: false,
+      bundle: true,
       minify: false,
       // outdir: paths.appBuild,
       outfile: path.resolve(paths.appBuild, 'service-worker.js'),
@@ -316,7 +316,7 @@ const build: build = async (
       options && options.publicPath ? options.publicPath : paths.appPublic,
   });
 
-  buildServiceWorker();
+  if (fs.existsSync(paths.swSrc)) buildServiceWorker();
 
   //
   return esbuild
