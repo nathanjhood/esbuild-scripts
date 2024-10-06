@@ -153,7 +153,7 @@ const getClientPaths: getClientPaths = (
         appTsBuildInfoFile: resolveApp(
           'node_modules/.cache/tsconfig.tsbuildinfo'
         ),
-        swSrc: resolveModule(resolveApp, 'src/serviceWorker'),
+        swSrc: resolveModule(resolveApp, 'src/service-worker'),
         publicUrlOrPath,
         moduleFileExtensions,
       } as const satisfies Readonly<GetClientPathsResult>);
@@ -186,7 +186,7 @@ const getClientPaths: getClientPaths = (
         appTsBuildInfoFile: resolveApp(
           'node_modules/.cache/tsconfig.tsbuildinfo'
         ),
-        swSrc: resolveModule(resolveApp, 'src/serviceWorker'),
+        swSrc: resolveModule(resolveApp, 'src/service-worker'),
         publicUrlOrPath,
         // These properties only exist before ejecting:
         ownPath: resolveOwn('.'),
@@ -240,7 +240,10 @@ const getClientPaths: getClientPaths = (
           appTsBuildInfoFile: resolveOwn(
             'node_modules/.cache/tsconfig.tsbuildinfo'
           ),
-          swSrc: resolveModule(resolveOwn, `${templatePath}/src/serviceWorker`),
+          swSrc: resolveModule(
+            resolveOwn,
+            `${templatePath}/src/service-worker`
+          ),
           publicUrlOrPath,
           // These properties only exist before ejecting:
           ownPath: resolveOwn('.'),
@@ -271,7 +274,6 @@ export = getClientPaths;
 
 if (require.main === module) {
   ((proc: NodeJS.Process, options?: GetClientPathsOptions) => {
-    const result = getClientPaths(proc, options);
-    global.console.assert(result);
+    getClientPaths(proc, options);
   })(global.process);
 }
