@@ -9,6 +9,7 @@ const require: NodeRequire = createRequire(__filename);
 import type ESBuild = require('esbuild');
 import util = require('node:util');
 import fs = require('node:fs');
+import path = require('node:path');
 import node_console = require('node:console');
 import esbuild = require('esbuild');
 import parseEnv = require('../process/parseEnv');
@@ -168,10 +169,10 @@ const start: start = async (
   const buildServiceWorker = () => {
     return esbuild.buildSync({
       entryPoints: [paths.swSrc],
-      bundle: false,
+      bundle: true,
       minify: false,
-      outdir: paths.appBuild,
-      outfile: 'service-worker.js',
+      // outdir: paths.appBuild,
+      outfile: path.resolve(paths.appBuild, 'service-worker.js'),
     });
   };
 
@@ -383,7 +384,7 @@ const start: start = async (
       options && options.publicPath ? options.publicPath : paths.appPublic,
   });
 
-  buildServiceWorker();
+  if (fs.existsSync(paths.swSrc)) buildServiceWorker();
 
   return esbuild
     .context(buildOptions)
