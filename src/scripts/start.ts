@@ -176,7 +176,7 @@ const start: start = async (
     });
   };
 
-  const buildHTML = (options: { appHtml: string }) => {
+  const buildHTML = (options: { appHtml: string, appBuild: string }) => {
     let html = fs.readFileSync(options.appHtml, { encoding: 'utf8' });
     // let htmlresult;
     Object.keys(proc.env).forEach((key) => {
@@ -190,7 +190,7 @@ const start: start = async (
 
       if (value) html = html.replaceAll(htmlsrc, value);
     });
-    return fs.writeFileSync(path.resolve(paths.appBuild, 'index.html'), html);
+    return fs.writeFileSync(path.resolve(options.appBuild, 'index.html'), html);
   };
 
   /**
@@ -411,6 +411,7 @@ const start: start = async (
   if (fs.existsSync(paths.swSrc)) buildServiceWorker();
 
   buildHTML({
+    appBuild: options && options.outdir ? options.outdir : paths.appBuild,
     appHtml:
       options && options.publicPath
         ? options.publicPath + '/index.html'

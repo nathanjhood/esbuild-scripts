@@ -12,7 +12,6 @@ import util = require('node:util');
 import fs = require('node:fs');
 import path = require('node:path');
 import node_console = require('node:console');
-import childProcess = require('node:child_process');
 import esbuild = require('esbuild');
 import parseEnv = require('../process/parseEnv');
 import getClientPaths = require('../config/getClientPaths');
@@ -161,7 +160,7 @@ const build: build = async (
     });
   };
 
-  const buildHTML = (options: { appHtml: string }) => {
+  const buildHTML = (options: { appHtml: string; appBuild: string }) => {
     let html = fs.readFileSync(options.appHtml, { encoding: 'utf8' });
     // let htmlresult;
     Object.keys(proc.env).forEach((key) => {
@@ -175,7 +174,7 @@ const build: build = async (
 
       if (value) html = html.replaceAll(htmlsrc, value);
     });
-    return fs.writeFileSync(path.resolve(paths.appBuild, 'index.html'), html);
+    return fs.writeFileSync(path.resolve(options.appBuild, 'index.html'), html);
   };
 
   /**
@@ -347,6 +346,7 @@ const build: build = async (
   if (fs.existsSync(paths.swSrc)) buildServiceWorker();
 
   buildHTML({
+    appBuild: options && options.outdir ? options.outdir : paths.appBuild,
     appHtml:
       options && options.publicPath
         ? options.publicPath + '/index.html'
