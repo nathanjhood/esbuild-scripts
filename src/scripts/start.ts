@@ -12,7 +12,6 @@ import fs = require('node:fs');
 import path = require('node:path');
 import node_console = require('node:console');
 import esbuild = require('esbuild');
-import childProcess = require('node:child_process');
 import parseEnv = require('../process/parseEnv');
 import getClientPaths = require('../config/getClientPaths');
 import getBuildOptions = require('../config/esbuild/getBuildOptions');
@@ -176,7 +175,7 @@ const start: start = async (
     });
   };
 
-  const buildHTML = (options: { appHtml: string, appBuild: string }) => {
+  const buildHTML = (options: { appHtml: string; appBuild: string }) => {
     let html = fs.readFileSync(options.appHtml, { encoding: 'utf8' });
     // let htmlresult;
     Object.keys(proc.env).forEach((key) => {
