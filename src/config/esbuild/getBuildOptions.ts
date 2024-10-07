@@ -173,6 +173,7 @@ if (require.main === module) {
     env: 'development' | 'production' | 'test'
   ): ESBuild.BuildOptions => {
     const result = getBuildOptions(proc, env);
+    global.console.log(result);
     return result;
   })(global.process, 'development');
 }
