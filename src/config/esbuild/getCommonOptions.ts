@@ -19,6 +19,20 @@ const getCommonOptions: getCommonOptions = (
   const isEnvDevelopment: boolean = env === 'development';
   const isEnvProduction: boolean = env === 'production';
 
+  const supportedTargets = [
+    'chrome',
+    'deno',
+    'edge',
+    'firefox',
+    'hermes',
+    'ie',
+    'ios',
+    'node',
+    'opera',
+    'rhino',
+    'safari',
+  ];
+
   // Source maps are resource heavy and can cause out of memory issue for large
   // source files.
   const shouldUseSourceMap = process.env.GENERATE_SOURCEMAP !== 'false';
@@ -39,9 +53,16 @@ const getCommonOptions: getCommonOptions = (
             'last 1 firefox version',
             'last 1 safari version',
           ]
-    ).map((browser) => {
-      return browser.replace(' ', '');
-    }),
+    )
+      .filter((testTarget) => {
+        const targetToTest = testTarget.split(' ')[0];
+        if (targetToTest && supportedTargets.includes(targetToTest))
+          return true;
+        return false;
+      })
+      .map<string>((browser) => {
+        return browser.replaceAll(' ', '');
+      }),
     // platform: 'neutral', // 'node' | browser | neutral,
     //
     define: {
@@ -61,6 +82,7 @@ if (require.main === module) {
     env: 'development' | 'production' | 'test'
   ): ESBuild.CommonOptions => {
     const commonOptions = getCommonOptions(proc, env);
+    global.console.log(commonOptions);
     return commonOptions;
-  })(global.process, 'development');
+  })(global.process, global.process.env.NODE_ENV!);
 }
