@@ -176,8 +176,8 @@ const start: start = async (
     });
   };
 
-  const buildHTML = () => {
-    let html = fs.readFileSync(paths.appHtml, { encoding: 'utf8' });
+  const buildHTML = (options: { appHtml: string }) => {
+    let html = fs.readFileSync(options.appHtml, { encoding: 'utf8' });
     // let htmlresult;
     Object.keys(proc.env).forEach((key) => {
       const escapeStringRegexp = (str: string) => {
@@ -410,7 +410,12 @@ const start: start = async (
 
   if (fs.existsSync(paths.swSrc)) buildServiceWorker();
 
-  buildHTML();
+  buildHTML({
+    appHtml:
+      options && options.publicPath
+        ? options.publicPath + '/index.html'
+        : paths.appHtml,
+  });
 
   return esbuild
     .context(buildOptions)
