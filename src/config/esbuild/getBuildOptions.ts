@@ -136,7 +136,7 @@ const getBuildOptions: getBuildOptions = (
       .map((ext) => `.${ext}`)
       .filter((ext) => useTypeScript || !ext.includes('ts')),
     //
-    jsx: 'automatic',
+    jsx: hasJsxRuntime ? 'automatic' : 'transform',
     plugins: [
       (() => {
         return {
