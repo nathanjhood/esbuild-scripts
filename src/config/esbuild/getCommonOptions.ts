@@ -2,7 +2,7 @@ import { createRequire } from 'node:module';
 const require: NodeRequire = createRequire(__filename);
 import type ESBuild = require('esbuild');
 import getClientEnvironment = require('../getClientEnvironment');
-// import browsersList = require('browserslist');
+import browsersList = require('browserslist');
 
 interface getCommonOptions {
   (
@@ -30,16 +30,18 @@ const getCommonOptions: getCommonOptions = (
     color: proc.stdout.isTTY,
     logLimit: 10,
     // lineLimit: 80,
-    //
-    // target: browsersList(
-    //   isEnvProduction
-    //     ? ['>0.2%', 'not dead', 'not op_mini all']
-    //     : [
-    //         'last 1 chrome version',
-    //         'last 1 firefox version',
-    //         'last 1 safari version',
-    //       ]
-    // ),
+
+    target: browsersList(
+      isEnvProduction
+        ? ['>0.2%', 'not dead', 'not op_mini all']
+        : [
+            'last 1 chrome version',
+            'last 1 firefox version',
+            'last 1 safari version',
+          ]
+    ).map((browser) => {
+      return browser.replace(' ', '');
+    }),
     // platform: 'neutral', // 'node' | browser | neutral,
     //
     define: {
