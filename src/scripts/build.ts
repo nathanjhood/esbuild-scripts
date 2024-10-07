@@ -161,8 +161,8 @@ const build: build = async (
     });
   };
 
-  const buildHTML = () => {
-    let html = fs.readFileSync(paths.appHtml, { encoding: 'utf8' });
+  const buildHTML = (options: { appHtml: string }) => {
+    let html = fs.readFileSync(options.appHtml, { encoding: 'utf8' });
     // let htmlresult;
     Object.keys(proc.env).forEach((key) => {
       const escapeStringRegexp = (str: string) => {
@@ -183,19 +183,19 @@ const build: build = async (
    * @param paths
    * @returns {void}
    */
-  const copyPublicFolder: (paths: {
+  const copyPublicFolder: (options: {
     appPublic: string;
     appBuild: string;
     appHtml: string;
-  }) => void = (paths: {
+  }) => void = (options: {
     appPublic: string;
     appBuild: string;
     appHtml: string;
   }): void => {
-    return fs.cpSync(paths.appPublic, paths.appBuild, {
+    return fs.cpSync(options.appPublic, options.appBuild, {
       dereference: true,
       recursive: true,
-      filter: (file) => file !== paths.appHtml,
+      filter: (file) => file !== options.appHtml,
     });
   };
 
@@ -338,12 +338,20 @@ const build: build = async (
     appBuild: options && options.outdir ? options.outdir : paths.appBuild,
     appPublic:
       options && options.publicPath ? options.publicPath : paths.appPublic,
-    appHtml: paths.appHtml,
+    appHtml:
+      options && options.publicPath
+        ? options.publicPath + '/index.html'
+        : paths.appHtml,
   });
 
   if (fs.existsSync(paths.swSrc)) buildServiceWorker();
 
-  buildHTML();
+  buildHTML({
+    appHtml:
+      options && options.publicPath
+        ? options.publicPath + '/index.html'
+        : paths.appHtml,
+  });
 
   //
   return esbuild
