@@ -2,6 +2,7 @@ import { createRequire } from 'node:module';
 const require: NodeRequire = createRequire(__filename);
 import type ESBuild = require('esbuild');
 import fs = require('node:fs');
+import path = require('node:path');
 import getClientPaths = require('../getClientPaths');
 import getCommonOptions = require('./getCommonOptions');
 
@@ -136,7 +137,7 @@ const getBuildOptions: getBuildOptions = (
       .map((ext) => `.${ext}`)
       .filter((ext) => useTypeScript || !ext.includes('ts')),
     //
-    jsx: 'automatic',
+    jsx: hasJsxRuntime ? 'automatic' : 'transform',
     plugins: [
       (() => {
         return {
@@ -159,6 +160,75 @@ const getBuildOptions: getBuildOptions = (
           },
         };
       })(),
+      (() => {
+        return {
+          name: 'txt',
+          setup(build) {
+            // Load ".txt" files and return an array of words
+            build.onLoad({ filter: /\.txt$/ }, async (args) => {
+              const txt = await fs.promises.readFile(args.path, 'utf8');
+              return {
+                contents: JSON.stringify(txt.split(/\s+/)),
+                loader: 'json',
+              };
+            });
+          },
+        };
+      })(),
+      (() => {
+        return {
+          name: 'csv',
+          setup(build) {
+            // Load ".txt" files and return an array of words
+            build.onLoad({ filter: /\.csv$/ }, async (args) => {
+              const csv = await fs.promises.readFile(args.path, 'utf8');
+              return {
+                contents: JSON.stringify(csv.split(/\s+/)),
+                loader: 'json',
+              };
+            });
+          },
+        };
+      })(),
+      (() => {
+        return {
+          name: 'src',
+          setup(build) {
+            // Redirect all paths starting with "@/" to "./src/"
+            build.onResolve({ filter: /^@\// }, (args) => {
+              return {
+                path: path.join(args.resolveDir, args.path.replace('@', 'src')),
+                external: false,
+              };
+            });
+          },
+        };
+      })(),
+      (() => {
+        return {
+          name: 'static',
+          setup(build) {
+            // Redirect all paths starting with "static/" to "./public/static/"
+            build.onResolve({ filter: /^static\// }, (args) => {
+              return {
+                path: path.join(args.resolveDir, 'public', args.path),
+                external: true,
+              };
+            });
+          },
+        };
+      })(),
+      (() => {
+        return {
+          name: 'http',
+          setup(build) {
+            // Mark all paths starting with "http://" or "https://" as external
+            build.onResolve({ filter: /^https?:\/\// }, (args) => {
+              return { path: args.path, external: true };
+            });
+          },
+        };
+      })(),
     ],
     ...commonOptions,
     //
@@ -173,6 +243,7 @@ if (require.main === module) {
     env: 'development' | 'production' | 'test'
   ): ESBuild.BuildOptions => {
     const result = getBuildOptions(proc, env);
+    global.console.log(result);
     return result;
   })(global.process, 'development');
 }

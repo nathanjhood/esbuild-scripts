@@ -166,14 +166,30 @@ const start: start = async (
 
   const paths = getClientPaths(proc);
 
-  const buildServiceWorker = () => {
-    return esbuild.buildSync({
+  const buildServiceWorker = async () => {
+    return await esbuild.build({
       entryPoints: [paths.swSrc],
-      bundle: true,
+      bundle: false, // TODO: how to set the swr build up?
       minify: false,
-      // outdir: paths.appBuild,
       outfile: path.resolve(paths.appBuild, 'service-worker.js'),
     });
+  };
+
+  const buildHTML = (options: { appHtml: string; appBuild: string }) => {
+    let html = fs.readFileSync(options.appHtml, { encoding: 'utf8' });
+    // let htmlresult;
+    Object.keys(proc.env).forEach((key) => {
+      const escapeStringRegexp = (str: string) => {
+        return str
+          .replace(/[|\\{}()[\]^$+*?.]/g, '\\$&')
+          .replace(/-/g, '\\x2d');
+      };
+      const value = proc.env[key];
+      const htmlsrc = new RegExp('%' + escapeStringRegexp(key) + '%', 'g');
+
+      if (value) html = html.replaceAll(htmlsrc, value);
+    });
+    return fs.writeFileSync(path.resolve(options.appBuild, 'index.html'), html);
   };
 
   /**
@@ -184,10 +200,16 @@ const start: start = async (
   const copyPublicFolder: (paths: {
     appPublic: string;
     appBuild: string;
-  }) => void = (paths: { appPublic: string; appBuild: string }): void => {
+    appHtml: string;
+  }) => void = (paths: {
+    appPublic: string;
+    appBuild: string;
+    appHtml: string;
+  }): void => {
     return fs.cpSync(paths.appPublic, paths.appBuild, {
       dereference: true,
       recursive: true,
+      filter: (file) => file !== paths.appHtml,
     });
   };
 
@@ -382,9 +404,18 @@ const start: start = async (
     appBuild: options && options.outdir ? options.outdir : paths.appBuild,
     appPublic:
       options && options.publicPath ? options.publicPath : paths.appPublic,
+    appHtml: paths.appHtml,
   });
 
   if (fs.existsSync(paths.swSrc)) buildServiceWorker();
+
+  buildHTML({
+    appBuild: options && options.outdir ? options.outdir : paths.appBuild,
+    appHtml:
+      options && options.publicPath
+        ? options.publicPath + '/index.html'
+        : paths.appHtml,
+  });
 
   return esbuild
     .context(buildOptions)
@@ -403,7 +434,7 @@ const start: start = async (
 
       // if (env.raw.FAST_REFRESH && semver.lt(react.version, '16.10.0')) {
       //   console.log(
-      //     chalk.yellow(
+      //     util.styleText('yellow',
       //       `Fast Refresh requires React 16.10 or higher. You are using React ${react.version}.`
       //     )
       //   );
@@ -447,11 +478,11 @@ const start: start = async (
         });
       });
 
-      if (process.env.CI !== 'true') {
+      if (proc.env.CI !== 'true') {
         // Whenever we get some data over stdin
         ['data'].forEach(function (ev) {
           console.log();
-          process.stdin.on(ev, () => {
+          proc.stdin.on(ev, () => {
             console.log('stdin recieved event:', util.styleText('cyan', ev));
             // Cancel the already-running build
             ctx
@@ -516,12 +547,12 @@ const start: start = async (
           });
         });
         // Gracefully exit when stdin ends
-        process.stdin.on('end', function () {
+        proc.stdin.on('end', function () {
           console.log();
           console.log(`shutting down gracefully...`);
           ctx.cancel().then(() => {
             ctx.dispose().then(() => {
-              process.exit();
+              proc.exit();
             });
           });
         });

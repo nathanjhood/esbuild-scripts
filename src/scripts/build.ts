@@ -150,14 +150,31 @@ const build: build = async (
 
   const logLevel = buildOptions.logLevel;
 
-  const buildServiceWorker = () => {
-    return esbuild.buildSync({
+  const buildServiceWorker = async () => {
+    return await esbuild.build({
       entryPoints: [paths.swSrc],
-      bundle: true,
+      bundle: false, // TODO: how to set the swr build up?
       minify: false,
       // outdir: paths.appBuild,
       outfile: path.resolve(paths.appBuild, 'service-worker.js'),
     });
+  };
+
+  const buildHTML = (options: { appHtml: string; appBuild: string }) => {
+    let html = fs.readFileSync(options.appHtml, { encoding: 'utf8' });
+    // let htmlresult;
+    Object.keys(proc.env).forEach((key) => {
+      const escapeStringRegexp = (str: string) => {
+        return str
+          .replace(/[|\\{}()[\]^$+*?.]/g, '\\$&')
+          .replace(/-/g, '\\x2d');
+      };
+      const value = proc.env[key];
+      const htmlsrc = new RegExp('%' + escapeStringRegexp(key) + '%', 'g');
+
+      if (value) html = html.replaceAll(htmlsrc, value);
+    });
+    return fs.writeFileSync(path.resolve(options.appBuild, 'index.html'), html);
   };
 
   /**
@@ -165,13 +182,19 @@ const build: build = async (
    * @param paths
    * @returns {void}
    */
-  const copyPublicFolder: (paths: {
+  const copyPublicFolder: (options: {
     appPublic: string;
     appBuild: string;
-  }) => void = (paths: { appPublic: string; appBuild: string }): void => {
-    return fs.cpSync(paths.appPublic, paths.appBuild, {
+    appHtml: string;
+  }) => void = (options: {
+    appPublic: string;
+    appBuild: string;
+    appHtml: string;
+  }): void => {
+    return fs.cpSync(options.appPublic, options.appBuild, {
       dereference: true,
       recursive: true,
+      filter: (file) => file !== options.appHtml,
     });
   };
 
@@ -314,9 +337,21 @@ const build: build = async (
     appBuild: options && options.outdir ? options.outdir : paths.appBuild,
     appPublic:
       options && options.publicPath ? options.publicPath : paths.appPublic,
+    appHtml:
+      options && options.publicPath
+        ? options.publicPath + '/index.html'
+        : paths.appHtml,
   });
 
   if (fs.existsSync(paths.swSrc)) buildServiceWorker();
+
+  buildHTML({
+    appBuild: options && options.outdir ? options.outdir : paths.appBuild,
+    appHtml:
+      options && options.publicPath
+        ? options.publicPath + '/index.html'
+        : paths.appHtml,
+  });
 
   //
   return esbuild

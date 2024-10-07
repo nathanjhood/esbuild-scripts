@@ -93,7 +93,7 @@ const getClientEnvironment: getClientEnvironment = (
     NODE_ENV: 'development' | 'test' | 'production';
     PUBLIC_URL: string;
     WDS_SOCKET_HOST: string | undefined;
-    WDS_SOCKET_PATH: string;
+    WDS_SOCKET_PATH: string | undefined;
     WDS_SOCKET_PORT: string | undefined;
     FAST_REFRESH: 'true' | 'false';
     // __TEST_VARIABLE__: string | undefined;
@@ -111,9 +111,9 @@ const getClientEnvironment: getClientEnvironment = (
     // They are used as the connection `hostname`, `pathname` and `port`
     // in webpackHotDevClient. They are used as the `sockHost`, `sockPath`
     // and `sockPort` options in webpack-dev-server.
-    WDS_SOCKET_HOST: proc.env.WDS_SOCKET_HOST, // || window.location.hostname,
-    WDS_SOCKET_PATH: proc.env.WDS_SOCKET_PATH || '/ws',
-    WDS_SOCKET_PORT: proc.env.WDS_SOCKET_PORT, // || window.location.port,
+    WDS_SOCKET_HOST: proc.env.WDS_SOCKET_HOST || undefined, // window.location.hostname,
+    WDS_SOCKET_PATH: proc.env.WDS_SOCKET_PATH || undefined, // '/ws',
+    WDS_SOCKET_PORT: proc.env.WDS_SOCKET_PORT || undefined, // window.location.port,
     // Whether or not react-refresh is enabled.
     // It is defined here so it is available in the webpackHotDevClient.
     FAST_REFRESH: proc.env.FAST_REFRESH || 'false', // !== 'false',
