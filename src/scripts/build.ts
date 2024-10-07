@@ -151,8 +151,8 @@ const build: build = async (
 
   const logLevel = buildOptions.logLevel;
 
-  const buildServiceWorker = () => {
-    return esbuild.buildSync({
+  const buildServiceWorker = async () => {
+    return await esbuild.build({
       entryPoints: [paths.swSrc],
       bundle: false, // TODO: how to set the swr build up?
       minify: false,
@@ -162,13 +162,20 @@ const build: build = async (
   };
 
   const buildHTML = () => {
-    return esbuild.buildSync({
-      entryPoints: [paths.appHtml],
-      bundle: false,
-      minify: false,
-      // outdir: paths.appBuild,
-      outfile: path.resolve(paths.appBuild, 'index.html'),
+    let html = fs.readFileSync(paths.appHtml, { encoding: 'utf8' });
+    // let htmlresult;
+    Object.keys(proc.env).forEach((key) => {
+      const escapeStringRegexp = (str: string) => {
+        return str
+          .replace(/[|\\{}()[\]^$+*?.]/g, '\\$&')
+          .replace(/-/g, '\\x2d');
+      };
+      const value = proc.env[key];
+      const htmlsrc = new RegExp('%' + escapeStringRegexp(key) + '%', 'g');
+
+      if (value) html = html.replaceAll(htmlsrc, value);
     });
+    return fs.writeFileSync(path.resolve(paths.appBuild, 'index.html'), html);
   };
 
   /**

@@ -162,33 +162,6 @@ const getBuildOptions: getBuildOptions = (
       })(),
       (() => {
         return {
-          name: 'html',
-          setup(build) {
-            const escapeStringRegexp = (str: string) => {
-              str.replace(/[|\\{}()[\]^$+*?.]/g, '\\$&').replace(/-/g, '\\x2d');
-            };
-            // Run HTML through a series of user-specified string replacements.
-            build.onLoad({ filter: /\.html$/ }, async (args) => {
-              let html = await fs.promises.readFile(args.path, 'utf8');
-              Object.keys(proc.env).forEach((key) => {
-                const value = proc.env[key];
-                if (value)
-                  html = html.replace(
-                    new RegExp('%' + escapeStringRegexp(key) + '%', 'g'),
-                    value
-                  );
-              });
-
-              return {
-                contents: html,
-                loader: 'file',
-              };
-            });
-          },
-        };
-      })(),
-      (() => {
-        return {
           name: 'txt',
           setup(build) {
             // Load ".txt" files and return an array of words
