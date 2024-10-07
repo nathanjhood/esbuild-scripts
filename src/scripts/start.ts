@@ -176,6 +176,16 @@ const start: start = async (
     });
   };
 
+  const buildHTML = () => {
+    return esbuild.buildSync({
+      entryPoints: [paths.appHtml],
+      bundle: false,
+      minify: false,
+      // outdir: paths.appBuild,
+      outfile: path.resolve(paths.appBuild, 'index.html'),
+    });
+  };
+
   /**
    *
    * @param paths
@@ -184,10 +194,16 @@ const start: start = async (
   const copyPublicFolder: (paths: {
     appPublic: string;
     appBuild: string;
-  }) => void = (paths: { appPublic: string; appBuild: string }): void => {
+    appHtml: string;
+  }) => void = (paths: {
+    appPublic: string;
+    appBuild: string;
+    appHtml: string;
+  }): void => {
     return fs.cpSync(paths.appPublic, paths.appBuild, {
       dereference: true,
       recursive: true,
+      filter: (file) => file !== paths.appHtml,
     });
   };
 
@@ -382,9 +398,12 @@ const start: start = async (
     appBuild: options && options.outdir ? options.outdir : paths.appBuild,
     appPublic:
       options && options.publicPath ? options.publicPath : paths.appPublic,
+    appHtml: paths.appHtml,
   });
 
   if (fs.existsSync(paths.swSrc)) buildServiceWorker();
+
+  buildHTML();
 
   return esbuild
     .context(buildOptions)
