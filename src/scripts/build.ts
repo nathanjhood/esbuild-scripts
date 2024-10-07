@@ -12,6 +12,7 @@ import util = require('node:util');
 import fs = require('node:fs');
 import path = require('node:path');
 import node_console = require('node:console');
+import childProcess = require('node:child_process');
 import esbuild = require('esbuild');
 import parseEnv = require('../process/parseEnv');
 import getClientPaths = require('../config/getClientPaths');
@@ -153,11 +154,95 @@ const build: build = async (
   const buildServiceWorker = () => {
     return esbuild.buildSync({
       entryPoints: [paths.swSrc],
-      bundle: true,
+      bundle: false, // TODO: how to set the swr build up?
       minify: false,
       // outdir: paths.appBuild,
       outfile: path.resolve(paths.appBuild, 'service-worker.js'),
     });
+  };
+
+  const buildTailwindStyles = async (
+    result: ESBuild.BuildResult<ESBuild.BuildOptions>
+  ) => {
+    const tailwindConfig = path.resolve(paths.appSrc, 'tailwind.config.js');
+    const postcssConfig = path.resolve(paths.appSrc, 'postcss.config.js');
+    const usePostCSS = fs.existsSync(postcssConfig);
+    //
+    result.outputFiles!.forEach((outputfile) => {
+      const parsedOutputFilePath = path.parse(outputfile.path);
+      if (parsedOutputFilePath.ext === '.css') {
+        //
+        const input = '--input' + ' ' + path.format(parsedOutputFilePath);
+        const output = '--output' + ' ' + path.format(parsedOutputFilePath);
+        const config = '--config' + ' ' + tailwindConfig;
+        const postcss = usePostCSS ? '--postcss' + ' ' + postcssConfig : '';
+        const cmd =
+          'npx' +
+          ' ' +
+          'tailwindcss' +
+          ' ' +
+          config +
+          ' ' +
+          postcss +
+          ' ' +
+          input +
+          ' ' +
+          output;
+
+        const tailwindResult = childProcess.spawnSync(cmd, {
+          argv0: 'npx',
+        });
+        if (tailwindResult.signal) {
+          switch (tailwindResult.signal) {
+            default: {
+              throw new Error('Recieved unhandled signal', {
+                cause: tailwindResult.signal,
+              });
+            }
+            case 'SIGKILL': {
+              ac.abort(tailwindResult.signal);
+              fs.writeSync(
+                proc.stderr.fd,
+                util.format(
+                  'The build failed because the process exited too early. ' +
+                    'This probably means the system ran out of memory or someone called ' +
+                    '`kill -9` on the process.'
+                ),
+                null,
+                'utf8'
+              );
+              return proc.exit(1);
+            }
+            case 'SIGTERM': {
+              ac.abort(tailwindResult.signal);
+              fs.writeSync(
+                proc.stderr.fd,
+                util.format(
+                  'The build failed because the process exited too early. ' +
+                    'Someone might have called `kill` or `killall`, or the system could ' +
+                    'be shutting down.'
+                ),
+                null,
+                'utf8'
+              );
+              return proc.exit(1);
+            }
+            case 'SIGABRT': {
+              fs.writeSync(
+                proc.stderr.fd,
+                util.format(tailwindResult.signal),
+                null,
+                'utf8'
+              );
+              // return proc.exit(1);
+            }
+          }
+          proc.exit(1); // TODO - optional...
+        }
+      }
+    });
+
+    return result;
   };
 
   /**
@@ -321,6 +406,12 @@ const build: build = async (
   //
   return esbuild
     .build<ESBuild.BuildOptions>(buildOptions)
+    .then<ESBuild.BuildResult<ESBuild.BuildOptions>>(
+      buildTailwindStyles,
+      (err) => {
+        throw err;
+      }
+    )
     .then<ESBuild.BuildResult<ESBuild.BuildOptions>>(logMangleCache, (err) => {
       throw err;
     })
