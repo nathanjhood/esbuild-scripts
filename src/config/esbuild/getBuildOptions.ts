@@ -94,9 +94,11 @@ const getBuildOptions: getBuildOptions = (
       '.js': 'js',
       '.tsx': 'tsx',
       '.ts': 'ts',
-      '.svg': 'base64',
+      '.svg': 'file',
       '.png': 'file',
       '.ico': 'file',
+      '.gif': 'file',
+      '.bmp': 'file'
     },
     // external: ['react', 'react-dom'],
     // TODO: fix paths with HTML interp plugin
