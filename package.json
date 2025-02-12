@@ -1,6 +1,6 @@
 {
   "name": "@nathanjhood/esbuild-scripts",
-  "version": "0.0.23",
+  "version": "0.0.24",
   "license": "MIT",
   "homepage": "https://github.com/nathanjhood/esbuild-scripts",
   "private": false,
@@ -17,7 +17,7 @@
     "minify": "pkgroll --minify",
     "sourcemap": "pkgroll --sourcemap",
     "type-check": "tsc --noEmit",
-    "prepublishOnly": "pkgroll --build --clean-dist --sourcemap",
+    "prepublishOnly": "pkgroll --build --clean-dist",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --check ./**/*.{js,jsx,ts,tsx,css,md,json} --config ./prettier.config.mjs",
