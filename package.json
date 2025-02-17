@@ -234,7 +234,7 @@
   "devDependencies": {
     "@eslint/js": "^9.13.0",
     "@types/node": "22.10.7",
-    "cli-testing-library": "^2.0.2",
+    "cli-testing-library": "^3.0.1",
     "debug": "^4.3.7",
     "eslint": "^9.13.0",
     "eslint-config-prettier": "9.1.0",
