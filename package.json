@@ -225,7 +225,7 @@
   "dependencies": {
     "browserslist": "^4.24.4",
     "ms": "^2.1.3",
-    "pkgroll": "2.6.1",
+    "pkgroll": "2.11.0",
     "tsx": "4.19.2"
   },
   "peerDependencies": {
