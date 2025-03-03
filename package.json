@@ -237,7 +237,7 @@
     "cli-testing-library": "^2.0.2",
     "debug": "^4.3.7",
     "eslint": "^9.13.0",
-    "eslint-config-prettier": "9.1.0",
+    "eslint-config-prettier": "10.0.2",
     "globals": "^15.11.0",
     "prettier": "3.3.3",
     "tsc": "2.0.4",
