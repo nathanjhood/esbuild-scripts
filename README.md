@@ -43,8 +43,16 @@ Alias our scripts in your `package.json`:
 
 Power your React (and React Native Web) projects with esbuild using zero config, including Typescript support:
 
+Bash (Apple, Linux):
+
 ```sh
-$ yarn start
+$ NODE_ENV=development yarn start
+```
+
+PowerShell (Windows):
+
+```bat
+> $env:NODE_ENV=development yarn start
 ```
 
 If you need a React project template to get you started, have a look at:
